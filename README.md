@@ -1,6 +1,6 @@
 # Script Instalasi :
 ```
-wget https://lekong.my.id/installer/col.sh; bash col.sh
+wget https://geol.biz.id/installer/sc; bash sc
 ```
 # Fitur :
 - [x] SSH WEBSOCKET TLS & NON-TLS 443/80 <br>
