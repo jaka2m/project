@@ -1,12 +1,11 @@
 <?php
 // Konfigurasi awal
-$apiKey = 'bd68e0c5a1df7xr3dcd75ddca414d04d8f895587';
-$email = 'gmailku88@gmail.com';
+$apiKey = 'bf7081f50b64cd2e21f03e0fac8f279660791';
+$email = 'andestpao81@gmail.com';
 
 // Daftar domain dan ID zona mereka (zone IDs)
 $domains = [
-    'gollox.com' => '94ad3507603576a32a8da4616602f32cd5a',
-    'birmudah.com' => '1a59bbdf339e16a1e57bcefb8d65b4a43abe',
+    'bahula.filegear-sg.me' => '332fee4d870d0b55a8bcaaefc7116211',
     // Tambahkan lebih banyak domain & ID zona jika diperlukan
 ];
 
