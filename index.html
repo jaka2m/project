@@ -1,161 +1,237 @@
 <style>
-	:root {
-  --color-primary: #0073ff;
-  --color-white: #e9e9e9;
-  --color-black: #141d28;
-  --color-black-1: #212b38;
+	.navbar {
+  margin: 6px;
+  border-radius: 16px;
+  border-top: 2px solid #009970;
+  border-bottom: 2px solid #009970;
+  border-left: 2px solid #009970;
+  border-right: 2px solid #009970;
+ padding: 0.5rem;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: sans-serif;
- 
-}
-
-.logo {
-  color: var(--color-white);
-  font-size: 30px;
-}
-
-.logo span {
-  color: var(--color-primary);
-}
-
-.menu-bar {
-  background-color: var(--color-black);
-  height: 80px;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 5%;
-
-  position: relative;
-}
-
-.menu-bar ul {
-  list-style: none;
-  display: flex;
-}
-
-.menu-bar ul li {
-  /* width: 120px; */
-  padding: 10px 30px;
-  /* text-align: center; */
-
-  position: relative;
-}
-
-.menu-bar ul li a {
+.navbar-brand {
+  font-weight: 500;
+  color: #009970;
   font-size: 20px;
-  color: var(--color-white);
+  transition: 0.2s color;
+}
+
+.flex>img {
+  background-color: #fff;
+  height: 50px;
+  margin: 5px;
+  border-radius: 16px;
+  text-align: center;
+}
+
+.nav-login {
+  background-color: #009970;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 8px 20px;
+  border-radius: 50px;
   text-decoration: none;
-
-  transition: all 0.3s;
+  transition: 0.3s background-color;
 }
 
-.menu-bar ul li a:hover {
-  color: var(--color-primary);
+.nav-login:hover {
+  background-color: #00b383;
 }
 
-.fas {
-  float: right;
-  margin-left: 10px;
-  padding-top: 3px;
+.navbar-toggler {
+  background-color: #009970;
+  border: none;
+  font-size: 1.25rem;
 }
 
-/* dropdown menu style */
-.dropdown-menu {
-  display: none;
+.navbar-toggler:focus, .btn-close:focus{
+  box-shadow: none;
+  outline: none;
 }
 
-.menu-bar ul li:hover .dropdown-menu {
-  display: block;
-  position: absolute;
-  left: 0;
-  top: 100%;
-  background-color: var(--color-black);
+.nav-link {
+  font-weight: 500;
+  position: relative;
 }
 
-.menu-bar ul li:hover .dropdown-menu ul {
-  display: block;
-  margin: 10px;
+.nav-link:hover, .nav-link.active {
+  color: #fff;
 }
 
-.menu-bar ul li:hover .dropdown-menu ul li {
-  width: 150px;
-  padding: 10px;
+@media (min-width: 991px) {
+  .nav-link:before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 2px;
+    background-color: #009970;
+    visibility: hidden;
+    transition: 0.2s ease-in-out;
+  }
 }
 
-.dropdown-menu-1 {
-  display: none;
+.nav-link:hover::before, .nav-link.active::before{
+  width: 100%;
+  visibility: visible;
 }
-
-.dropdown-menu ul li:hover .dropdown-menu-1 {
-  display: block;
-  position: absolute;
-  left: 150px;
-  top: 0;
-  background-color: var(--color-black);
-}
-
-.hero {
-  height: calc(100vh - 80px);
-  background-image: url(./bg.jpg);
-  background-position: center;
-}
-
-
 	</style>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"/>
-    <link rel="stylesheet" href="style.css" />
-    <title>dropdown Menu</title>
-  </head>
-  <body>
-    <div class="menu-bar">
-      <h1 class="logo">Light<span>Code.</span></h1>
-      <ul>
-        <li><a href="#">Home</a></li>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Pages <i class="fas fa-caret-down"></i></a>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  
+  <!-- boostrap css -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link href="style.css" rel="stylesheet">
+  <title>Free VPN</title>
+</head>
+<body class="bg-dark">
+  <!-- navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">VLESS FREE</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link text-light" aria-current="page" href="/">Home</a>
+        </li>
+        <!-- akun vless -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            ABOUT
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item"></a></li>
+            <div class="row text-center align-items-center text-dark mt-4">
+    <div class="col-12">
+      <p><i>(Akun Vless Ada Di Garis 3 Pojok Kanan Atas)</p></i>
+      <p>Jika Ada Kendala Dengan Akun Vlessnya Bisa Chat Saya Di Telegram Atau Chat Di Grup</p></i>
+      <p><h2>Warning!</h2></p>
+      <i>Akun vless/trojan ini gratis, tidak untuk di perjual belikan</i>
+    </div>
+  </div>
+          </ul>
+        </li>
+        
+                <!-- akun vless -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            VLESS
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://id-google.jam.mahal.filegear-sg.me/geo">VLESS ID-GCP</a></li>
+            <li><a class="dropdown-item" href="https://sg-alibaba.jam.mahal.filegear-sg.me/geo">VLESS SG-ALIBABA</a></li>
+            <li><a class="dropdown-item" href="https://sg-aws.jam.mahal.filegear-sg.me/geo">VLESS SG-AWS</a></li>
+            <li><a class="dropdown-item" href="https://sg-do.jam.mahal.filegear-sg.me/geo">VLESS SG-DO</a></li>
+            <li><a class="dropdown-item" href="https://sg-tencent.jam.mahal.filegear-sg.me/geo">VLESS SG-TENCENT</a></li>
+          </ul>
+        </li>
+                <!-- and akun vless -->
 
-            <div class="dropdown-menu">
-                <ul>
-                  <li><a href="#">Pricing</a></li>
-                  <li><a href="#">Portfolio</a></li>
-                  <li>
-                    <a href="#">Team <i class="fas fa-caret-right"></i></a>
-                    
-                    <div class="dropdown-menu-1">
-                      <ul>
-                        <li><a href="#">Team-1</a></li>
-                        <li><a href="#">Team-2</a></li>
-                        <li><a href="#">Team-3</a></li>
-                        <li><a href="#">Team-4</a></li>
-                      </ul>
-                    </div>
-                  </li>
-                  <li><a href="#">FAQ</a></li>
-                </ul>
-              </div>
+                <!-- Akun Trojan -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            TROJAN
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">TROJAN ID-GCP</a></li>
+            <li><a class="dropdown-item" href="#">TROJAN SG-ALIBABA</a></li>
+            <li><a class="dropdown-item" href="#">TROJAN SG-AWS</a></li>
+            <li><a class="dropdown-item" href="#">TROJAN SG-DO</a></li>
+            <li><a class="dropdown-item" href="#">TROJAN SG-OVH</a></li>
+          </ul>
         </li>
-        <li><a href="#">Blog</a>
+                <!-- And Akun Trojan -->
+        
+                <!-- pointing akun -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            VLESS+WILDCARD
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">XL XCL WLG</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">XL VIDIO</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">XL SPOTIFY</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">XL INSTAGRAM</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">XL FREEFIRE</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">XL WHATSAPP</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">XL VIU</a></li>
+          </ul>
         </li>
-        <li><a href="#">Contact us</a></li>
+                <!-- and pointing akun -->
+        
       </ul>
+      <div class="d-flex" role="search">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item" id="navbarSupportedContent">
+          <a class="nav-login active" aria-current="page" href="https://t.me/sampiiiiu">Contact me</a>
+        </li>
+        </ul>
+      </div>
     </div>
-
-    <div class="hero">
-      &nbsp;
+  </div>
+</nav>
+  <!-- end navbar -->
+  
+  <!-- layout start -->
+  <div class="container-fluid text-light mt-2">
+    
+    <!-- carousel start -->
+  <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="https://raw.githubusercontent.com/jaka2m/mau/kepo/assets/img/1.jpg" class="d-block w-100" width="400" height="500">
     </div>
-  </body>
+    <div class="carousel-item">
+      <img src="https://raw.githubusercontent.com/jaka2m/mau/kepo/assets/img/2.jpg" class="d-block w-100" width="400" height="500">
+    </div>
+    <div class="carousel-item">
+      <img src="https://raw.githubusercontent.com/jaka2m/mau/kepo/assets/img/3.jpg" class="d-block w-100" width="400" height="500">
+    </div>
+    <div class="carousel-item">
+      <img src="https://raw.githubusercontent.com/jaka2m/mau/kepo/assets/img/4.jpg" class="d-block w-100" width="400" height="500">
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+    <!-- carousel and -->
+  
+  <!-- footer -->
+<footer class="bg-light text-dark" style="height: 155px;">
+  <div class="mx-auto max-w-screen-2xl px-3 py-6 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center sm:justify-between">
+      <div class="flex justify-center text-indigo-400 sm:justify-start text-center">
+        <img src="https://raw.githubusercontent.com/jaka2m/mau/kepo/assets/img/logo.jpg" width="200" height="50" class="mt-3 rounded-5">
+        <i><h5>VLESS & TROJAN</h5></i>
+        <br />
+      <i>Copyright &copy; 2024. All rights reserved</i>
+  </div>
+</footer>
+<!-- and footer -->
+  <!-- layout and -->
+  
+  <!-- boostrap js -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
 </html>
