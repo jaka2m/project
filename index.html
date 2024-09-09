@@ -1,45 +1,318 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta http-equiv="refresh" content="5;url=http://hamzah.serv00.net">
-    <title>direck</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Website untuk cek alamat IP support VLESS">
+    <title>IP CF Checker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        :root {
+            --bg-color-light: #e0e5ec;
+            --bg-color-dark: #2e3b4e;
+            --shadow-light: #ffffff;
+            --shadow-dark: #a3b1c6;
+            --primary-color: #007BFF;
+            --primary-color-dark: #0056b3;
+            --text-color-light: #333;
+            --text-color-dark: #f0f0f0;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
             margin: 0;
-        }
-        .container {
-            text-align: center;
-            background: white;
+            font-family: Arial, sans-serif;
+            background: var(--bg-color-light);
+            color: var(--text-color-light);
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
         }
-        a {
-            color: #3498db;
-            text-decoration: none;
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            background: var(--bg-color-light);
+            box-shadow: 0 0 16px var(--shadow-dark), 0 0 16px var(--shadow-light);
+            border-radius: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2em;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        #ipInput {
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            outline: none;
+            font-size: 1em;
+            box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light);
+            background: var(--bg-color-light);
+            resize: none;
+            height: 120px;
+        }
+
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            outline: none;
+            font-size: 1em;
+            background-color: var(--primary-color);
+            color: var(--text-color-light);
+            cursor: pointer;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light);
+        }
+
+        button:hover {
+            background-color: var(--primary-color-dark);
+            box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+        }
+
+        .spinner {
+            display: none;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #ipData {
+            margin-top: 20px;
+            display: grid;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .ip-box {
+            position: relative;
+            background: var(--bg-color-light);
+            border-radius: 15px;
+            box-shadow: 0 0 16px var(--shadow-dark), 0 0 16px var(--shadow-light);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .copy-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            background-image: url('copy.img'); /* Placeholder background image */
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        .ip-header {
             font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.2em;
         }
-        a:hover {
+
+        .ip-info {
+            display: grid;
+            gap: 10px;
+        }
+
+        .output-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1px 0;
+        }
+
+        .output-key {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .output-value {
+            color: #333;
+        }
+
+        .credits {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1em;
+            color: #333;
+        }
+
+        .credits a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .credits a:hover {
             text-decoration: underline;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 8px var(--shadow-dark);
+            transition: background-color 0.3s;
+            font-size: 1.5em;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--primary-color-dark);
+        }
+
+        @media (max-width: 600px) {
+            .input-section {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+                margin-top: 10px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Redirecting...</h1>
-        <p>Anda akan diarahkan ke <a href="http://hamzah.serv00.net">MANUSIA PLANGA PLONGO</a>.</p>
-        <p>Jika Anda tidak minat, <a href="http://hamzah.serv00.net">klik di sini</a>.</p>
+        <h1 class="title">IP CF Checker</h1>
+        <div class="input-section">
+            <textarea id="ipInput" placeholder="Enter IP Address (one per line or comma-separated)" rows="5"></textarea>
+            <button onclick="checkIPs()">Check IPs</button>
+        </div>
+        <div id="notification"></div>
+        <div id="spinner" class="spinner"></div>
+        <div id="ipData"></div>
+        <div class="credits">
+            <p>developered. by <a href="https://t.me/sampiiiiu">Geo Project</a></p>
+        </div>
     </div>
-    <script type="text/javascript">
-        setTimeout(function() {
-            window.location.href = "http://hamzah.serv00.net";
-        }, 10000); // Mengarahkan setelah 5 detik
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-sun" id="themeIcon"></i>
+    </div>
+    <script>
+        const telegramBotToken = '6718815916:AAFGaokOugl7qKxTdXCAYoq9bIeYEksWM54'; // Ganti dengan token bot Telegram Anda
+        const telegramChatId = '1467883032'; // Ganti dengan chat ID Telegram Anda
+
+        async function checkIPs() {
+            const ipInput = document.getElementById('ipInput').value.trim();
+            const ipAddresses = ipInput.split(/\s*[\n,;]\s*/).filter(ip => ip);
+
+            if (ipAddresses.length === 0) {
+                document.getElementById('notification').textContent = 'Please enter at least one IP address.';
+                return;
+            }
+
+            document.getElementById('notification').textContent = '';
+            document.getElementById('spinner').style.display = 'block';
+            document.getElementById('ipData').innerHTML = '';
+
+            const results = [];
+
+            for (const ip of ipAddresses) {
+                const apiUrl = `https://israel-babi.vlessipcf.us.kg/key=babi/ip=${ip}`;
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
+
+                try {
+                    const response = await fetch(proxyUrl);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    results.push({ ip, data });
+                } catch (error) {
+                    results.push({ ip, data: { error: error.message } });
+                }
+            }
+
+            results.forEach(result => {
+                const ipBox = document.createElement('div');
+                ipBox.className = 'ip-box';
+                ipBox.innerHTML = `
+                    <span class="copy-icon" onclick="copyToClipboard('${result.ip}')"></span>
+                    <div class="ip-header">${result.ip}</div>
+                    <div class="ip-info">
+                        ${result.data.error ? `<div class="output-item"><span class="output-key">Error:</span><span class="output-value">${result.data.error}</span></div>` : 
+                        `
+                            <div class="output-item"><span class="output-key">Country:</span><span class="output-value">${result.data.country}</span></div>
+                            <div class="output-item"><span class="output-key">City:</span><span class="output-value">${result.data.city}</span></div>
+                            <div class="output-item"><span class="output-key">ISP:</span><span class="output-value">${result.data.isp}</span></div>
+                            <div class="output-item"><span class="output-key">Proxy:</span><span class="output-value">${result.data.proxyStatus}</span></div>
+                        `}
+                    </div>
+                `;
+                document.getElementById('ipData').appendChild(ipBox);
+            });
+
+            document.getElementById('spinner').style.display = 'none';
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            }).catch(err => {
+                console.error('Error copying to clipboard: ', err);
+            });
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                body.style.background = 'var(--bg-color-light)';
+                body.style.color = 'var(--text-color-light)';
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                body.classList.add('dark-mode');
+                body.style.background = 'var(--bg-color-dark)';
+                body.style.color = 'var(--text-color-dark)';
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        }
     </script>
 </body>
 </html>
