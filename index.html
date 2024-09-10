@@ -7,205 +7,216 @@
   <title>IP CF Checker</title>
   <style>
     body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Poppins', sans-serif;
-  background: url('https://picsum.photos/1920/1080?random') no-repeat center center fixed;
-  background-size: cover;
-  color: #f5f5f5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  overflow: auto;
-  transition: filter 0.3s ease;
-  
-}
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url('https://picsum.photos/1920/1080?random') no-repeat center center fixed;
+      background-size: cover;
+      color: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: auto;
+      transition: filter 0.3s ease;
+    }
 
-.container {
-  width: 80%;
-  max-width: 1200px;
-  margin-top: 50px;
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 15px;
-  padding: 30px;
-  box-shadow: 0 0 16px var(--shadow-dark), 0 0 16px var(--shadow-light);
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
-  animation: fadeIn 1s ease-in-out;
-  overflow-y: auto;
-  max-height: 80vh;
-}
+    .container {
+      width: 80%;
+      max-width: 1200px;
+      margin-top: 50px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 0 16px rgba(0, 0, 0, 0.8), 0 0 16px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(1px);
+      -webkit-backdrop-filter: blur(1px);
+      animation: fadeIn 1s ease-in-out;
+      overflow-y: auto;
+      max-height: 80vh;
+    }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-.header {
-  text-align: center;
-  margin-bottom: 40px;
-}
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
 
-.header h1 {
-  font-size: 25px;
-  color: #00a8ff;
-  margin: 0;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 4px;
-  animation: slideInDown 1s ease-out;
-}
+    .header h1 {
+      font-size: 25px;
+      color: #00a8ff;
+      margin: 0;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      animation: slideInDown 1s ease-out;
+    }
 
-@keyframes slideInDown {
-  from { transform: translateY(-50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
+    @keyframes slideInDown {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
 
-.input-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 30px;
-}
+    .input-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 30px;
+    }
 
-.input-section textarea {
-  width: 100%;
-  max-width: 700px;
-  height: 100px;
-  padding: 10px;
-  font-size: 16px;
-  border: 2px solid #00a8ff;
-  border-radius: 5px;
-  outline: none;
-  transition: border-color 0.3s ease;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  resize: none;
-}
+    .input-section textarea {
+      width: 100%;
+      max-width: 700px;
+      height: 100px;
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #00a8ff;
+      border-radius: 5px;
+      outline: none;
+      transition: border-color 0.3s ease;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      resize: none;
+    }
 
-.input-section textarea:focus {
-  border-color: #ff5e57;
-}
+    .input-section textarea:focus {
+      border-color: #ff5e57;
+    }
 
-.input-section button {
-  background-color: #00a8ff;
-  border: none;
-  color: #fff;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-  margin-top: 10px;
-}
+    .input-section button {
+      background-color: #00a8ff;
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      margin-top: 10px;
+    }
 
-.input-section button:hover {
-  background-color: #ff5e57;
-  transform: scale(1.05);
-}
+    .input-section button:hover {
+      background-color: #ff5e57;
+      transform: scale(1.05);
+    }
 
-.spinner {
-  display: none;
-  margin: 20px auto;
-  border: 5px solid rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  border-top: 5px solid #00a8ff;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-}
+    .spinner {
+      display: none;
+      margin: 20px auto;
+      border: 5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top: 5px solid #00a8ff;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-.output-table {
-  width: 100%;
-  border-collapse: collapse;
-}
+    .output-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
 
-.output-table th, .output-table td {
-  padding: 10px;
-  text-align: left;
-  border-bottom: 1px solid #00a8ff;
-}
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      font-size: 14px;
+      color: #f5f5f5;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
-.output-table th {
-  background-color: rgba(0, 0, 0, 0.5);
-  color: #00a8ff;
-}
+    .info-row strong {
+      flex: 1;
+      text-align: left;
+    }
 
-.output-table td {
-  background-color: rgba(0, 0, 0, 0.6);
-  color: #f5f5f5;
-}
+    .info-row span {
+      flex: 2;
+      text-align: right;
+    }
 
-.credits {
-  text-align: center;
-  font-size: 14px;
-  color: #fff;
-  margin-top: 20px;
-}
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, rgba(0, 168, 255, 0.2), rgba(255, 255, 255, 0.5), rgba(0, 168, 255, 0.2));
+      box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.3);
+      margin: 20px 0;
+    }
 
-.credits a {
-  color: #00a8ff;
-  text-decoration: none;
-}
+    .credits {
+      text-align: center;
+      font-size: 14px;
+      color: #fff;
+      margin-top: 20px;
+    }
 
-.credits a:hover {
-  text-decoration: underline;
-}
+    .credits a {
+      color: #00a8ff;
+      text-decoration: none;
+    }
 
-/* Blur mode styles */
-body.blur-mode {
-  filter: blur(5px);
-  background-color: rgba(255, 255, 255, 0.8);
-}
+    .credits a:hover {
+      text-decoration: underline;
+    }
 
-.toggle-container {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  z-index: 9999;
-}
+    /* Blur mode styles */
+    body.blur-mode {
+      filter: blur(5px);
+      background-color: rgba(255, 255, 255, 0.8);
+    }
 
-.toggle-button {
-  width: 30px;
-  height: 30px;
-  background-color: #007bff;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  color: #fff;
-  animation: rotateBlur 4s linear infinite;
-}
+    .toggle-container {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 9999;
+    }
 
-@keyframes rotateBlur {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+    .toggle-button {
+      width: 30px;
+      height: 30px;
+      background-color: #007bff;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: #fff;
+      animation: rotateBlur 4s linear infinite;
+    }
 
-.toggle-button:hover {
-  background-color: #0056b3;
-}
+    @keyframes rotateBlur {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-.logo-container {
-  position: fixed;
-  bottom: 10px;
-  left: 10px;
-}
+    .toggle-button:hover {
+      background-color: #0056b3;
+    }
 
-.logo-container img {
-  width: 100px;
-  height: auto;
-}
+    .logo-container {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+    }
 
+    .logo-container img {
+      width: 100px;
+      height: auto;
+    }
   </style>
 </head>
 <body>
@@ -229,7 +240,6 @@ body.blur-mode {
       <i class="fas fa-sun"></i>
     </button>
   </div>
-      </div>
   <script>
     const checkIPs = async () => {
       const ipInput = document.getElementById('ipInput').value;
@@ -253,25 +263,24 @@ body.blur-mode {
 
           const { ip: ipAddress, isp, country, city, proxyStatus } = data;
 
-          const table = document.createElement('table');
-          table.className = 'output-table';
-          table.innerHTML = `
-            <th>IP :</th><td>${ipAddress}</td></tr>
-            <tr><th>ISP :</th><td>${isp}</td></tr>
-            <tr><th>Country :</th><td>${country}</td></tr>
-            <tr><th>City :</th><td>${city}</td></tr>
-            <tr><th>Proxy :</th><td>${proxyStatus}</td></tr>
-            <br>
-            	<br>
+          const outputSection = document.createElement('div');
+          outputSection.className = 'output-section';
+          outputSection.innerHTML = `
+            <div class="info-row"><strong>IP Address :</strong><span>${ipAddress}</span></div>
+            <div class="info-row"><strong>ISP :</strong><span>${isp}</span></div>
+            <div class="info-row"><strong>ISP City :</strong><span>${city}</span></div>
+            <div class="info-row"><strong>Country :</strong><span>${country}</span></div>
+            <div class="info-row"><strong>Proxy :</strong><span>${proxyStatus}</span></div>
           `;
 
-          document.getElementById('ipData').appendChild(table);
+          document.getElementById('ipData').appendChild(outputSection);
+
+          // Garis pembatas
+          const divider = document.createElement('div');
+          divider.className = 'divider';
+          document.getElementById('ipData').appendChild(divider);
         } catch (error) {
-          console.error('Error fetching IP data:', error);
-          const errorMessage = document.createElement('div');
-          errorMessage.className = 'output-item';
-          errorMessage.innerHTML = `<div class="output-value">Error fetching data for IP: ${ip}</div>`;
-          document.getElementById('ipData').appendChild(errorMessage);
+          console.error(`Failed to fetch data for IP ${ip}:`, error);
         }
       }
 
