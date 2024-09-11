@@ -86,23 +86,37 @@
     .input-section textarea:focus {
       border-color: #ff5e57;
     }
-
-    .input-section button {
-      background-color: #00a8ff;
-      border: none;
-      color: #fff;
-      padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.3s ease;
-      margin-top: 10px;
+    #ipInput::placeholder {
+      color: #fff; 
+      opacity: 1; 
     }
 
-    .input-section button:hover {
-      background-color: #ff5e57;
-      transform: scale(1.05);
-    }
+    /* Ukuran default tombol */
+.input-section button {
+  background-color: #00a8ff;
+  border: none;
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  margin-top: 10px;
+}
+
+/* Efek hover tombol */
+.input-section button:hover {
+  background-color: #ff5e57;
+  transform: scale(1.05);
+}
+
+/* Tombol ukuran kecil */
+.input-section .btn-geol {
+  padding: 10px 10px;
+  font-size: 14px;
+}
+
+
 
     .spinner {
       display: none;
@@ -148,16 +162,26 @@
       text-align: right;
     }
 
-    .info-row .copy-icon {
-      margin-left: 10px;
-      font-size: 16px;
-      color: #00a8ff;
-      cursor: pointer;
-    }
 
-    .info-row .copy-icon:hover {
-      color: #0056b3;
-    }
+    /* CSS */
+.copy-icon {
+  display: inline-block; /* Menjaga elemen tetap inline untuk transisi */
+  cursor: pointer; /* Mengubah kursor menjadi pointer saat hover */
+  font-size: 24px; /* Ukuran font ikon */
+  transition: transform 0.3s ease, color 0.3s ease; /* Transisi untuk gerakan dan warna */
+  color: #007bff; /* Warna biru default ikon */
+}
+
+.copy-icon:hover {
+  transform: translateY(-5px); /* Gerakan ikon ke atas saat hover */
+  color: #4CAF50; /* Warna hijau terang saat hover */
+}
+
+.copy-icon:active {
+  transform: scale(0.9); /* Memperkecil ukuran ikon saat diklik */
+  color: #388E3C; /* Warna hijau gelap saat diklik */
+}
+
 
     .divider {
       height: 1px;
@@ -237,13 +261,15 @@
       <h1>Fetch IP Data</h1>
     </div>
     <div class="input-section">
-      <textarea id="ipInput" placeholder="Enter IP Address (one per line or comma-separated)" rows="5"></textarea>
-      <button onclick="checkIPs()">Check IPs</button>
-    </div>
+      <textarea id="ipInput" placeholder="Enter IP Address" rows="5"></textarea>
+      <button class="btn-geol" onclick="checkIPs()">Check IPs</button>
+      </div>
     <div id="notification"></div>
     <div id="spinner" class="spinner"></div>
     <div id="ipData"></div>
     <div class="credits">
+    	<br>
+    	<br>
       <p>Developed by <a href="https://t.me/sampiiiiu">Geo Project</a></p>
     </div>
   </div>
@@ -277,7 +303,7 @@
             <div class="info-row">
               <strong>${ipInfo.ip}</strong>
               <span></span>
-              <i class="fas fa-copy copy-icon" onclick="copyToClipboard('${ipInfo.ip}')"></i>
+              <i class="fas fa-clipboard-check copy-icon" onclick="copyToClipboard('${ipInfo.ip}')"></i>
             </div>
             <div class="info-row">
               <strong>ISP :</strong>
@@ -316,9 +342,9 @@
                     alertBox.style.right = '20px';
                     alertBox.style.backgroundColor = '#00a8ff';
                     alertBox.style.color = '#fff';
-                    alertBox.style.padding = '10px 20px';
+                    alertBox.style.padding = '10px 10px';
                     alertBox.style.borderRadius = '5px';
-                    alertBox.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+                    alertBox.style.boxShadow = '0 10px 6px rgba(31, 38, 135, 0.9)';
                     alertBox.style.opacity = '0';
                     alertBox.style.transition = 'opacity 0.5s ease-in-out';
                     document.body.appendChild(alertBox);
