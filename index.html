@@ -280,19 +280,19 @@
               <i class="fas fa-copy copy-icon" onclick="copyToClipboard('${ipInfo.ip}')"></i>
             </div>
             <div class="info-row">
-              <strong>ISP:</strong>
+              <strong>ISP :</strong>
               <span>${ipInfo.isp || 'N/A'}</span>
             </div>
             <div class="info-row">
-              <strong>Country:</strong>
+              <strong>COUNTRY :</strong>
               <span>${ipInfo.country || 'N/A'}</span>
             </div>
             <div class="info-row">
-              <strong>City:</strong>
+              <strong>CITY :</strong>
               <span>${ipInfo.city || 'N/A'}</span>
             </div>
             <div class="info-row">
-              <strong>Proxy:</strong>
+              <strong>PROXY :</strong>
               <span>${ipInfo.proxyStatus || 'N/A'}</span>
             </div>
             <div class="divider"></div>
@@ -306,13 +306,36 @@
       document.getElementById('spinner').style.display = 'none';
     }
 
-    const copyToClipboard = (text) => {
-      navigator.clipboard.writeText(text).then(() => {
-        alert('Copied to clipboard');
-      }, (err) => {
-        console.error('Error copying text: ', err);
-      });
-    }
+    function copyToClipboard(text) {
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    const alertBox = document.createElement('div');
+                    alertBox.textContent = "Copied to clipboard!";
+                    alertBox.style.position = 'fixed';
+                    alertBox.style.bottom = '20px';
+                    alertBox.style.right = '20px';
+                    alertBox.style.backgroundColor = '#00a8ff';
+                    alertBox.style.color = '#fff';
+                    alertBox.style.padding = '10px 20px';
+                    alertBox.style.borderRadius = '5px';
+                    alertBox.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+                    alertBox.style.opacity = '0';
+                    alertBox.style.transition = 'opacity 0.5s ease-in-out';
+                    document.body.appendChild(alertBox);
+                    setTimeout(() => {
+                        alertBox.style.opacity = '1';
+                    }, 100);
+                    setTimeout(() => {
+                        alertBox.style.opacity = '0';
+                        setTimeout(() => {
+                            document.body.removeChild(alertBox);
+                        }, 500);
+                    }, 2000);
+                })
+                .catch((err) => {
+                    console.error("Failed to copy to clipboard:", err);
+                });
+        }
 
     const toggleBlur = () => {
       document.body.classList.toggle('blur-mode');
