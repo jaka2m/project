@@ -620,8 +620,8 @@ body {
             var wildcardParam = wildcard ? `&wildcard=${wildcard}` : '';
 
             // Buat URL berdasarkan input
-            var link1 = `https://sub.bmkg.xyz/${serviceType}?sub1=${countryCode}&count=${count}${wildcardParam}`;
-            var link2 = `https://sub.bmkg.xyz/${serviceType}?sub2=${countryCode}&count=${count}${wildcardParam}`;
+            var link1 = `https://subscription.gpj.us.kg/${serviceType}?sub1=${countryCode}&count=${count}${wildcardParam}`;
+            var link2 = `https://subscription.gpj.us.kg/${serviceType}?sub2=${countryCode}&count=${count}${wildcardParam}`;
 
             // Tampilkan kedua link pada input box
             document.getElementById("link1").value = link1;
@@ -720,7 +720,6 @@ function renderProxies(proxies, proxyList, pagination) {
       <td> <span class="aha">${penyedia} | ${negara} </span><span class="flag-icon flag-icon-${negara.toLowerCase()}"></span>
      </td>
       <td><button class="cekproxy" onclick="checkProxyStatus('${ip}:${port}', this)">CHECK</button>          
-      <span class="latency-cell"></span></td>
       <td>
         <select class="service-selector">
           <option value="">NO WILDCARD</option>
@@ -728,7 +727,7 @@ function renderProxies(proxies, proxyList, pagination) {
           <option value="ava.game.naver.com">ava.game.naver.com</option>
           <option value="graph.instagram.com">graph.instagram.com</option>
           <option value="quiz.int.vidio.com">quiz.int.vidio.com</option>
-          <option value="live.iflix.com.com">live.iflix.com</option>
+          <option value="live.iflix.com">live.iflix.com</option>
           <option value="support.zoom.us">support.zoom.us</option>
           <option value="blog.webex.com">blog.webex.com</option>
           <option value="investors.spotify.com">investors.spotify.com</option>
@@ -1092,7 +1091,6 @@ row.querySelector('.copy-trojan877').addEventListener('click', () => {
 }
 
 // Function to render pagination
-// Function to render pagination
 function renderPagination(proxies, pagination) {
   const totalPages = Math.ceil(proxies.length / proxyPerPage);
   const maxButtons = 6;
@@ -1179,35 +1177,28 @@ fetch("https://geol.biz.id/proxy_list.txt")
   })
   .catch(error => console.error("Error fetching proxy data:", error)); // Correct placement here
 
-// Check Proxy status function
 function checkProxyStatus(proxy, button) {
   button.textContent = 'Loading';
   button.style.backgroundColor = 'yellow'; // Set background color to yellow when loading
   button.style.color = 'black'; // Set text color to black during loading
-  const latencyCell = button.parentElement.querySelector('.latency-cell'); // Find the latency span in the same cell
+  
+  // Split proxy into IP and port
+  const [ip, port] = proxy.split(':');
 
-  const startTime = performance.now();
-  fetch('https://httpbin.org/ip', {
-    method: 'GET',
-    headers: {
-      'Proxy': `http://${proxy}`,
-    },
-    timeout: 5000
-  })
-    .then(response => {
-      const endTime = performance.now();
-      const latency = (endTime - startTime).toFixed(2); // Calculate latency
+  // Fetching the status of the proxy from the API
+  fetch(`https://ipcf.vlessipcf.us.kg/key=geo/ip=${ip}:${port}`)
+    .then(response => response.json())
+    .then(data => {
+      const proxyStatus = data.proxyStatus;
 
-      if (response.ok) {
+      if (proxyStatus === "ACTIVE") {
         button.textContent = 'ACTIVE';
         button.style.backgroundColor = 'green'; // Set background color to green if the proxy is working
         button.style.color = 'white'; // Set text color to white for active proxy
-        latencyCell.textContent = ``; // Display latency in the same column
 
-        // Display latency in a popup
+        // Display success popup
         Swal.fire({
           title: 'Proxy Status: ACTIVE',
-          text: `${latency} ms.`,
           icon: 'success',
           background: 'rgba(6, 18, 67, 0.89)', // Background color
           color: 'white', // Text color
@@ -1217,19 +1208,32 @@ function checkProxyStatus(proxy, button) {
           confirmButtonColor: '#3085d6',
         });
       } else {
-        throw new Error('DEAD');
+        button.textContent = 'DEAD';
+        button.style.backgroundColor = 'red'; // Set background color to red if the proxy failed
+        button.style.color = 'white'; // Set text color to white for failed proxy
+
+        // Display error popup
+        Swal.fire({
+          title: 'Proxy Status: DEAD',
+          icon: 'error',
+          background: 'rgba(6, 18, 67, 0.89)', // Background color
+          color: 'white', // Text color
+          customClass: {
+            popup: 'rounded-popup',
+          },
+          confirmButtonColor: '#d33',
+        });
       }
     })
-    .catch(() => {
-      button.textContent = 'DEAD';
-      button.style.backgroundColor = 'red'; // Set background color to red if the proxy failed
+    .catch(error => {
+      button.textContent = 'ERROR';
+      button.style.backgroundColor = 'red'; // Set background color to red if the API call fails
       button.style.color = 'white'; // Set text color to white for failed proxy
-      latencyCell.textContent = ''; // Clear latency cell text on failure
 
-      // Display error in a popup
+      // Display error popup
       Swal.fire({
-        title: 'Proxy Status: DEAD',
-        text: ``,
+        title: 'Proxy Status: ERROR',
+        text: 'Unable to fetch proxy status.',
         icon: 'error',
         background: 'rgba(6, 18, 67, 0.89)', // Background color
         color: 'white', // Text color
@@ -1240,8 +1244,6 @@ function checkProxyStatus(proxy, button) {
       });
     });
 }
-
 </script>
-  
 </body>
 </html>
