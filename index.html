@@ -1,26 +1,25 @@
-  
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FREE | CF | LIFETIME | BMKG.XYZ</title>
-    <meta name="description" content="FREE | CF | LIFETIME | BMKG.XYZ">
-    <meta name="keywords" content="FREE | CF | LIFETIME | BMKG.XYZ">
-    <meta name="author" content="FREE | CF | LIFETIME | BMKG.XYZ">
-    <meta name="robots" content="FREE | CF | LIFETIME | BMKG.XYZ">
+    <meta name="description" content="FREE | VPN | CLOUDFLARE">
+    <meta name="keywords" content="FREE | VPN | CLOUDFLARE">
+    <meta name="author" content="FREE | VPN | CLOUDFLARE">
+    <meta name="robots" content="FREE | VPN | CLOUDFLARE">
 
     <!-- Open Graph Meta Tags untuk SEO Media Sosial -->
-    <meta property="og:title" content="FREE | CF | LIFETIME | BMKG.XYZ">
-    <meta property="og:description" content="FREE | CF | LIFETIME | BMKG.XYZ">
+    <meta property="og:title" content="FREE | VPN | CLOUDFLARE">
+    <meta property="og:description" content="FREE | VPN | CLOUDFLARE">
     <meta property="og:image" content="https://png.pngtree.com/background/20231016/original/pngtree-high-definition-3d-wallpaper-in-black-and-red-picture-image_5583707.jpg"> <!-- Ganti dengan URL gambar yang sesuai -->
     <meta property="og:url" content="https://png.pngtree.com/background/20231016/original/pngtree-high-definition-3d-wallpaper-in-black-and-red-picture-image_5583707.jpg">
     <meta property="og:type" content="website">
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="FREE | CF | LIFETIME | BMKG.XYZ">
-    <meta name="twitter:description" content="FREE | CF | LIFETIME | BMKG.XYZ">
+    <meta name="twitter:title" content="FREE | VPN | CLOUDFLARE">
+    <meta name="twitter:description" content="FREE | VPN | CLOUDFLARE">
     <meta name="twitter:image" content="https://png.pngtree.com/background/20231016/original/pngtree-high-definition-3d-wallpaper-in-black-and-red-picture-image_5583707.jpg"> <!-- Ganti dengan URL gambar yang sesuai -->
     <link href="https://png.pngtree.com/background/20231016/original/pngtree-high-definition-3d-wallpaper-in-black-and-red-picture-image_5583707.jpg" rel="icon" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -377,7 +376,7 @@ thhhh {
 </head>
 <body>
   <header>
-  <h1>FREE PROXY CF BMKG.XYZ</h1>
+  <h1>GEO PROJECT</h1>
     </header>
   <main class="content">
     <center><button class="button" onclick="showPopup()">SHOW LINK SUB</button></center>
@@ -399,7 +398,8 @@ thhhh {
       <div class="table-container">
     <table>
       <thead>
-        <tr>          
+        <tr>
+        	<th>IP PORT</th>
           <th>ISP | COUNTRY</th>
           <th>Status</th>
           <th>WILDCARD</th>
@@ -468,7 +468,7 @@ thhhh {
     </div>
   </div>
   <footer class="footer">
-    <h2><p>&copy; 2024 FREE PROXY CF BMKG.XYZ</p></h2>
+    <h2><p>&copy; Free VPN Cloudflare 2024</p></h2>
   </footer>
 <script>
   // Function to generate the link
@@ -479,7 +479,7 @@ thhhh {
     const cons = document.getElementById('cons').value;
 
     // Base URL for the link
-    let baseURL = `https://sub.bmkg.xyz/${serviceType}?sub1=${countryCode}&count=${cons}`;
+    let baseURL = `https://sub.gpj.us.kg/${serviceType}?sub1=${countryCode}&count=${cons}`;
 
     // If wildcard is selected, append it to the URL
     if (wildcard) {
@@ -570,6 +570,7 @@ function renderProxies(proxies, proxyList, pagination) {
     const uuid = uuidv4();
     const row = document.createElement('tr');
     row.innerHTML = `
+    <td> <span class="aha">${ip}:${port}</span>
       <td> <span class="aha">${penyedia} | ${negara} </span><span class="flag-icon flag-icon-${negara.toLowerCase()}"></span>
      </td>
       <td><button class="cekproxy" onclick="checkProxyStatus('${ip}:${port}', this)">CHECK</button>          
@@ -610,8 +611,8 @@ function renderProxies(proxies, proxyList, pagination) {
       
     
   row.querySelector('.copy-vless').addEventListener('click', () => {
-    const selectedService = row.querySelector('.service-selector').value || "tp1.bmkg.xyz";
-    const domain = selectedService === "tp1.bmkg.xyz" ? "tp1.bmkg.xyz" : `${selectedService}.tp1.bmkg.xyz`;
+    const selectedService = row.querySelector('.service-selector').value || "sub.gpj.us.kg";
+    const domain = selectedService === "sub.gpj.us.kg" ? "sub.gpj.us.kg" : `${selectedService}.sub.gpj.us.kg`;
     const VLESS = `vless://${uuid}@${selectedService}:443?encryption=none&type=ws&host=${domain}&path=%2F${ip}-${port}&security=tls&sni=${domain}#(${selectedService})+${negara}+${penyedia}`;
     navigator.clipboard.writeText(VLESS);
     Swal.fire({
@@ -628,8 +629,8 @@ function renderProxies(proxies, proxyList, pagination) {
   });
 
   row.querySelector('.copy-vless-clash').addEventListener('click', () => {
-    const selectedService = row.querySelector('.service-selector').value || "tp1.bmkg.xyz";
-    const domain = selectedService === "tp1.bmkg.xyz" ? "tp1.bmkg.xyz" : `${selectedService}.tp1.bmkg.xyz`;
+    const selectedService = row.querySelector('.service-selector').value || "sub.gpj.us.kg";
+    const domain = selectedService === "sub.gpj.us.kg" ? "sub.gpj.us.kg" : `${selectedService}.sub.gpj.us.kg`;
     const VLESSC = `- name: (${selectedService})+${negara}+${penyedia}
   server: ${selectedService}
   port: 443
@@ -660,8 +661,8 @@ function renderProxies(proxies, proxyList, pagination) {
   });
 
   row.querySelector('.copy-trojan').addEventListener('click', () => {
-    const selectedService = row.querySelector('.service-selector').value || "tp1.bmkg.xyz";
-    const domain = selectedService === "tp1.bmkg.xyz" ? "tp1.bmkg.xyz" : `${selectedService}.tp1.bmkg.xyz`;
+    const selectedService = row.querySelector('.service-selector').value || "sub.gpj.us.kg";
+    const domain = selectedService === "sub.gpj.us.kg" ? "sub.gpj.us.kg" : `${selectedService}.sub.gpj.us.kg`;
     const TROJAN = `trojan://${uuid}@${selectedService}:443?encryption=none&type=ws&host=${domain}&path=%2F${ip}-${port}&security=tls&sni=${domain}#(${selectedService})+${negara}+${penyedia}`;
     navigator.clipboard.writeText(TROJAN);
     Swal.fire({
@@ -678,8 +679,8 @@ function renderProxies(proxies, proxyList, pagination) {
   });
 
   row.querySelector('.copy-trojan-clash').addEventListener('click', () => {
-    const selectedService = row.querySelector('.service-selector').value || "tp1.bmkg.xyz";
-    const domain = selectedService === "tp1.bmkg.xyz" ? "tp1.bmkg.xyz" : `${selectedService}.tp1.bmkg.xyz`;
+    const selectedService = row.querySelector('.service-selector').value || "sub.gpj.us.kg";
+    const domain = selectedService === "sub.gpj.us.kg" ? "sub.gpj.us.kg" : `${selectedService}.sub.gpj.us.kg`;
     const TROJANC = `- name: (${selectedService})+${negara}+${penyedia}
     server: ${selectedService}
     port: 443
@@ -708,8 +709,8 @@ function renderProxies(proxies, proxyList, pagination) {
   });
 
   row.querySelector('.copy-ss').addEventListener('click', () => {
-    const selectedService = row.querySelector('.service-selector').value || "tp1.bmkg.xyz";
-    const domain = selectedService === "tp1.bmkg.xyz" ? "tp1.bmkg.xyz" : `${selectedService}.tp1.bmkg.xyz`;
+    const selectedService = row.querySelector('.service-selector').value || "sub.gpj.us.kg";
+    const domain = selectedService === "sub.gpj.us.kg" ? "sub.gpj.us.kg" : `${selectedService}.sub.gpj.us.kg`;
     const SS = `ss://bm9uZTo1ZDJlYmQyYS05Y2I5LTRkMWItYWY1NS04NjE3ZDNlODFmMzk%3D@${selectedService}:443?encryption=none&type=ws&host=${domain}&path=%2F${ip}-${port}&security=tls&sni=${domain}#(${selectedService})+${negara}+${penyedia}`;
     navigator.clipboard.writeText(SS);
     Swal.fire({
@@ -742,7 +743,7 @@ function renderProxies(proxies, proxyList, pagination) {
   });
 
   row.querySelector('.copy-vless1').addEventListener('click', () => {
-    const VLESS1 = `vless://${uuid}@tp1.bmkg.xyz:80?encryption=none&type=ws&host=tp1.bmkg.xyz&path=%2F${ip}-${port}&security=none&sni=#(${selectedService})+${negara}+${penyedia}`;
+    const VLESS1 = `vless://${uuid}@sub.gpj.us.kg:80?encryption=none&type=ws&host=sub.gpj.us.kg&path=%2F${ip}-${port}&security=none&sni=#(${selectedService})+${negara}+${penyedia}`;
     navigator.clipboard.writeText(VLESS1);
     Swal.fire({
       title: 'Berhasil!',
@@ -759,19 +760,19 @@ function renderProxies(proxies, proxyList, pagination) {
 
   row.querySelector('.copy-vless2').addEventListener('click', () => {
     const VLESS2 = `- name: (${selectedService})+${negara}+${penyedia}
-  server: tp1.bmkg.xyz
+  server: sub.gpj.us.kg
   port: 80
   type: vless
   uuid: ${uuid}
   cipher: auto
   tls: false
   skip-cert-verify: false
-  servername: tp1.bmkg.xyz
+  servername: sub.gpj.us.kg
   network: ws
   ws-opts:
     path: /${ip}-${port}
     headers:
-      Host: tp1.bmkg.xyz
+      Host: sub.gpj.us.kg
   udp: true `;
     navigator.clipboard.writeText(VLESS2);
     Swal.fire({
