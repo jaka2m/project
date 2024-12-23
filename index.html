@@ -720,6 +720,7 @@ function renderProxies(proxies, proxyList, pagination) {
       <td> <span class="aha">${penyedia} | ${negara} </span><span class="flag-icon flag-icon-${negara.toLowerCase()}"></span>
      </td>
       <td><button class="cekproxy" onclick="checkProxyStatus('${ip}:${port}', this)">CHECK</button>          
+      <span class="latency-cell"></span></td>
       <td>
         <select class="service-selector">
           <option value="">NO WILDCARD</option>
@@ -1090,6 +1091,7 @@ row.querySelector('.copy-trojan877').addEventListener('click', () => {
   renderPagination(proxies, pagination);
 }
 
+// Function to render pagination
 // Function to render pagination
 function renderPagination(proxies, pagination) {
   const totalPages = Math.ceil(proxies.length / proxyPerPage);
