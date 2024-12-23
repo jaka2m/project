@@ -505,7 +505,8 @@ body {
       <div class="table-container">
     <table>
       <thead>
-        <tr>          
+        <tr>
+          <th>IP | PORT</th>
           <th>ISP | COUNTRY</th>
           <th>STATUS</th>
           <th>WILDCARD</th>
@@ -715,6 +716,7 @@ function renderProxies(proxies, proxyList, pagination) {
     const uuid = uuidv4();
     const row = document.createElement('tr');
     row.innerHTML = `
+    <td> <span class="aha">${ip}:${port}</span>
       <td> <span class="aha">${penyedia} | ${negara} </span><span class="flag-icon flag-icon-${negara.toLowerCase()}"></span>
      </td>
       <td><button class="cekproxy" onclick="checkProxyStatus('${ip}:${port}', this)">CHECK</button>          
@@ -739,9 +741,9 @@ function renderProxies(proxies, proxyList, pagination) {
       <button class="button" onclick="showPopup('vtls${ip}:${port}')">VLESS TLS 443</button>
       <div class="popup" id="vtls${ip}:${port}">
       <div class="popup-content"><hr/><br>
-      » ISP         : ${penyedia}<br>
-      » Country     :${negara}&nbsp;<span class="flag-icon flag-icon-${negara.toLowerCase()}"></span><br>
-      » IP:PORT      : ${ip}:${port}<br>
+      ISP         : ${penyedia}<br>
+      Country     :${negara}&nbsp;<span class="flag-icon flag-icon-${negara.toLowerCase()}"></span><br>
+      IP:PORT      : ${ip}:${port}<br>
       <hr/>SERVER 1<br>
       <button class="copy-vless">COPY VLESS 443</button>
       <br><button class="copy-vless-clash">COPY CLASH 443</button>
@@ -753,9 +755,9 @@ function renderProxies(proxies, proxyList, pagination) {
 </div></td>
       <div class="popup" id="vntls${ip}:${port}">
       <div class="popup-content"><hr/><br>
-      » ISP         : ${penyedia}<br>
-      » Country     :${negara}&nbsp;<span class="flag-icon flag-icon-${negara.toLowerCase()}"></span><br>
-      » IP:PORT      : ${ip}:${port}<br>
+      ISP         : ${penyedia}<br>
+      Country     :${negara}&nbsp;<span class="flag-icon flag-icon-${negara.toLowerCase()}"></span><br>
+      IP:PORT      : ${ip}:${port}<br>
       <hr/>SERVER 1<br>
       <button class="copy-vless1">COPY VLESS 80</button>
       <br><button class="copy-vless2">COPY CLASH 80</button>
@@ -768,9 +770,9 @@ function renderProxies(proxies, proxyList, pagination) {
       <button class="button" onclick="showPopup('trojan${ip}:${port}')">TROJAN TLS 443</button>
       <div class="popup" id="trojan${ip}:${port}">
       <div class="popup-content"><hr/><br>
-      » ISP         : ${penyedia}<br>
-      » Country     :${negara}&nbsp;<span class="flag-icon flag-icon-${negara.toLowerCase()}"></span><br>
-      » IP:PORT      : ${ip}:${port}<br>
+      ISP         : ${penyedia}<br>
+      Country     :${negara}&nbsp;<span class="flag-icon flag-icon-${negara.toLowerCase()}"></span><br>
+      IP:PORT      : ${ip}:${port}<br>
       <hr/>SERVER 1<br>
       <button class="copy-trojan">COPY TROJAN 443</button>
       <br><button class="copy-trojan-clash">COPY CLASH 443</button> 
@@ -783,9 +785,9 @@ function renderProxies(proxies, proxyList, pagination) {
       <button class="button" onclick="showPopup('ss${ip}:${port}')">SHADOWSOCK</button>
       <div class="popup" id="ss${ip}:${port}">
       <div class="popup-content"><hr/><br>
-      » ISP         : ${penyedia}<br>
-      » Country     :${negara}&nbsp;<span class="flag-icon flag-icon-${negara.toLowerCase()}"></span><br>
-      » IP:PORT      : ${ip}:${port}<br>
+      ISP         : ${penyedia}<br>
+      Country     :${negara}&nbsp;<span class="flag-icon flag-icon-${negara.toLowerCase()}"></span><br>
+      IP:PORT      : ${ip}:${port}<br>
       <hr/>SERVER 1<br>
       <button class="copy-ss">COPY SHADOWSOCK</button>
       <br><button class="copy-ss1">COPY CLASH</button>
