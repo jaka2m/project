@@ -25,7 +25,7 @@ async function handleRequest(request) {
 
     try {
         // Mengambil data proxy
-        const response = await fetch('https://geol.biz.id/bot/proxy_list.txt');
+        const response = await fetch('https://geol.biz.id/proxy_list.txt');
         if (!response.ok) throw new Error('Failed to load proxy list.');
         const text = await response.text();
         const proxies = text.split('\n').filter(proxy => proxy.trim() !== '');
