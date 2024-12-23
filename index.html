@@ -799,8 +799,8 @@ function renderProxies(proxies, proxyList, pagination) {
     
     
   row.querySelector('.copy-vless').addEventListener('click', () => {
-    const selectedService = row.querySelector('.service-selector').value || "geovless.vlessipcf.us.kg";
-    const domain = selectedService === "geovless.vlessipcf.us.kg" ? "geovless.vlessipcf.us.kg" : `${selectedService}.geovless.vlessipcf.us.kg`;
+    const selectedService = row.querySelector('.service-selector').value || "sub.gpj.us.kg";
+    const domain = selectedService === "sub.gpj.us.kg" ? "sub.gpj.us.kg" : `${selectedService}.sub.gpj.us.kg`;
     const VLESS = `vless://${uuid}@${selectedService}:443?encryption=none&type=ws&host=${domain}&path=%2F${ip}-${port}&security=tls&sni=${domain}#(${selectedService})+${negara}+${penyedia}`;
     navigator.clipboard.writeText(VLESS);
     Swal.fire({
@@ -817,7 +817,7 @@ function renderProxies(proxies, proxyList, pagination) {
   });
 
  row.querySelector('.copy-vless877').addEventListener('click', () => {
-    const selectedService = row.querySelector('.service-selector').value || "sub.gpj.us.kg";
+    const selectedService = row.querySelector('.service-selector').value || "geovless.vlessipcf.us.kg";
     const domain = selectedService === "geovless.vlessipcf.us.kg" ? "geovless.vlessipcf.us.kg" : `${selectedService}.geovless.vlessipcf.us.kg`;
     const VLESS877 = `vless://GEO-PROJECT@${selectedService}:443?encryption=none&type=ws&host=${domain}&path=%2Fvl%3D${ip}%3A${port}&security=tls&sni=${domain}#(${selectedService})+${negara}+${penyedia}`;
     navigator.clipboard.writeText(VLESS877);
@@ -996,7 +996,7 @@ row.querySelector('.copy-trojan877').addEventListener('click', () => {
     
   row.querySelector('.copy-ss').addEventListener('click', () => {
     const selectedService = row.querySelector('.service-selector').value || "sub.gpj.us.kg";
-    const domain = selectedService === "sub.gpj.us.kg" ? "geovless.vlessipcf.us.kg" : `${selectedService}.sub.gpj.us.kg`;
+    const domain = selectedService === "sub.gpj.us.kg" ? "sub.gpj.us.kg" : `${selectedService}.sub.gpj.us.kg`;
     const SS = `ss://bm9uZTo1ZDJlYmQyYS05Y2I5LTRkMWItYWY1NS04NjE3ZDNlODFmMzk%3D@${selectedService}:443?encryption=none&type=ws&host=${domain}&path=%2F${ip}-${port}&security=tls&sni=${domain}#(${selectedService})+${negara}+${penyedia}`;
     navigator.clipboard.writeText(SS);
     Swal.fire({
@@ -1055,12 +1055,12 @@ row.querySelector('.copy-trojan877').addEventListener('click', () => {
   cipher: auto
   tls: false
   skip-cert-verify: false
-  servername: geovless.vlessipcf.us.kg
+  servername: sub.gpj.us.kg
   network: ws
   ws-opts:
     path: /${ip}-${port}
     headers:
-      Host: geovless.vlessipcf.us.kg
+      Host: sub.gpj.us.kg
   udp: true `;
     navigator.clipboard.writeText(VLESS2);
     Swal.fire({
