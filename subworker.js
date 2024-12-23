@@ -25,7 +25,7 @@ async function handleRequest(request) {
 
     try {
         // Mengambil data proxy
-        const response = await fetch('https://geol.biz.id/bot/proxy_list.txt');
+        const response = await fetch('https://geol.biz.id/proxy_list.txt');
         if (!response.ok) throw new Error('Failed to load proxy list.');
         const text = await response.text();
         const proxies = text.split('\n').filter(proxy => proxy.trim() !== '');
@@ -76,15 +76,15 @@ async function handleRequest(request) {
                 // sub2
                 if (type === 'vless') {
                     if (wildcard) {
-                        urlString = `vless://GEO-PROJECT@${wildcard}:443?encryption=none&type=ws&host=${wildcard}.xvp.bmkg.xyz&path=%2Fvl%3D${ip}%3A${port}&security=tls&sni=${wildcard}.xvp.bmkg.xyz#${country}+${provider}`;
+                        urlString = `vless://GEO-PROJECT@${wildcard}:443?encryption=none&type=ws&host=${wildcard}.geovless.vlessipcf.us.kg&path=%2Fvl%3D${ip}%3A${port}&security=tls&sni=${wildcard}.geovless.vlessipcf.us.kg#${country}+${provider}`;
                     } else {
-                        urlString = `vless://GEO-PROJECT@xvp.bmkg.xyz:443?encryption=none&type=ws&host=xvp.bmkg.xyz&path=%2Fvl%3D${ip}%3A${port}&security=tls&sni=xvp.bmkg.xyz#${country}+${provider}`;
+                        urlString = `vless://GEO-PROJECT@geovless.vlessipcf.us.kg:443?encryption=none&type=ws&host=geovless.vlessipcf.us.kg&path=%2Fvl%3D${ip}%3A${port}&security=tls&sni=geovless.vlessipcf.us.kg#${country}+${provider}`;
                     }
                 } else if (type === 'trojan') {
                     if (wildcard) {
-                        urlString = `trojan://GEO-PROJECT@${wildcard}:443?encryption=none&type=ws&host=${wildcard}.xvp.bmkg.xyz&path=%2Ftr%3D${ip}%3A${port}&security=tls&sni=${wildcard}.xvp.bmkg.xyz#${country}+${provider}`;
+                        urlString = `trojan://GEO-PROJECT@${wildcard}:443?encryption=none&type=ws&host=${wildcard}.geovless.vlessipcf.us.kg&path=%2Ftr%3D${ip}%3A${port}&security=tls&sni=${wildcard}.geovless.vlessipcf.us.kg#${country}+${provider}`;
                     } else {
-                        urlString = `trojan://GEO-PROJECT@xvp.bmkg.xyz:443?encryption=none&type=ws&host=xvp.bmkg.xyz&path=%2Ftr%3D${ip}%3A${port}&security=tls&sni=xvp.bmkg.xyz#${country}+${provider}`;
+                        urlString = `trojan://GEO-PROJECT@geovless.vlessipcf.us.kg:443?encryption=none&type=ws&host=geovless.vlessipcf.us.kg&path=%2Ftr%3D${ip}%3A${port}&security=tls&sni=geovless.vlessipcf.us.kg#${country}+${provider}`;
                     }
                 }
             }

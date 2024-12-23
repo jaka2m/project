@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FREE | CF | LIFETIME | BMKG.XYZ</title>
+    <title>FREE | VPN | CLOUDFLARE</title>
     <meta name="description" content="FREE | VPN | CLOUDFLARE">
     <meta name="keywords" content="FREE | VPN | CLOUDFLARE">
     <meta name="author" content="FREE | VPN | CLOUDFLARE">
@@ -27,11 +27,6 @@
 
   <style>
  
-    
-
-
-
-
 #link-sub {
     border: 2px solid #007bff; /* Warna biru */
     border-radius: 5px; /* Opsional: Membuat sudut melengkung */
@@ -399,7 +394,7 @@ thhhh {
     <table>
       <thead>
         <tr>
-        	<th>IP PORT</th>
+          <th>IP PORT</th>
           <th>ISP | COUNTRY</th>
           <th>Status</th>
           <th>WILDCARD</th>
@@ -447,6 +442,23 @@ thhhh {
     .catch(error => console.error('Error fetching country data:', error));
 </script>
     <div class="col">
+      <label for="wildcard">WILDCARD</label>
+      <select class="service-selector" id="wildcard">
+        <option value="">NO WILDCARD</option>
+          <option value="ava.game.naver.com">ava.game.naver.com</option>
+          <option value="graph.instagram.com">graph.instagram.com</option>
+          <option value="quiz.int.vidio.com">quiz.int.vidio.com</option>
+          <option value="live.iflix.com">live.iflix.com</option>
+          <option value="support.zoom.us">support.zoom.us</option>
+          <option value="blog.webex.com">blog.webex.com</option>
+          <option value="investors.spotify.com">investors.spotify.com</option>
+          <option value="cache.netflix.com">cache.netflix.com</option>
+          <option value="zaintest.vuclip.com">zaintest.vuclip.com</option>
+          <option value="io.ruangguru.com">io.ruangguru.com</option>
+          <option value="api.midtrans.com">api.midtrans.com</option>
+        </select>
+      </div>
+    <div class="col">
       <label for="cons">COUNT</label>
       <select class="service-selector" id="cons">
         <option value="5">5</option>
@@ -468,7 +480,7 @@ thhhh {
     </div>
   </div>
   <footer class="footer">
-    <h2><p>&copy; Free VPN Cloudflare 2024</p></h2>
+    <h2><p>&copy; FREE VPN CLOUDFLARE</p></h2>
   </footer>
 <script>
   // Function to generate the link
@@ -909,14 +921,14 @@ function checkProxyStatus(proxy, button) {
       const latency = (endTime - startTime).toFixed(2); // Calculate latency
 
       if (response.ok) {
-        button.textContent = 'NGACENG';
+        button.textContent = 'ACTIVE';
         button.style.backgroundColor = 'green'; // Set background color to green if the proxy is working
         button.style.color = 'white'; // Set text color to white for active proxy
         latencyCell.textContent = `${latency} ms`; // Display latency in the same column
 
         // Display latency in a popup
         Swal.fire({
-          title: 'Proxy Status: NGACENG',
+          title: 'Proxy Status: ACTIVE',
           text: `${latency} ms.`,
           icon: 'success',
           background: 'rgba(6, 18, 67, 0.89)', // Background color
@@ -927,18 +939,18 @@ function checkProxyStatus(proxy, button) {
           confirmButtonColor: '#3085d6',
         });
       } else {
-        throw new Error('TURU');
+        throw new Error('DEAD');
       }
     })
     .catch(() => {
-      button.textContent = 'TURU';
+      button.textContent = 'DEAD';
       button.style.backgroundColor = 'red'; // Set background color to red if the proxy failed
       button.style.color = 'white'; // Set text color to white for failed proxy
       latencyCell.textContent = ''; // Clear latency cell text on failure
 
       // Display error in a popup
       Swal.fire({
-        title: 'Proxy Status: TURU',
+        title: 'Proxy Status: DEAD',
         text: ``,
         icon: 'error',
         background: 'rgba(6, 18, 67, 0.89)', // Background color
@@ -950,10 +962,6 @@ function checkProxyStatus(proxy, button) {
       });
     });
 }
-
-
-
 </script>
-  
 </body>
 </html>
