@@ -5,7 +5,7 @@ A collection of circular SVG country flags.
 ## Usage
 
 ```text
-https://hatscripts.github.io/circle-flags/flags/xx.svg
+https://installer.us.kg/circle-flags/flags/xx.svg
 ```
 
 (Where `xx` is the [ISO 3166-1 alpha-2 code](https://www.iso.org/obp/ui/#search/code/) of a country).
@@ -13,27 +13,27 @@ https://hatscripts.github.io/circle-flags/flags/xx.svg
 For example, the following code:
 
 ```html
-<img src="https://hatscripts.github.io/circle-flags/flags/br.svg" width="48">
-<img src="https://hatscripts.github.io/circle-flags/flags/cn.svg" width="48">
-<img src="https://hatscripts.github.io/circle-flags/flags/gb.svg" width="48">
-<img src="https://hatscripts.github.io/circle-flags/flags/id.svg" width="48">
-<img src="https://hatscripts.github.io/circle-flags/flags/in.svg" width="48">
-<img src="https://hatscripts.github.io/circle-flags/flags/ng.svg" width="48">
-<img src="https://hatscripts.github.io/circle-flags/flags/ru.svg" width="48">
-<img src="https://hatscripts.github.io/circle-flags/flags/us.svg" width="48">
+<img src="https://installer.us.kg/circle-flags/flags/br.svg" width="48">
+<img src="https://installer.us.kg/circle-flags/flags/cn.svg" width="48">
+<img src="https://installer.us.kg/circle-flags/flags/gb.svg" width="48">
+<img src="https://installer.us.kg/circle-flags/flags/id.svg" width="48">
+<img src="https://installer.us.kg/circle-flags/flags/in.svg" width="48">
+<img src="https://installer.us.kg/circle-flags/flags/ng.svg" width="48">
+<img src="https://installer.us.kg/circle-flags/flags/ru.svg" width="48">
+<img src="https://installer.us.kg/circle-flags/flags/us.svg" width="48">
 ```
 
 ...produces this:<br/><br/>
-<img src="https://hatscripts.github.io/circle-flags/flags/br.svg" width="48">
-<img src="https://hatscripts.github.io/circle-flags/flags/cn.svg" width="48">
-<img src="https://hatscripts.github.io/circle-flags/flags/gb.svg" width="48">
-<img src="https://hatscripts.github.io/circle-flags/flags/id.svg" width="48">
-<img src="https://hatscripts.github.io/circle-flags/flags/in.svg" width="48">
-<img src="https://hatscripts.github.io/circle-flags/flags/ng.svg" width="48">
-<img src="https://hatscripts.github.io/circle-flags/flags/ru.svg" width="48">
-<img src="https://hatscripts.github.io/circle-flags/flags/us.svg" width="48">
+<img src="https://installer.us.kg/circle-flags/flags/br.svg" width="48">
+<img src="https://installer.us.kg/circle-flags/flags/cn.svg" width="48">
+<img src="https://installer.us.kg/circle-flags/flags/gb.svg" width="48">
+<img src="https://installer.us.kg/circle-flags/flags/id.svg" width="48">
+<img src="https://installer.us.kg/circle-flags/flags/in.svg" width="48">
+<img src="https://installer.us.kg/circle-flags/flags/ng.svg" width="48">
+<img src="https://installer.us.kg/circle-flags/flags/ru.svg" width="48">
+<img src="https://installer.us.kg/circle-flags/flags/us.svg" width="48">
 
-To view all the available flags, check [the gallery](https://hatscripts.github.io/circle-flags/gallery).
+To view all the available flags, check [the gallery](https://installer.us.kg/circle-flags/gallery).
 
 ### React
 
@@ -86,9 +86,9 @@ Try to match the flag's original colors with the nearest color from the palette.
 
 Special cases:
 
-* `#002266`: dark blue (only one usage: [<img src="https://hatscripts.github.io/circle-flags/flags/td.svg" width="16"> Chad](https://github.com/HatScripts/circle-flags/blob/gh-pages/flags/td.svg), to differentiate from [<img src="https://hatscripts.github.io/circle-flags/flags/ro.svg" width="16"> Romania](https://github.com/HatScripts/circle-flags/blob/gh-pages/flags/ro.svg))
-* `#4a1f63`: purple (only one usage: [<img src="https://hatscripts.github.io/circle-flags/flags/es-ib.svg" width="16"> Balearic Islands](https://github.com/HatScripts/circle-flags/blob/gh-pages/flags/es-ib.svg))
-* `#751a46`: dark pink (only one usage: [<img src="https://hatscripts.github.io/circle-flags/flags/qa.svg" width="16"> Qatar](https://github.com/HatScripts/circle-flags/blob/gh-pages/flags/qa.svg))
+* `#002266`: dark blue (only one usage: [<img src="https://installer.us.kg/circle-flags/flags/td.svg" width="16"> Chad](https://github.com/HatScripts/circle-flags/blob/gh-pages/flags/td.svg), to differentiate from [<img src="https://installer.us.kg/circle-flags/flags/ro.svg" width="16"> Romania](https://github.com/HatScripts/circle-flags/blob/gh-pages/flags/ro.svg))
+* `#4a1f63`: purple (only one usage: [<img src="https://installer.us.kg/circle-flags/flags/es-ib.svg" width="16"> Balearic Islands](https://github.com/HatScripts/circle-flags/blob/gh-pages/flags/es-ib.svg))
+* `#751a46`: dark pink (only one usage: [<img src="https://installer.us.kg/circle-flags/flags/qa.svg" width="16"> Qatar](https://github.com/HatScripts/circle-flags/blob/gh-pages/flags/qa.svg))
 
 ## License
 
