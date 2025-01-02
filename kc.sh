@@ -192,7 +192,7 @@ clear
 apt-get -y install --no-install-recommends software-properties-common > /dev/null 2>&1
 print_install "Setup Dependencies $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')"
 curl https://haproxy.debian.net/bernat.debian.org.gpg | gpg --dearmor > /usr/share/keyrings/haproxy.debian.net.gpg > /dev/null 2>&1
-echo deb "[signed-by=/usr/share/keyrings/haproxy.debian.net.gpg]" http://haproxy.debian.net buster-backports-2.6 main  > /etc/apt/sources.list.d/haproxy.list > /dev/null 2>&1
+echo "deb [signed-by=/usr/share/keyrings/haproxy.debian.net.gpg] http://haproxy.debian.net buster-backports-2.4 main" | sudo tee /etc/apt/sources.list.d/haproxy.list /dev/null 2>&1
 apt-get update > /dev/null 2>&1
 apt-get -y install haproxy=2.6.\* > /dev/null 2>&1
     ;;
