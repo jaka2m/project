@@ -1204,4 +1204,4 @@ exit 1
 else
 echo -e "${EROR} Reboot Otomatis !"
 reboot
-fi  
+fi
