@@ -1,0 +1,164 @@
+#!/bin/bash
+clear
+export RED='\033[0;31m'
+export GREEN='\033[0;32m'
+export YELLOW='\033[0;33m'
+export BLUE='\033[0;34m'
+export PURPLE='\033[0;35m'
+export CYAN='\033[0;36m'
+export LIGHT='\033[0;37m'
+export NC='\033[0m'
+GREEN="\e[92;1m"
+RED="\033[31m"
+YELLOW="\033[33m"
+BLUE="\033[36m"
+FONT="\033[0m"
+GREENBG="\033[42;37m"
+REDBG="\033[41;37m"
+OK="${GREEN}--->${FONT}"
+ERROR="${RED}[ERROR]${FONT}"
+GRAY="\e[1;30m"
+IJO="\e[1;32m"
+NC='\e[0m'
+red='\e[1;31m'
+GREEN='\e[0;32m'
+export EROR="[${RED} ERROR ${NC}]"
+export INFO="[${YELLOW} INFO ${NC}]"
+export OKEY="[${GREEN} OKEY ${NC}]"
+export PENDING="[${YELLOW} PENDING ${NC}]"
+export SEND="[${YELLOW} SEND ${NC}]"
+export RECEIVE="[${YELLOW} RECEIVE ${NC}]"
+export BOLD="\e[1m"
+export WARNING="${RED}\e[5m"
+export UNDERLINE="\e[4m"
+cyan="\033[1;36m"
+NC='\033[0m'
+echo""
+function SAMAWA(){
+clear
+echo -e " ${BLUE}┌─────────────────────────────────────────────────────┐${NC}"
+echo -e " ${BLUE}│${NC}${GREEN}         ____ _____ _____     ______  _   _${NC}${BLUE}          │${NC}"
+echo -e " ${BLUE}│${NC}${GREEN}        / ___| ____/ _ \ \   / /  _ \| \ | |${NC}${BLUE}         │${NC}"
+echo -e " ${BLUE}│${NC}${GREEN}       | |  _|  _|| | | \ \ / /| |_) |  \| |${NC}${BLUE}         │${NC}"
+echo -e " ${BLUE}│${NC}${GREEN}       | |_| | |__| |_| |\ V / |  __/| |\  |${NC}${BLUE}         │${NC}"
+echo -e " ${BLUE}│${NC}${GREEN}        \____|_____\___/  \_/  |_|   |_| \_|${NC}${BLUE}         │${NC}"
+echo -e " ${BLUE}│${NC}                                                    ${BLUE} │${NC}"
+echo -e " ${BLUE}│${NC}             MULTIPORT VPN SCRIPT V3.1              ${BLUE} │${NC}"
+echo -e " ${BLUE}│${NC}                   WWW.GEOVPN.COM                   ${BLUE} │${NC}"
+echo -e " ${BLUE}│${NC}    TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GREEN}@tau_samawa${NC}    ${BLUE} │${NC}"
+echo -e " ${BLUE}└─────────────────────────────────────────────────────┘${NC}"
+}
+function input_IP(){
+clear
+SAMAWA
+echo -e " ${BLUE}┌─────────────────────────────────────────────────────┐${NC}"
+echo -e " ${BLUE}│$NC$L1\033[41m          ⚡ Pointing IP & Nameserver \e[1;92m⚡             $NC"
+echo -e " ${BLUE}└─────────────────────────────────────────────────────┘${NC}"
+read -p "$( echo -e "${GREEN}  Masukkan IP VPS ${NC} " ) : " IP
+echo ""
+}
+function hasil() {
+SAMAWA
+echo -e " ${BLUE}┌─────────────────────────────────────────────────────┐${NC}"
+echo -e " ${BLUE}│$NC$L1\033[41m          ⚡ IP TELAH BERHASIL DIPOINTING \e[1;92m⚡         $NC"
+echo -e " ${BLUE}└─────────────────────────────────────────────────────┘${NC}"
+echo ""
+echo -e "  ⚡ Domain Pointing : [ ${YELLOW}$SUB_DOMAIN.$Domain_Hasil_Random${NC} ]"
+echo -e "  ⚡ IP VPS          : [ ${YELLOW}$IP${NC} ]"
+echo -e "  ⚡ Nameserver      : [ ${YELLOW}ns.$SUB_DOMAIN.$Domain_Hasil_Random${NC} ]"
+echo -e " "
+echo -e " ${BLUE}└─────────────────────────────────────────────────────┘${NC}"
+echo ""
+echo -ne "[ ${RED}WARNING ${NC}] Apakah anda ingin kembali ke menu ? (y/n)? "
+read answer
+if [ "$answer" == "${answer#[Yy]}" ] ;then
+exit 0
+else
+settings
+fi
+}
+function ins_domain_ns() {
+clear
+Random_Number=$( </dev/urandom tr -dc 1-$( curl -s https://jaka1m.github.io/project/ssh/domain.list | grep -E Jumlah | cut -d " " -f 2 | tail -n1 ) | head -c1 | tr -d '\r\n' | tr -d '\r')
+Domain_Hasil_Random=$( curl -s https://jaka1m.github.io/project/ssh/domain.list | grep -E Domain$Random_Number | cut -d " " -f 2 | tr -d '\r' | tr -d '\r\n')
+SUB_DOMAIN="$(</dev/urandom tr -dc a-x1-9 | head -c5 | tr -d '\r' | tr -d '\r\n')"
+EMAIL_CLOUDFLARE="ambebalong@gmail.com"
+API_KEY_CLOUDFLARE="5fae9fcb9c193ce65de4b57689a94938b708e"
+ZonaPadaCloudflare=$(curl -sLX GET "https://api.cloudflare.com/client/v4/zones?name=${Domain_Hasil_Random}&status=active" \
+-H "X-Auth-Email: ${EMAIL_CLOUDFLARE}" \
+-H "X-Auth-Key: ${API_KEY_CLOUDFLARE}" \
+-H "Content-Type: application/json" | jq -r .result[0].id)
+RECORD=$(curl -sLX POST "https://api.cloudflare.com/client/v4/zones/${ZonaPadaCloudflare}/dns_records" \
+-H "X-Auth-Email: ${EMAIL_CLOUDFLARE}" \
+-H "X-Auth-Key: ${API_KEY_CLOUDFLARE}" \
+-H "Content-Type: application/json" \
+--data '{"type":"NS","name":"'ns.${SUB_DOMAIN}'","content":"'${SUB_DOMAIN}.${Domain_Hasil_Random}'","ttl":0,"proxied":false}' | jq -r .result.id)
+RESULT=$(curl -sLX PUT "https://api.cloudflare.com/client/v4/zones/${ZonaPadaCloudflare}/dns_records/${RECORD}" \
+-H "X-Auth-Email: ${EMAIL_CLOUDFLARE}" \
+-H "X-Auth-Key: ${API_KEY_CLOUDFLARE}" \
+-H "Content-Type: application/json" \
+--data '{"type":"NS","name":"'ns.${SUB_DOMAIN}'","content":"'${SUB_DOMAIN}.${Domain_Hasil_Random}'","ttl":0,"proxied":false}')
+#echo "ns.$SUB_DOMAIN.$Domain_Hasil_Random" > /etc/xray/ns.txt
+}
+
+function ins_domain() {
+echo -e ""
+clear
+SAMAWA
+Random_Number=$( </dev/urandom tr -dc 1-$( curl -s https://jaka1m.github.io/project/ssh/domain.list | grep -E Jumlah | cut -d " " -f 2 | tail -n1 ) | head -c1 | tr -d '\r\n' | tr -d '\r')
+Domain_Hasil_Random=$( curl -s https://jaka1m.github.io/project/ssh/domain.list | grep -E Domain$Random_Number | cut -d " " -f 2 | tr -d '\r' | tr -d '\r\n')
+SUB_DOMAIN="$(</dev/urandom tr -dc a-x1-9 | head -c5 | tr -d '\r' | tr -d '\r\n')"
+EMAIL_CLOUDFLARE="ambebalong@gmail.com"
+API_KEY_CLOUDFLARE="5fae9fcb9c193ce65de4b57689a94938b708e"
+ZonaPadaCloudflare=$(curl -sLX GET "https://api.cloudflare.com/client/v4/zones?name=${Domain_Hasil_Random}&status=active" \
+-H "X-Auth-Email: ${EMAIL_CLOUDFLARE}" \
+-H "X-Auth-Key: ${API_KEY_CLOUDFLARE}" \
+-H "Content-Type: application/json" | jq -r .result[0].id)
+RECORD=$(curl -sLX POST "https://api.cloudflare.com/client/v4/zones/${ZonaPadaCloudflare}/dns_records" \
+-H "X-Auth-Email: ${EMAIL_CLOUDFLARE}" \
+-H "X-Auth-Key: ${API_KEY_CLOUDFLARE}" \
+-H "Content-Type: application/json" \
+--data '{"type":"A","name":"'${SUB_DOMAIN}'","content":"'${IP}'","ttl":0,"proxied":false}' | jq -r .result.id)
+RESULT=$(curl -sLX PUT "https://api.cloudflare.com/client/v4/zones/${ZonaPadaCloudflare}/dns_records/${RECORD}" \
+-H "X-Auth-Email: ${EMAIL_CLOUDFLARE}" \
+-H "X-Auth-Key: ${API_KEY_CLOUDFLARE}" \
+-H "Content-Type: application/json" \
+--data '{"type":"A","name":"'${SUB_DOMAIN}'","content":"'${IP}'","ttl":0,"proxied":false}')
+ZonaPadaCloudflare=$(curl -sLX GET "https://api.cloudflare.com/client/v4/zones?name=${Domain_Hasil_Random}&status=active" \
+-H "X-Auth-Email: ${EMAIL_CLOUDFLARE}" \
+-H "X-Auth-Key: ${API_KEY_CLOUDFLARE}" \
+-H "Content-Type: application/json" | jq -r .result[0].id)
+RECORD=$(curl -sLX POST "https://api.cloudflare.com/client/v4/zones/${ZonaPadaCloudflare}/dns_records" \
+-H "X-Auth-Email: ${EMAIL_CLOUDFLARE}" \
+-H "X-Auth-Key: ${API_KEY_CLOUDFLARE}" \
+-H "Content-Type: application/json" \
+--data '{"type":"A","name":"'*.${SUB_DOMAIN}'","content":"'${IP}'","ttl":0,"proxied":true}' | jq -r .result.id)
+RESULT=$(curl -sLX PUT "https://api.cloudflare.com/client/v4/zones/${ZonaPadaCloudflare}/dns_records/${RECORD}" \
+-H "X-Auth-Email: ${EMAIL_CLOUDFLARE}" \
+-H "X-Auth-Key: ${API_KEY_CLOUDFLARE}" \
+-H "Content-Type: application/json" \
+--data '{"type":"A","name":"'*.${SUB_DOMAIN}'","content":"'${IP}'","ttl":0,"proxied":true}')
+ZonaPadaCloudflare=$(curl -sLX GET "https://api.cloudflare.com/client/v4/zones?name=${Domain_Hasil_Random}&status=active" \
+-H "X-Auth-Email: ${EMAIL_CLOUDFLARE}" \
+-H "X-Auth-Key: ${API_KEY_CLOUDFLARE}" \
+-H "Content-Type: application/json" | jq -r .result[0].id)
+RECORD=$(curl -sLX POST "https://api.cloudflare.com/client/v4/zones/${ZonaPadaCloudflare}/dns_records" \
+-H "X-Auth-Email: ${EMAIL_CLOUDFLARE}" \
+-H "X-Auth-Key: ${API_KEY_CLOUDFLARE}" \
+-H "Content-Type: application/json" \
+--data '{"type":"NS","name":"'ns.${SUB_DOMAIN}'","content":"'${SUB_DOMAIN}.${Domain_Hasil_Random}'","ttl":0,"proxied":false}' | jq -r .result.id)
+RESULT=$(curl -sLX PUT "https://api.cloudflare.com/client/v4/zones/${ZonaPadaCloudflare}/dns_records/${RECORD}" \
+-H "X-Auth-Email: ${EMAIL_CLOUDFLARE}" \
+-H "X-Auth-Key: ${API_KEY_CLOUDFLARE}" \
+-H "Content-Type: application/json" \
+--data '{"type":"NS","name":"'ns.${SUB_DOMAIN}'","content":"'${SUB_DOMAIN}.${Domain_Hasil_Random}'","ttl":0,"proxied":false}')
+}
+
+function pasang() {
+input_IP
+ins_domain_ns
+ins_domain
+hasil
+}
+pasang
+
