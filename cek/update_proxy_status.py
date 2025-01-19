@@ -1,7 +1,7 @@
 import requests
 import csv
 import os
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 
 def check_proxy(row, api_url_template, output_file, error_file):
     ip, port = row[0].strip(), row[1].strip()
@@ -38,7 +38,7 @@ def main():
     error_file = './cek/error.txt'
     api_url_template = os.getenv('API_URL', 'https://check.installer.us.kg/check?ip={ip}:{port}')
 
-    # Pastikan file output dan error bersih sebelum ditulis
+    # Pastikan file output dan error kosong sebelum dimulai
     open(output_file, "w").close()
     open(error_file, "w").close()
 
@@ -51,16 +51,9 @@ def main():
         return
 
     with ThreadPoolExecutor(max_workers=50) as executor:
-        tasks = [
-            executor.submit(check_proxy, row, api_url_template, output_file, error_file)
-            for row in rows if len(row) >= 2
-        ]
-
-        # Tunggu semua proses selesai
-        for _ in as_completed(tasks):
-            pass
-
-    print("Proses pengecekan selesai.")
+        for row in rows:
+            if len(row) >= 2:
+                executor.submit(check_proxy, row, api_url_template, output_file, error_file)
 
 if __name__ == "__main__":
     main()
