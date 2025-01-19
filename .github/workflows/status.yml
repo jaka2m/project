@@ -25,7 +25,7 @@ jobs:
 
     - name: Update proxy status
       env:
-        IP_FILE: 'cek/output.txt'
+        IP_FILE: 'cek/anu.txt'
         API_URL: 'https://check.installer.us.kg/check?ip={ip}:{port}'
       run: |
         python cek/update_proxy_status.py
