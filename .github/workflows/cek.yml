@@ -25,17 +25,17 @@ jobs:
 
     - name: Update proxy status
       env:
-        IP_FILE: 'output.txt'
-        API_URL: 'https://check.installer.us.kg/check?ip={ip}'
+        IP_FILE: './cek/output.txt'
+        API_URL: 'https://p01--boiling-frame--kw6dd7bjv2nr.code.run/check?ip={ip}&host=speed.cloudflare.com&port={port}&tls=true'
       run: |
-        python proxy_status.py
+        python ./cek/update_proxy_status.py
 
     - name: Commit and push changes
       run: |
         git config --local user.name "github-actions[bot]"
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git add output.txt
-        git add error.txt
+        git add cek/output.txt
+        git add cek/error.txt
         if git diff --cached --exit-code; then
           echo "No changes to commit"
         else
