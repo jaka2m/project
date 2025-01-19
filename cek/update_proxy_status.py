@@ -12,13 +12,8 @@ def check_proxy(row, api_url_template):
         response.raise_for_status()
         data = response.json()
 
-        proxyip = data.get("proxyip", "")
-        if isinstance(proxyip, bool):
-            status = proxyip
-        elif isinstance(proxyip, str):
-            status = proxyip.strip().lower() == "true"
-        else:
-            status = False
+        # Parsing status dari API
+        status = data.get("status", "").strip().upper() == "ACTIVE"
 
         if status:
             print(f"{ip}:{port} is ALIVE")
@@ -36,10 +31,10 @@ def check_proxy(row, api_url_template):
         return (None, error_message)
 
 def main():
-    input_file = os.getenv('IP_FILE', 'output.txt')
-    output_file = 'output.txt'
-    error_file = 'error.txt'
-    api_url_template = os.getenv('API_URL', 'https://p01--boiling-frame--kw6dd7bjv2nr.code.run/check?ip={ip}&host=speed.cloudflare.com&port={port}&tls=true')
+    input_file = os.getenv('IP_FILE', './cek/output.txt')
+    output_file = './cek/output.txt'
+    error_file = './cek/error.txt'
+    api_url_template = os.getenv('API_URL', 'https://check.installer.us.kg/check?ip={ip}:{port}')
 
     alive_proxies = []
     error_logs = []
