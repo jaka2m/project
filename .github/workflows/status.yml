@@ -25,17 +25,21 @@ jobs:
 
     - name: Update proxy status
       env:
-        IP_FILE: './cek/output.txt'
+        IP_FILE: 'cek/output.txt'
         API_URL: 'https://check.installer.us.kg/check?ip={ip}:{port}'
       run: |
-        python ./cek/update_proxy_status.py
+        python cek/update_proxy_status.py
+
+    - name: Create error.txt if not exists
+      run: |
+        touch cek/error.txt
 
     - name: Commit and push changes
       run: |
         git config --local user.name "github-actions[bot]"
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git add cek/output.txt
-        git add cek/error.txt
+        git add cek/output.txt || true
+        git add cek/error.txt || true
         if git diff --cached --exit-code; then
           echo "No changes to commit"
         else
