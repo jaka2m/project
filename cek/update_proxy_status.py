@@ -12,9 +12,7 @@ def check_proxy(row, api_url_template):
         response.raise_for_status()
         data = response.json()
 
-        # Menyesuaikan JSON yang diterima dari API
-        status = data.get("status", "").strip().lower() == "active"
-        
+        status = data.get("status", "").lower() == "active"
         if status:
             print(f"{ip}:{port} is ALIVE")
             return (row, None)
@@ -31,9 +29,9 @@ def check_proxy(row, api_url_template):
         return (None, error_message)
 
 def main():
-    input_file = os.getenv('IP_FILE', 'output.txt')
-    output_file = 'output.txt'
-    error_file = 'error.txt'
+    input_file = os.getenv('IP_FILE', 'cek/output.txt')
+    output_file = 'cek/output.txt'
+    error_file = 'cek/error.txt'
     api_url_template = os.getenv('API_URL', 'https://check.installer.us.kg/check?ip={ip}:{port}')
 
     alive_proxies = []
@@ -65,7 +63,10 @@ def main():
         print(f"Error menulis ke {output_file}: {e}")
         return
 
-    if error_logs:
+    # Pastikan file error.txt dibuat jika tidak ada
+    if not error_logs:
+        open(error_file, "w").close()  # Buat file kosong
+    else:
         try:
             with open(error_file, "w") as f:
                 for error in error_logs:
