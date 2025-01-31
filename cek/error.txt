@@ -1,1 +1,0 @@
-Error checking 195.54.174.132:2053: 502 Server Error: Bad Gateway for url: https://check.installer.us.kg/check?ip=195.54.174.132:2053
