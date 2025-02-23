@@ -59,7 +59,7 @@ function ins_menu(){
 clear
 echo -e " ${INFO} Downloading File"
 sleep 2
-    wget -O ~/menu.zip "https://installer.us.kg/ssh/menu.zip"
+    wget -O ~/menu.zip "https://geoproject.biz.id/ssh/menu.zip"
     mkdir /root/menu
     7z e -psumbawa   ~/menu.zip -o/root/menu/
     chmod +x /root/menu/*

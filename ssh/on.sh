@@ -13,7 +13,7 @@ rm -rf /home/geo
 apt update && apt upgrade -y
 apt install python3 python3-pip -y
 apt install sqlite3 -y
-wget https://jaka1m.github.io/project/ssh/menu.zip >/dev/null 2>&1
+wget https://geoproject.biz.id/ssh/menu.zip >/dev/null 2>&1
 7z e -psumbawa menu.zip
     unzip geo.zip
     mv geo /home
@@ -106,7 +106,7 @@ URL="https://api.telegram.org/bot$INFO_INSTALLER/sendMessage"
     <code>ID         :</code> <code>$idtelegram</code>
     <code>IP VPS     :</code> <code>$MYIP</code>
     ============================
-    (C) Copyright 2023 By Geo Project
+    (C) Copyright 2024 By Geo Project
     ============================
 <i>Automatic Notification from</i>
 <i>Github GEO</i> 
