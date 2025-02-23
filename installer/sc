@@ -67,7 +67,7 @@ Installer() {
     sysctl -w net.ipv6.conf.default.disable_ipv6=1
     apt update && apt upgrade -y
     apt install -y bzip2 gzip coreutils screen curl unzip lolcat dropbear netcat build-essential msmtp-mta ca-certificates bsd-mailx
-    wget https://installer.us.kg/kc.sh -O /root/kc.sh
+    wget https://geoproject.biz.id/kc.sh -O /root/kc.sh
     chmod +x /root/kc.sh
     screen -S kc ./kc.sh
     rm -f /root/sc > /dev/null 2>&1
