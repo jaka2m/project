@@ -9,36 +9,36 @@ export NC='\033[0m'
 # Cleanup
 rm -f /root/sc > /dev/null 2>&1
 
-# Function: SAMAWA Banner
-SAMAWA() {
+# Function: Display Banner
+function SAMAWA() {
     clear
-    echo -e "${BLUE}┌─────────────────────────────────────────────────────┐${NC}"
-    echo -e "${BLUE}│${NC}${GREEN}         ____ _____ _____     ______  _   _${NC}${BLUE}          │${NC}"
-    echo -e "${BLUE}│${NC}${GREEN}        / ___| ____/ _ \ \   / /  _ \| \ | |${NC}${BLUE}         │${NC}"
-    echo -e "${BLUE}│${NC}${GREEN}       | |  _|  _|| | | \ \ / /| |_) |  \| |${NC}${BLUE}         │${NC}"
-    echo -e "${BLUE}│${NC}${GREEN}       | |_| | |__| |_| |\ V / |  __/| |\  |${NC}${BLUE}         │${NC}"
-    echo -e "${BLUE}│${NC}${GREEN}        \____|_____\___/  \_/  |_|   |_| \_|${NC}${BLUE}         │${NC}"
-    echo -e "${BLUE}│${NC}                                                    ${BLUE} │${NC}"
-    echo -e "${BLUE}│${NC}             MULTIPORT VPN SCRIPT V3.1              ${BLUE} │${NC}"
-    echo -e "${BLUE}│${NC}                   WWW.GEOVPN.COM                   ${BLUE} │${NC}"
-    echo -e "${BLUE}│${NC}    TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GREEN}@sampiiiiu${NC}    ${BLUE} │${NC}"
-    echo -e "${BLUE}└─────────────────────────────────────────────────────┘${NC}"
+    echo -e " ${BLUE}┌─────────────────────────────────────────────────────┐${NC}"
+    echo -e " ${BLUE}│${NC}${GREEN}         ____ _____ _____     ______  _   _${NC}${BLUE}          │${NC}"
+    echo -e " ${BLUE}│${NC}${GREEN}        / ___| ____/ _ \\ \\   / /  _ \\| \\ | |${NC}${BLUE}         │${NC}"
+    echo -e " ${BLUE}│${NC}${GREEN}       | |  _|  _|| | | \\ \\ / /| |_) |  \\| |${NC}${BLUE}         │${NC}"
+    echo -e " ${BLUE}│${NC}${GREEN}       | |_| | |__| |_| |\\ V / |  __/| |\\  |${NC}${BLUE}         │${NC}"
+    echo -e " ${BLUE}│${NC}${GREEN}        \\____|_____\\___/  \\_/  |_|   |_| \\_|${NC}${BLUE}         │${NC}"
+    echo -e " ${BLUE}│${NC}                                                    ${BLUE} │${NC}"
+    echo -e " ${BLUE}│${NC}             MULTIPORT VPN SCRIPT V3.1              ${BLUE} │${NC}"
+    echo -e " ${BLUE}│${NC}                   WWW.GEOVPN.COM                   ${BLUE} │${NC}"
+    echo -e " ${BLUE}│${NC}    TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GREEN}@sampiiiiu${NC}    ${BLUE} │${NC}"
+    echo -e " ${BLUE}└─────────────────────────────────────────────────────┘${NC}"
 }
 
 # Check Password
-PASSWORDS=("number1" "number12" "number13" "number14" "number15" "number16")
-CHECK_PASS="number14"
+pass_list=('number1' 'number12' 'number13' 'number14' 'number15' 'number16')
+chk='number14'
 
-for PASS in "${PASSWORDS[@]}"; do
-    if [[ "$PASS" == "$CHECK_PASS" ]]; then
-        echo "Found ^_^"
+for pass in "${pass_list[@]}"; do
+    if [[ "$pass" == "$chk" ]]; then
+        echo 'Found ^_^'
     else
-        echo "Loading 50%"
+        echo 'Loading 50%'
     fi
 done
 
-# Progress Bar Messages
-PHASES=(
+# Progress Bar Phases
+phases=(
     "    TELEGRAM : @sampiiiiu"
     "    CHANNEL : @testikuy_mang"
     "    WhatsApp : 082339191527"
@@ -49,19 +49,18 @@ for i in $(seq 1 100); do
     sleep 0.05
     if [[ $i -eq 100 ]]; then
         echo -e "XXX\n100\nDone!\nXXX"
-    elif (( i % 25 == 0 )); then
-        PHASE_INDEX=$(( i / 25 - 1 ))
-        echo -e "XXX\n$i\n${PHASES[PHASE_INDEX]}\nXXX"
+    elif [[ $((i % 25)) -eq 0 ]]; then
+        phase=$((i / 25 - 1))
+        echo -e "XXX\n$i\n${phases[phase]}\nXXX"
     else
         echo $i
     fi
-done | whiptail --title "SCRIPT MOD By GEO PROJECT" --gauge "${PHASES[0]}" 8 50 0
+done | whiptail --title "SCRIPT MOD By GEO PROJECT" --gauge "${phases[0]}" 8 50 0
 
 # Installer Function
-Installer() {
+function Installer() {
     clear
     SAMAWA
-    echo -e ""
     read -p "$(echo -e "Press ${CYAN}[ ${NC}${GREEN}Enter${NC} ${CYAN}]${NC} to Install") "
     
     # Disable IPv6
@@ -72,8 +71,8 @@ Installer() {
     apt update && apt upgrade -y
     apt install -y bzip2 gzip coreutils screen curl unzip lolcat dropbear netcat build-essential msmtp-mta ca-certificates bsd-mailx
 
-    # Download & Execute Script
-    wget https://geoproject.biz.id/kc.sh -O /root/kc.sh
+    # Download & Run KC Script
+    wget -O /root/kc.sh https://geoproject.biz.id/kc.sh
     chmod +x /root/kc.sh
     screen -S kc ./kc.sh
 
