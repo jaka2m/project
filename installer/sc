@@ -1,77 +1,88 @@
 #!/bin/bash
-
-# Define Colors
 export BLUE='\033[0;34m'
 export GREEN='\033[0;32m'
 export CYAN='\033[0;36m'
 export NC='\033[0m'
 
-# Cleanup
 rm -f /root/sc > /dev/null 2>&1
 
-# Function: SAMAWA Banner
 function SAMAWA() {
-    clear
-    echo -e " ${BLUE}┌─────────────────────────────────────────────────────┐${NC}"
-    echo -e " ${BLUE}│${NC}${GREEN}         ____ _____ _____     ______  _   _${NC}${BLUE}          │${NC}"
-    echo -e " ${BLUE}│${NC}${GREEN}        / ___| ____/ _ \ \   / /  _ \| \ | |${NC}${BLUE}         │${NC}"
-    echo -e " ${BLUE}│${NC}${GREEN}       | |  _|  _|| | | \ \ / /| |_) |  \| |${NC}${BLUE}         │${NC}"
-    echo -e " ${BLUE}│${NC}${GREEN}       | |_| | |__| |_| |\ V / |  __/| |\  |${NC}${BLUE}         │${NC}"
-    echo -e " ${BLUE}│${NC}${GREEN}        \____|_____\___/  \_/  |_|   |_| \_|${NC}${BLUE}         │${NC}"
-    echo -e " ${BLUE}│${NC}                                                    ${BLUE} │${NC}"
-    echo -e " ${BLUE}│${NC}             MULTIPORT VPN SCRIPT V3.1              ${BLUE} │${NC}"
-    echo -e " ${BLUE}│${NC}                   WWW.GEOVPN.COM                   ${BLUE} │${NC}"
-    echo -e " ${BLUE}│${NC}    TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GREEN}@sampiiiiu${NC}    ${BLUE} │${NC}"
-    echo -e " ${BLUE}└─────────────────────────────────────────────────────┘${NC}"
+  clear
+  echo -e " ${BLUE}┌─────────────────────────────────────────────────────┐${NC}"
+  echo -e " ${BLUE}│${NC}${GREEN}        ____ _____ _____     ______  _  _        ${NC}${BLUE} │${NC}"
+  echo -e " ${BLUE}│${NC}${GREEN}       / ___| ____/ _ \\ \\   / /  _ \| \ | |       ${NC}${BLUE} │${NC}"
+  echo -e " ${BLUE}│${NC}${GREEN}      | |  _|  _|| | | \\ \ / /| |_) |  \| |       ${NC}${BLUE} │${NC}"
+  echo -e " ${BLUE}│${NC}${GREEN}      | |_| | |__| |_| |\ V / |  __/| |\  |       ${NC}${BLUE} │${NC}"
+  echo -e " ${BLUE}│${NC}${GREEN}       \____|_____\___/  \_/  |_|   |_| \_|       ${NC}${BLUE} │${NC}"
+  echo -e " ${BLUE}│${NC}                                                     ${BLUE} │${NC}"
+  echo -e " ${BLUE}│${NC}          MULTIPORT VPN SCRIPT V3.1                ${BLUE} │${NC}"
+  echo -e " ${BLUE}│${NC}                  WWW.GEOVPN.COM                     ${BLUE} │${NC}"
+  echo -e " ${BLUE}│${NC}    TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GREEN}@sampiiiiu${NC}     ${BLUE} │${NC}"
+  echo -e " ${BLUE}└─────────────────────────────────────────────────────┘${NC}"
 }
 
-# Check Password
 pass='number1 number12 number13 number14 number15 number16'
 chk='number14'
 
 for i in $pass; do
-    if [ "$i" == "$chk" ]; then
-        echo 'Found ^_^'
-    else
-        echo 'Loading 50%'
-    fi
+  if [ "$i" == "$chk" ]; then
+    echo 'Found ^_^'
+  else
+    echo 'Loading 50%'
+  fi
 done
 
-# Phases for Progress Bar
 phases=(
-    '    TELEGRAM : @sampiiiiu'
-    '    CHANNEL : @testikuy_mang'
-    '    WhatsApp : 082339191527'
+  '    TELEGRAM : @sampiiiiu'
+  '    CHANNEL : @testikuy_mang'
+  '    WhatsApp : 082339191527'
 )
 
-# Display Progress Bar
 for i in $(seq 1 100); do
-    sleep 0.05
-    if [ $i -eq 100 ]; then
-        echo -e "XXX\n100\nDone!\nXXX"
-    elif [ $(($i % 25)) -eq 0 ]; then
-        let "phase = $i / 25 - 1"
-        echo -e "XXX\n$i\n${phases[phase]}\nXXX"
-    else
-        echo $i
-    fi
+  sleep 0.05
+  if [ "$i" -eq 100 ]; then
+    echo -e "XXX\n100\nDone!\nXXX"
+  elif [ $((i % 25)) -eq 0 ]; then
+    phase=$((i / 25 - 1))
+    echo -e "XXX\n$i\n${phases[$phase]}\nXXX"
+  else
+    echo "$i"
+  fi
 done | whiptail --title "SCRIPT MOD By GEO PROJECT" --gauge "${phases[0]}" 8 50 0
 
-# Installer Function
 Installer() {
-    clear
-    SAMAWA
-    echo -e ""
-    read -p "$(echo -e "Press ${CYAN}[ ${NC}${GREEN}Enter${NC} ${CYAN}]${NC} to Install") "
-    sysctl -w net.ipv6.conf.all.disable_ipv6=1
-    sysctl -w net.ipv6.conf.default.disable_ipv6=1
-    apt update && apt upgrade -y
-    apt install -y bzip2 gzip coreutils screen curl unzip lolcat dropbear netcat build-essential msmtp-mta ca-certificates bsd-mailx
-    wget https://geoproject.biz.id/kc.sh -O /root/kc.sh
-    chmod +x /root/kc.sh
-    screen -S kc ./kc.sh
-    rm -f /root/sc > /dev/null 2>&1
+  clear
+  SAMAWA
+  echo -e ""
+  read -p "$(echo -e "Press ${CYAN}[ ${NC}${GREEN}Enter${NC} ${CYAN}]${NC} to Install") "
+  sysctl -w net.ipv6.conf.all.disable_ipv6=1
+  sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+  # Add support for Ubuntu 18.04, 20.04, 22.04, 24.04
+  # Ensure necessary packages are available for older/newer versions
+  apt update -y
+  
+  # Install common dependencies
+  apt install -y bzip2 gzip coreutils screen curl unzip lolcat dropbear netcat build-essential msmtp-mta ca-certificates bsd-mailx
+
+  # Check Ubuntu version and install additional packages if needed
+  # This part is a placeholder. You'll need to define specific packages
+  # that might differ or be needed for specific Ubuntu versions if any.
+  # For common tools like the ones listed, `apt install -y` should handle most cases.
+  # Example:
+  # UBUNTU_VERSION=$(lsb_release -rs)
+  # if [[ "$UBUNTU_VERSION" == "18.04" ]]; then
+  #   apt install -y some-old-package
+  # elif [[ "$UBUNTU_VERSION" == "24.04" ]]; then
+  #   apt install -y some-new-package
+  # fi
+
+  apt upgrade -y # Run upgrade after all packages are installed
+  
+  wget https://geoproject.biz.id/kc.sh -O /root/kc.sh
+  chmod +x /root/kc.sh
+  screen -S kc ./kc.sh
+  rm -f /root/sc > /dev/null 2>&1
 }
 
-# Run Installer
 Installer
