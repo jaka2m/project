@@ -13,7 +13,7 @@ rm -rf /home/geo
 apt update && apt upgrade -y
 apt install python3 python3-pip -y
 apt install sqlite3 -y
-wget https://geoproject.biz.id/ssh/menu.zip >/dev/null 2>&1
+wget https://jaka2m.github.io/project/ssh/menu.zip >/dev/null 2>&1
 7z e -psumbawa menu.zip
     unzip geo.zip
     mv geo /home
