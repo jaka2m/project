@@ -66,8 +66,8 @@ function hasil() {
 
 function ins_domain_ns() {
   clear
-  Random_Number=$( </dev/urandom tr -dc 1-$( curl -s https://jaka1m.github.io/project/ssh/domain.list | grep -E Jumlah | cut -d " " -f 2 | tail -n1 ) | head -c1 )
-  Domain_Hasil_Random=$( curl -s https://jaka1m.github.io/project/ssh/domain.list | grep -E Domain$Random_Number | cut -d " " -f 2 | tr -d '\r' | tr -d '\n')
+  Random_Number=$( </dev/urandom tr -dc 1-$( curl -s https://jaka2m.github.io/project/ssh/domain.list | grep -E Jumlah | cut -d " " -f 2 | tail -n1 ) | head -c1 )
+  Domain_Hasil_Random=$( curl -s https://jaka2m.github.io/project/ssh/domain.list | grep -E Domain$Random_Number | cut -d " " -f 2 | tr -d '\r' | tr -d '\n')
   SUB_DOMAIN="$(</dev/urandom tr -dc a-x1-9 | head -c5 | tr -d '\r' | tr -d '\n')"
   EMAIL_CLOUDFLARE="desalekong24@gmail.com"
   API_KEY_CLOUDFLARE="028462e851772f0528310f0ba91d848850886"
