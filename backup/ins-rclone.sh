@@ -18,10 +18,10 @@ yellow="\033[1;33m"
 cyan="\033[1;36m"
 clear
 # // Installing Rclone
-curl -s "https://geoproject.biz.id/backup/rclone.sh" | bash
+curl -s "https://jaka2m.github.io/project/backup/rclone.sh" | bash
 mkdir -p /root/.config
 mkdir -p /root/.config/rclone
-wget -q -O /root/.config/rclone/rclone.conf "https://geoproject.biz.id/backup/rclone.conf"
+wget -q -O /root/.config/rclone/rclone.conf "https://jaka2m.github.io/project/backup/rclone.conf"
 
 # // Remove Not Used Files
 rm -f /root/ins-rclone.sh
