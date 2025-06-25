@@ -6,38 +6,63 @@
 # (C) Copyright 2024
 # =========================================
 clear
-rm /etc/systemd/system/rc-local.service > /dev/null 2>&1
-rm /etc/rc.local > /dev/null 2>&1
-cat >/etc/systemd/system/rc-local.service <<-END
-		[Unit]
-		Description=/etc/rc.local
-		ConditionPathExists=/etc/rc.local
-		[Service]
-		Type=forking
-		ExecStart=/etc/rc.local start
-		TimeoutSec=0
-		StandardOutput=tty
-		RemainAfterExit=yes
-		SysVStartPriority=99
-		[Install]
-		WantedBy=multi-user.target
-	END
 
-    cat >/etc/rc.local <<-END
-		#!/bin/sh -e
-		# rc.local
-		# By default this script does nothing.
-		iptables -I INPUT -p udp --dport 5300 -j ACCEPT
-		iptables -t nat -I PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 5300
-		systemctl restart netfilter-persistent
-		exit 0
-	END
-    # Ubah izin akses
+echo "Menyiapkan dan mengaktifkan rc.local service..."
+
+# Hapus file service dan rc.local yang mungkin ada sebelumnya
+rm -f /etc/systemd/system/rc-local.service
+rm -f /etc/rc.local
+
+# Buat file unit systemd untuk rc.local
+cat >/etc/systemd/system/rc-local.service <<-END
+[Unit]
+Description=/etc/rc.local
+ConditionPathExists=/etc/rc.local
+[Service]
+Type=forking
+ExecStart=/etc/rc.local start
+TimeoutSec=0
+StandardOutput=tty
+RemainAfterExit=yes
+SysVStartPriority=99
+[Install]
+WantedBy=multi-user.target
+END
+
+# Buat file rc.local dengan aturan iptables
+# Menambahkan pengecekan untuk menghindari duplikasi aturan iptables
+cat >/etc/rc.local <<-END
+#!/bin/sh -e
+# rc.local
+# By default this script does nothing.
+
+# Cek apakah aturan INPUT untuk port 5300 sudah ada
+if ! iptables -C INPUT -p udp --dport 5300 -j ACCEPT > /dev/null 2>&1; then
+    iptables -I INPUT -p udp --dport 5300 -j ACCEPT
+fi
+
+# Cek apakah aturan PREROUTING untuk port 53 sudah ada
+if ! iptables -t nat -C PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 5300 > /dev/null 2>&1; then
+    iptables -t nat -I PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 5300
+fi
+
+# Simpan aturan iptables agar persisten setelah reboot
+systemctl restart netfilter-persistent
+
+exit 0
+END
+
+# Ubah izin akses agar rc.local bisa dieksekusi
 chmod +x /etc/rc.local
 
-# enable rc local
-rm /root/rc_local
+# Aktifkan dan mulai service rc-local
+# Baris rm /root/rc_local dihapus karena tidak relevan dan berpotensi menghapus file penting
 systemctl enable rc-local
 systemctl start rc-local.service
+
+# Restart service rc-local untuk menerapkan aturan iptables segera
+# Ini juga akan menjalankan kembali rc.local setelah perubahan
 service rc-local restart
+
+echo "Konfigurasi rc.local dan aturan iptables berhasil diterapkan."
 echo ""
