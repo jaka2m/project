@@ -120,7 +120,7 @@ Documentation=GEOVPN
 After=network-online.target rsyslog.service
 
 [Service]
-ExecStart=/usr/sbin/GeoProject -Ws -f /etc/haproxy/haproxy.cfg -p 18173 
+ExecStart=/usr/sbin/haproxy -Ws -f /etc/haproxy/haproxy.cfg -p 18173 
 Restart=on-failure
 RestartPreventExitStatus=23
 LimitNPROC=10000
