@@ -219,6 +219,10 @@ function Installer() {
 
     # --- Bagian Baru: Konfirmasi Instalasi kc.sh untuk Eksekusi Langsung ---
     clear
+    echo " "
+    display_banner
+    echo " "
+    echo " "
     read -p "$(echo -e "${GREEN}Apakah Anda ingin lanjut sekarang? (y/n): ${NC}")" -n 1 -r
     echo # Tambahkan baris baru setelah input y/n
 
