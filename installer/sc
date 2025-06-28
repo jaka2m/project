@@ -156,7 +156,6 @@ EOF
         if [ "$OS_VERSION_ID" == "20.04" ]; then
             print_install "Mengatur sources.list untuk Ubuntu 20.04 (Focal Fossa) menggunakan Mirror Poliwangi..."
             sudo cat >/etc/apt/sources.list <<EOF
-# Repositori Mirror Poliwangi - Ubuntu 20.04 (Focal Fossa)
 deb http://mirror.poliwangi.ac.id/ubuntu/ focal main restricted universe multiverse
 deb http://mirror.poliwangi.ac.id/ubuntu/ focal-updates main restricted universe multiverse
 deb http://mirror.poliwangi.ac.id/ubuntu/ focal-security main restricted universe multiverse
@@ -165,7 +164,7 @@ deb http://mirror.poliwangi.ac.id/ubuntu/ focal-proposed main restricted univers
 EOF
             print_success "Sources.list Ubuntu 20.04 berhasil dikonfigurasi dengan Mirror Poliwangi."
         elif [ "$OS_VERSION_ID" == "22.04" ]; then
-            print_install "Mengatur sources.list untuk Ubuntu 22.04 (Jammy Jellyfish) menggunakan repositori resmi..."
+            print_install "Mengatur sources.list untuk Ubuntu 22.04 (Jammy Jellyfish)..."
             sudo cat >/etc/apt/sources.list <<EOF
 deb http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse
 deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted universe multiverse
@@ -175,17 +174,15 @@ deb http://archive.canonical.com/ubuntu/ jammy partner
 EOF
             print_success "Sources.list Ubuntu 22.04 berhasil dikonfigurasi."
         elif [ "$OS_VERSION_ID" == "24.04" ]; then
-            print_install "Mengatur sources.list untuk Ubuntu 24.04 (Noble Numbat) menggunakan repositori resmi..."
-            echo -e "${YELLOW}Catatan: Mirror Poliwangi yang Anda berikan adalah untuk Ubuntu 20.04 (focal).${NC}"
-            echo -e "${YELLOW}Untuk Ubuntu 24.04 (noble), saya akan menggunakan repositori resmi Ubuntu.${NC}"
+            print_install "Mengatur sources.list untuk Ubuntu 24.04 (Noble Numbat)..."
             sudo cat >/etc/apt/sources.list <<EOF
-deb http://archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu/ noble-updates main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu/ noble-security main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu/ noble-backports main restricted universe multiverse
-deb http://archive.canonical.com/ubuntu/ noble partner
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal-updates main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal-security main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal-backports main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal-proposed main restricted universe multiverse
 EOF
-            print_success "Sources.list Ubuntu 24.04 berhasil dikonfigurasi dengan repositori resmi."
+            print_success "Sources.list Ubuntu 24.04 berhasil dikonfigurasi."
         else
             print_error "Versi Ubuntu ($OS_VERSION_ID) tidak didukung oleh skrip ini."
             print_error "Skrip akan keluar."
