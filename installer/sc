@@ -2,9 +2,9 @@
 
 # Pastikan script dijalankan sebagai root
 if [[ $EUID -ne 0 ]]; then
-   echo "Skrip ini harus dijalankan sebagai root."
-   echo "Gunakan: sudo bash $(basename "$0")"
-   exit 1
+    echo "Skrip ini harus dijalankan sebagai root."
+    echo "Gunakan: sudo bash $(basename "$0")"
+    exit 1
 fi
 
 clear
@@ -134,23 +134,13 @@ function show_whiptail_progress() {
 function configure_sources_list() {
     print_install "Mendeteksi sistem operasi..."
 
-    # Deteksi OS
-    local OS_TYPE=""
-    if grep -q "ID=debian" /etc/os-release; then
-        OS_TYPE="debian"
-        print_ok "Terdeteksi: Debian"
-    elif grep -q "ID=ubuntu" /etc/os-release; then
-        OS_TYPE="ubuntu"
-        print_ok "Terdeteksi: Ubuntu"
-    else
-        print_error "Sistem operasi tidak didukung atau tidak dapat dideteksi."
-        print_error "Skrip akan keluar."
-        exit 1
-    fi
+    # Deteksi OS dan versi
+    local OS_ID=$(grep -oP '(?<=^ID=).*' /etc/os-release | tr -d '"')
+    local OS_VERSION_ID=$(grep -oP '(?<=^VERSION_ID=).*' /etc/os-release | tr -d '"')
 
-    # Konfigurasi sources.list berdasarkan OS
     clear
-    if [ "$OS_TYPE" == "debian" ]; then
+    if [ "$OS_ID" == "debian" ]; then
+        print_ok "Terdeteksi: Debian"
         print_install "Mengatur sources.list untuk Debian Bullseye..."
         sudo cat >/etc/apt/sources.list <<EOF
 deb http://deb.debian.org/debian/ bullseye main
@@ -161,16 +151,11 @@ deb http://deb.debian.org/debian/ bullseye-updates main
 deb-src http://deb.debian.org/debian/ bullseye-updates main
 EOF
         print_success "Sources.list Debian berhasil dikonfigurasi."
-    elif [ "$OS_TYPE" == "ubuntu" ]; then
-        print_install "Mengatur sources.list untuk Ubuntu Focal Fossa (20.04)..."
-        sudo cat >/etc/apt/sources.list <<EOF
-# Repositori Mirror Data Utama - Ubuntu 20.04 (Focal Fossa)
-# deb http://kartolo.sby.datautama.net.id/ubuntu/ focal main restricted universe multiverse
-# deb http://kartolo.sby.datautama.net.id/ubuntu/ focal-updates main restricted universe multiverse
-# deb http://kartolo.sby.datautama.net.id/ubuntu/ focal-security main restricted universe multiverse
-# deb http://kartolo.sby.datautama.net.id/ubuntu/ focal-backports main restricted universe multiverse
-# deb http://kartolo.sby.datautama.net.id/ubuntu/ focal-proposed main restricted universe multiverse
-
+    elif [ "$OS_ID" == "ubuntu" ]; then
+        print_ok "Terdeteksi: Ubuntu"
+        if [ "$OS_VERSION_ID" == "20.04" ]; then
+            print_install "Mengatur sources.list untuk Ubuntu 20.04 (Focal Fossa) menggunakan Mirror Poliwangi..."
+            sudo cat >/etc/apt/sources.list <<EOF
 # Repositori Mirror Poliwangi - Ubuntu 20.04 (Focal Fossa)
 deb http://mirror.poliwangi.ac.id/ubuntu/ focal main restricted universe multiverse
 deb http://mirror.poliwangi.ac.id/ubuntu/ focal-updates main restricted universe multiverse
@@ -178,8 +163,40 @@ deb http://mirror.poliwangi.ac.id/ubuntu/ focal-security main restricted univers
 deb http://mirror.poliwangi.ac.id/ubuntu/ focal-backports main restricted universe multiverse
 deb http://mirror.poliwangi.ac.id/ubuntu/ focal-proposed main restricted universe multiverse
 EOF
-        print_success "Sources.list Ubuntu berhasil dikonfigurasi."
+            print_success "Sources.list Ubuntu 20.04 berhasil dikonfigurasi dengan Mirror Poliwangi."
+        elif [ "$OS_VERSION_ID" == "22.04" ]; then
+            print_install "Mengatur sources.list untuk Ubuntu 22.04 (Jammy Jellyfish) menggunakan repositori resmi..."
+            sudo cat >/etc/apt/sources.list <<EOF
+deb http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ jammy-security main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse
+deb http://archive.canonical.com/ubuntu/ jammy partner
+EOF
+            print_success "Sources.list Ubuntu 22.04 berhasil dikonfigurasi."
+        elif [ "$OS_VERSION_ID" == "24.04" ]; then
+            print_install "Mengatur sources.list untuk Ubuntu 24.04 (Noble Numbat) menggunakan repositori resmi..."
+            echo -e "${YELLOW}Catatan: Mirror Poliwangi yang Anda berikan adalah untuk Ubuntu 20.04 (focal).${NC}"
+            echo -e "${YELLOW}Untuk Ubuntu 24.04 (noble), saya akan menggunakan repositori resmi Ubuntu.${NC}"
+            sudo cat >/etc/apt/sources.list <<EOF
+deb http://archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ noble-updates main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ noble-security main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ noble-backports main restricted universe multiverse
+deb http://archive.canonical.com/ubuntu/ noble partner
+EOF
+            print_success "Sources.list Ubuntu 24.04 berhasil dikonfigurasi dengan repositori resmi."
+        else
+            print_error "Versi Ubuntu ($OS_VERSION_ID) tidak didukung oleh skrip ini."
+            print_error "Skrip akan keluar."
+            exit 1
+        fi
+    else
+        print_error "Sistem operasi tidak didukung atau tidak dapat dideteksi."
+        print_error "Skrip akan keluar."
+        exit 1
     fi
+
     clear
     print_install "Memperbarui daftar paket setelah perubahan sources.list..."
     sudo apt update || print_error "Gagal memperbarui daftar paket. Periksa koneksi internet atau sources.list."
@@ -187,11 +204,10 @@ EOF
 
 # --- Fungsi Instalasi Utama ---
 function Installer() {
-    is_root_check # Pastikan root sebelum melanjutkan
-    install_lolcat # Coba instal lolcat untuk tampilan yang lebih baik
-
-    display_banner # Tampilkan banner pembuka
-    show_whiptail_progress # Tampilkan progress bar whiptail
+    is_root_check
+    install_lolcat
+    display_banner
+    show_whiptail_progress
 
     clear
     print_install "Mematikan IPv6 (sementara)..."
@@ -205,11 +221,11 @@ function Installer() {
     sudo apt upgrade -y || print_error "Gagal upgrade sistem."
     print_success "Sistem berhasil diperbarui."
 
-    configure_sources_list # Panggil fungsi konfigurasi sources.list
+    configure_sources_list
 
     clear
     print_install "Menginstal dependensi umum..."
-    sudo apt install -y bzip2 gzip coreutils screen curl unzip lolcat dropbear netcat build-essential msmtp-mta ca-certificates bsd-mailx || print_error "Gagal menginstal dependensi umum."
+    sudo apt install -y libbz2-1.0=1.0.8-2 bzip2 gzip coreutils screen curl unzip lolcat dropbear netcat build-essential msmtp-mta ca-certificates bsd-mailx || print_error "Gagal menginstal dependensi umum."
     print_success "Dependensi umum berhasil diinstal."
 
     clear
@@ -246,9 +262,6 @@ function Installer() {
         print_ok "Pengunduhan dan instalasi kc.sh dibatalkan oleh pengguna."
         sleep 2
     fi
-    # --- Akhir Bagian Baru ---
-
-    # Membersihkan file sementara jika diperlukan
     rm -f /root/sc > /dev/null 2>&1
 
     clear
