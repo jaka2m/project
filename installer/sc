@@ -2,9 +2,9 @@
 
 # Pastikan script dijalankan sebagai root
 if [[ $EUID -ne 0 ]]; then
-    echo "Skrip ini harus dijalankan sebagai root."
-    echo "Gunakan: sudo bash $(basename "$0")"
-    exit 1
+   echo "Skrip ini harus dijalankan sebagai root."
+   echo "Gunakan: sudo bash $(basename "$0")"
+   exit 1
 fi
 
 clear
@@ -76,7 +76,6 @@ function is_root_check() {
 function install_lolcat() {
     if ! command -v lolcat &>/dev/null; then
         print_install "Menginstal Lolcat untuk tampilan warna-warni..."
-        sudo apt update -y >/dev/null 2>&1
         sudo apt install -y lolcat
         if [[ $? -ne 0 ]]; then
             print_error "Gagal menginstal lolcat. Tampilan mungkin tidak berwarna-warni."
@@ -105,9 +104,9 @@ function display_banner() {
 # --- Fungsi Progress Bar Whiptail (Opsional, jika Anda ingin menyertakannya) ---
 function show_whiptail_progress() {
     local phases=(
-        '    TELEGRAM : @sampiiiiu'
-        '    CHANNEL : @testikuy_mang'
-        '    WhatsApp : 082339191527'
+        '   TELEGRAM : @sampiiiiu'
+        '   CHANNEL : @testikuy_mang'
+        '   WhatsApp : 082339191527'
     )
 
     # Pastikan whiptail terinstal
@@ -135,40 +134,23 @@ function show_whiptail_progress() {
 function configure_sources_list() {
     print_install "Mendeteksi sistem operasi..."
 
-    local OS_ID=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
-    local OS_VERSION_ID=$(grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"')
-    local OS_CODENAME=$(grep -oP '(?<=^VERSION_CODENAME=).+' /etc/os-release | tr -d '"')
+    # Deteksi OS
+    local OS_TYPE=""
+    if grep -q "ID=debian" /etc/os-release; then
+        OS_TYPE="debian"
+        print_ok "Terdeteksi: Debian"
+    elif grep -q "ID=ubuntu" /etc/os-release; then
+        OS_TYPE="ubuntu"
+        print_ok "Terdeteksi: Ubuntu"
+    else
+        print_error "Sistem operasi tidak didukung atau tidak dapat dideteksi."
+        print_error "Skrip akan keluar."
+        exit 1
+    fi
 
-    if [ "$OS_ID" == "ubuntu" ]; then
-        print_ok "Terdeteksi: Ubuntu $OS_VERSION_ID ($OS_CODENAME)"
-        clear
-        if [ "$OS_VERSION_ID" == "22.04" ]; then
-            print_install "Mengatur sources.list untuk Ubuntu 22.04 (Jammy Jellyfish)..."
-            sudo cat >/etc/apt/sources.list <<EOF
-deb http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu/ jammy-security main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse
-deb http://archive.canonical.com/ubuntu/ jammy partner
-EOF
-            print_success "Sources.list Ubuntu 22.04 berhasil dikonfigurasi."
-        elif [ "$OS_VERSION_ID" == "20.04" ] || [ "$OS_VERSION_ID" == "24.04" ]; then # Asumsi focal masih bisa dipakai untuk 24.04
-            print_install "Mengatur sources.list untuk Ubuntu $OS_VERSION_ID (Focal/Noble)..."
-            sudo cat >/etc/apt/sources.list <<EOF
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal-updates main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal-security main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal-backports main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal-proposed main restricted universe multiverse
-EOF
-            print_success "Sources.list Ubuntu $OS_VERSION_ID berhasil dikonfigurasi."
-        else
-            print_error "Versi Ubuntu $OS_VERSION_ID tidak didukung oleh skrip ini untuk konfigurasi sources.list."
-            print_error "Skrip akan keluar."
-            exit 1
-        fi
-    elif [ "$OS_ID" == "debian" ]; then
-        print_ok "Terdeteksi: Debian $OS_VERSION_ID ($OS_CODENAME)"
+    # Konfigurasi sources.list berdasarkan OS
+    clear
+    if [ "$OS_TYPE" == "debian" ]; then
         print_install "Mengatur sources.list untuk Debian Bullseye..."
         sudo cat >/etc/apt/sources.list <<EOF
 deb http://deb.debian.org/debian/ bullseye main
@@ -179,12 +161,17 @@ deb http://deb.debian.org/debian/ bullseye-updates main
 deb-src http://deb.debian.org/debian/ bullseye-updates main
 EOF
         print_success "Sources.list Debian berhasil dikonfigurasi."
-    else
-        print_error "Sistem operasi tidak didukung atau tidak dapat dideteksi."
-        print_error "Skrip akan keluar."
-        exit 1
+    elif [ "$OS_TYPE" == "ubuntu" ]; then
+        print_install "Mengatur sources.list untuk Ubuntu Focal Fossa (20.04)..."
+        sudo cat >/etc/apt/sources.list <<EOF
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal-updates main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal-security main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal-backports main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal-proposed main restricted universe multiverse
+EOF
+        print_success "Sources.list Ubuntu berhasil dikonfigurasi."
     fi
-
     clear
     print_install "Memperbarui daftar paket setelah perubahan sources.list..."
     sudo apt update || print_error "Gagal memperbarui daftar paket. Periksa koneksi internet atau sources.list."
@@ -217,28 +204,10 @@ function Installer() {
     sudo apt install -y bzip2 gzip coreutils screen curl unzip lolcat dropbear netcat build-essential msmtp-mta ca-certificates bsd-mailx || print_error "Gagal menginstal dependensi umum."
     print_success "Dependensi umum berhasil diinstal."
 
-    # --- Bagian Baru: Instalasi Dependensi Spesifik Versi OS ---
-    local OS_ID=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
-    local OS_VERSION_ID=$(grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"')
-
-    if [ "$OS_ID" == "ubuntu" ]; then
-        if [ "$OS_VERSION_ID" == "20.04" ] || [ "$OS_VERSION_ID" == "24.04" ]; then
-            print_install "Menginstal libssl1.1 untuk Ubuntu $OS_VERSION_ID..."
-            sudo apt install -y libssl1.1
-            print_success "libssl1.1 berhasil diinstal."
-        elif [ "$OS_VERSION_ID" == "22.04" ]; then
-            print_install "Menginstal liblua5.3-0 untuk Ubuntu $OS_VERSION_ID..."
-            sudo apt install -y liblua5.3-0
-            print_success "liblua5.3-0 berhasil diinstal."
-        fi
-    elif [ "$OS_ID" == "debian" ]; then
-        print_install "Menginstal libssl1.1 untuk Debian $OS_VERSION_ID..."
-        # Untuk Debian, jika libssl1.1 tidak ada di Bullseye, bisa jadi harus dari arsip lama.
-        # Namun, kita akan coba instal dari repositori default dulu.
-        sudo apt install -y libssl1.1
-        print_success "libssl1.1 berhasil diinstal."
-    fi
-    # --- Akhir Bagian Baru ---
+    clear
+    print_install "Menginstal dependensi khusus (liblua5.3-0, libssl1.1)..."
+    sudo apt install -y liblua5.3-0 libssl1.1 || print_error "Gagal menginstal liblua5.3-0 atau libssl1.1."
+    print_success "Dependensi khusus berhasil diinstal."
 
     # --- Bagian Baru: Konfirmasi Instalasi kc.sh untuk Eksekusi Langsung ---
     clear
