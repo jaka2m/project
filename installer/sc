@@ -88,15 +88,15 @@ function install_lolcat() {
 function display_banner() {
     clear
     echo -e "${BLUE}╔═════════════════════════════════════════════════════╗${NC}"
-    echo -e "${BLUE}║${GREEN}     ____ _____ _____     ______  _  _           ${BLUE} ║${NC}"
-    echo -e "${BLUE}║${GREEN}    / ___| ____/ _ \ \   / /  _ \| \ | |          ${BLUE} ║${NC}"
-    echo -e "${BLUE}║${GREEN}   | |  _| _|| | | \ \ / /| |_) |  \| |          ${BLUE} ║${NC}"
-    echo -e "${BLUE}║${GREEN}   | |_| | |__| |_| |\ V /  | __/| |\  |          ${BLUE} ║${NC}"
-    echo -e "${BLUE}║${GREEN}    \____|_____\___/  \_/   |_|  |_| \_|          ${BLUE} ║${NC}"
+    echo -e "${BLUE}║${GREEN}       ____ _____ _____      ______  _   _          ${BLUE} ║${NC}"
+    echo -e "${BLUE}║${GREEN}      / ___| ____/ _ \ \    / /  _ \| \ | |         ${BLUE} ║${NC}"
+    echo -e "${BLUE}║${GREEN}     | |  _|  _|| | | \ \  / /| |_) |  \| |         ${BLUE} ║${NC}"
+    echo -e "${BLUE}║${GREEN}     | |_| | |__| |_| |\ V /  |  __/| |\  |         ${BLUE} ║${NC}"
+    echo -e "${BLUE}║${GREEN}      \____|_____\___/  \_/   |_|   |_| \_|         ${BLUE} ║${NC}"
     echo -e "${BLUE}║${NC}                                                     ${BLUE}║${NC}"
-    echo -e "${BLUE}║${NC}           ${YELLOW}MULTIPORT VPN SCRIPT V3.1${NC}           ${BLUE} ║${NC}"
-    echo -e "${BLUE}║${NC}                 ${CYAN}WWW.GEOVPN.COM${NC}                  ${BLUE} ║${NC}"
-    echo -e "${BLUE}║${NC}   TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GREEN}@sampiiiiu${NC}     ${BLUE} ║${NC}"
+    echo -e "${BLUE}║${NC}             ${YELLOW}MULTIPORT VPN SCRIPT V3.1${NC}              ${BLUE} ║${NC}"
+    echo -e "${BLUE}║${NC}                   ${CYAN}WWW.GEOVPN.COM${NC}                   ${BLUE} ║${NC}"
+    echo -e "${BLUE}║${NC}   TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GREEN}@sampiiiiu${NC}      ${BLUE} ║${NC}"
     echo -e "${BLUE}╚═════════════════════════════════════════════════════╝${NC}"
     echo -e ""
     read -p "$(echo -e "Tekan ${CYAN}[ ${NC}${GREEN}Enter${NC} ${CYAN}]${NC} untuk memulai instalasi...") "
@@ -150,6 +150,7 @@ deb http://mirror.poliwangi.ac.id/ubuntu/ focal-updates main restricted universe
 deb http://mirror.poliwangi.ac.id/ubuntu/ focal-security main restricted universe multiverse
 deb http://mirror.poliwangi.ac.id/ubuntu/ focal-backports main restricted universe multiverse
 deb http://mirror.poliwangi.ac.id/ubuntu/ focal-proposed main restricted universe multiverse
+
 deb http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse
 deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted universe multiverse
 deb http://archive.ubuntu.com/ubuntu/ jammy-security main restricted universe multiverse
@@ -165,6 +166,12 @@ deb http://mirror.poliwangi.ac.id/ubuntu/ focal-updates main restricted universe
 deb http://mirror.poliwangi.ac.id/ubuntu/ focal-security main restricted universe multiverse
 deb http://mirror.poliwangi.ac.id/ubuntu/ focal-backports main restricted universe multiverse
 deb http://mirror.poliwangi.ac.id/ubuntu/ focal-proposed main restricted universe multiverse
+
+deb http://archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ noble-updates main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ noble-security main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ noble-backports main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ noble-proposed main restricted universe multiverse
 EOF
             print_success "Sources.list Ubuntu $OS_VERSION_ID berhasil dikonfigurasi."
         else
