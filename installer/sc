@@ -77,6 +77,9 @@ function install_lolcat() {
     if ! command -v lolcat &>/dev/null; then
         print_install "Menginstal Lolcat untuk tampilan warna-warni..."
         sudo apt install -y lolcat
+        sudo apt install libbz2-1.0=1.0.8-2
+        sudo apt update
+        sudo apt install bzip2
         if [[ $? -ne 0 ]]; then
             print_error "Gagal menginstal lolcat. Tampilan mungkin tidak berwarna-warni."
         fi
