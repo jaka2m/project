@@ -217,7 +217,7 @@ function Installer() {
     sudo apt install -y bzip2 gzip coreutils screen curl unzip lolcat dropbear netcat build-essential msmtp-mta ca-certificates bsd-mailx || print_error "Gagal menginstal dependensi umum."
     print_success "Dependensi umum berhasil diinstal."
 
-    # --- Bagian Baru: Instalasi Dependensi Spesifik Versi Ubuntu ---
+    # --- Bagian Baru: Instalasi Dependensi Spesifik Versi OS ---
     local OS_ID=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
     local OS_VERSION_ID=$(grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"')
 
@@ -231,6 +231,12 @@ function Installer() {
             sudo apt install -y liblua5.3-0
             print_success "liblua5.3-0 berhasil diinstal."
         fi
+    elif [ "$OS_ID" == "debian" ]; then
+        print_install "Menginstal libssl1.1 untuk Debian $OS_VERSION_ID..."
+        # Untuk Debian, jika libssl1.1 tidak ada di Bullseye, bisa jadi harus dari arsip lama.
+        # Namun, kita akan coba instal dari repositori default dulu.
+        sudo apt install -y libssl1.1
+        print_success "libssl1.1 berhasil diinstal."
     fi
     # --- Akhir Bagian Baru ---
 
