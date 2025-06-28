@@ -73,6 +73,11 @@ function is_root_check() {
     fi
 }
 
+function up() {
+apt update
+apt upgrade -y
+}
+
 function install_lolcat() {
     if ! command -v lolcat &>/dev/null; then
         print_install "Menginstal Lolcat untuk tampilan warna-warni..."
@@ -266,4 +271,5 @@ function Installer() {
     echo -e "${GREEN}Terima kasih telah menggunakan skrip ini!${NC}"
     echo -e ""
 }
+up
 Installer
