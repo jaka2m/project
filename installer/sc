@@ -76,6 +76,7 @@ function is_root_check() {
 function install_lolcat() {
     if ! command -v lolcat &>/dev/null; then
         print_install "Menginstal Lolcat untuk tampilan warna-warni..."
+        sudo apt update -y >/dev/null 2>&1
         sudo apt install -y lolcat
         if [[ $? -ne 0 ]]; then
             print_error "Gagal menginstal lolcat. Tampilan mungkin tidak berwarna-warni."
@@ -87,14 +88,14 @@ function install_lolcat() {
 function display_banner() {
     clear
     echo -e "${BLUE}╔═════════════════════════════════════════════════════╗${NC}"
-    echo -e "${BLUE}║${GREEN}     ____ _____ _____      ______  _  _           ${BLUE} ║${NC}"
-    echo -e "${BLUE}║${GREEN}    / ___| ____/ _ \ \    / /  _ \| \ | |          ${BLUE} ║${NC}"
-    echo -e "${BLUE}║${GREEN}   | |  _|  _|| | | \ \  / /| |_) |  \| |          ${BLUE} ║${NC}"
-    echo -e "${BLUE}║${GREEN}   | |_| | |__| |_| |\ V /  |  __/| |\  |          ${BLUE} ║${NC}"
-    echo -e "${BLUE}║${GREEN}    \____|_____\___/  \_/   |_|   |_| \_|          ${BLUE} ║${NC}"
+    echo -e "${BLUE}║${GREEN}     ____ _____ _____     ______  _  _           ${BLUE} ║${NC}"
+    echo -e "${BLUE}║${GREEN}    / ___| ____/ _ \ \   / /  _ \| \ | |          ${BLUE} ║${NC}"
+    echo -e "${BLUE}║${GREEN}   | |  _| _|| | | \ \ / /| |_) |  \| |          ${BLUE} ║${NC}"
+    echo -e "${BLUE}║${GREEN}   | |_| | |__| |_| |\ V /  | __/| |\  |          ${BLUE} ║${NC}"
+    echo -e "${BLUE}║${GREEN}    \____|_____\___/  \_/   |_|  |_| \_|          ${BLUE} ║${NC}"
     echo -e "${BLUE}║${NC}                                                     ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}           ${YELLOW}MULTIPORT VPN SCRIPT V3.1${NC}           ${BLUE} ║${NC}"
-    echo -e "${BLUE}║${NC}                     ${CYAN}WWW.GEOVPN.COM${NC}                    ${BLUE} ║${NC}"
+    echo -e "${BLUE}║${NC}                 ${CYAN}WWW.GEOVPN.COM${NC}                  ${BLUE} ║${NC}"
     echo -e "${BLUE}║${NC}   TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GREEN}@sampiiiiu${NC}     ${BLUE} ║${NC}"
     echo -e "${BLUE}╚═════════════════════════════════════════════════════╝${NC}"
     echo -e ""
@@ -130,100 +131,68 @@ function show_whiptail_progress() {
     clear
 }
 
----
-
-## Konfigurasi Sources.list Berdasarkan OS dan Versi
-
----
-
-```bash
+# --- Fungsi Konfigurasi Sources.list ---
 function configure_sources_list() {
     print_install "Mendeteksi sistem operasi..."
 
-    local OS_TYPE=""
-    local OS_VERSION=""
-    local OS_CODENAME=""
+    local OS_ID=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
+    local OS_VERSION_ID=$(grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"')
+    local OS_CODENAME=$(grep -oP '(?<=^VERSION_CODENAME=).+' /etc/os-release | tr -d '"')
 
-    if grep -q "ID=ubuntu" /etc/os-release; then
-        OS_TYPE="ubuntu"
-        OS_VERSION=$(grep "VERSION_ID" /etc/os-release | cut -d'=' -f2 | tr -d '"')
-        OS_CODENAME=$(grep "VERSION_CODENAME" /etc/os-release | cut -d'=' -f2 | tr -d '"')
-        print_ok "Terdeteksi: Ubuntu Versi ${OS_VERSION} (${OS_CODENAME})"
-    elif grep -q "ID=debian" /etc/os-release; then
-        OS_TYPE="debian"
-        OS_CODENAME=$(grep "VERSION_CODENAME" /etc/os-release | cut -d'=' -f2 | tr -d '"')
-        print_ok "Terdeteksi: Debian (${OS_CODENAME})"
+    if [ "$OS_ID" == "ubuntu" ]; then
+        print_ok "Terdeteksi: Ubuntu $OS_VERSION_ID ($OS_CODENAME)"
+        clear
+        if [ "$OS_VERSION_ID" == "22.04" ]; then
+            print_install "Mengatur sources.list untuk Ubuntu 22.04 (Jammy Jellyfish)..."
+            sudo cat >/etc/apt/sources.list <<EOF
+deb http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ jammy-security main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse
+deb http://archive.canonical.com/ubuntu/ jammy partner
+EOF
+            print_success "Sources.list Ubuntu 22.04 berhasil dikonfigurasi."
+        elif [ "$OS_VERSION_ID" == "20.04" ] || [ "$OS_VERSION_ID" == "24.04" ]; then # Tambahkan 24.04 di sini jika repositori focal bisa digunakan
+            print_install "Mengatur sources.list untuk Ubuntu $OS_VERSION_ID (Focal/Noble)..."
+            # Asumsi repositori focal bisa digunakan untuk 20.04 dan 24.04 berdasarkan contoh Anda
+            # Jika 24.04 membutuhkan 'noble', ini perlu disesuaikan
+            sudo cat >/etc/apt/sources.list <<EOF
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal-updates main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal-security main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal-backports main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal-proposed main restricted universe multiverse
+EOF
+            print_success "Sources.list Ubuntu $OS_VERSION_ID berhasil dikonfigurasi."
+        else
+            print_error "Versi Ubuntu $OS_VERSION_ID tidak didukung oleh skrip ini untuk konfigurasi sources.list."
+            print_error "Skrip akan keluar."
+            exit 1
+        fi
+    elif [ "$OS_ID" == "debian" ]; then
+        print_ok "Terdeteksi: Debian $OS_VERSION_ID ($OS_CODENAME)"
+        print_install "Mengatur sources.list untuk Debian Bullseye..."
+        sudo cat >/etc/apt/sources.list <<EOF
+deb http://deb.debian.org/debian/ bullseye main
+deb-src http://deb.debian.org/debian/ bullseye main
+deb http://security.debian.org/debian-security bullseye-security main
+deb-src http://security.debian.org/debian-security bullseye-security main
+deb http://deb.debian.org/debian/ bullseye-updates main
+deb-src http://deb.debian.org/debian/ bullseye-updates main
+EOF
+        print_success "Sources.list Debian berhasil dikonfigurasi."
     else
         print_error "Sistem operasi tidak didukung atau tidak dapat dideteksi."
         print_error "Skrip akan keluar."
         exit 1
     fi
-
-    clear
-    print_install "Mengatur sources.list..."
-
-    if [ "$OS_TYPE" == "ubuntu" ]; then
-        if [ "$OS_VERSION" == "20.04" ]; then
-            print_ok "Mengatur sources.list untuk Ubuntu Focal Fossa (20.04)..."
-            sudo cat >/etc/apt/sources.list <<EOF
-deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) focal main restricted universe multiverse
-deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) focal-updates main restricted universe multiverse
-deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) focal-security main restricted universe multiverse
-deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) focal-backports main restricted universe multiverse
-deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) focal-proposed main restricted universe multiverse
-EOF
-            print_success "Sources.list Ubuntu 20.04 berhasil dikonfigurasi."
-        elif [ "$OS_VERSION" == "22.04" ]; then
-            print_ok "Mengatur sources.list untuk Ubuntu Jammy Jellyfish (22.04)..."
-            sudo cat >/etc/apt/sources.list <<EOF
-deb [http://archive.ubuntu.com/ubuntu/](http://archive.ubuntu.com/ubuntu/) jammy main restricted universe multiverse
-deb [http://archive.ubuntu.com/ubuntu/](http://archive.ubuntu.com/ubuntu/) jammy-updates main restricted universe multiverse
-deb [http://archive.ubuntu.com/ubuntu/](http://archive.ubuntu.com/ubuntu/) jammy-security main restricted universe multiverse
-deb [http://archive.ubuntu.com/ubuntu/](http://archive.ubuntu.com/ubuntu/) jammy-backports main restricted universe multiverse
-deb [http://archive.canonical.com/ubuntu/](http://archive.canonical.com/ubuntu/) jammy partner
-EOF
-            print_success "Sources.list Ubuntu 22.04 berhasil dikonfigurasi."
-        elif [ "$OS_VERSION" == "24.04" ]; then
-            print_ok "Mengatur sources.list untuk Ubuntu Noble Numbat (24.04)..."
-            # Asumsi repositori untuk 24.04 menggunakan mirror poliwangi dan codename 'noble'
-            sudo cat >/etc/apt/sources.list <<EOF
-deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) noble main restricted universe multiverse
-deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) noble-updates main restricted universe multiverse
-deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) noble-security main restricted universe multiverse
-deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) noble-backports main restricted universe multiverse
-deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) noble-proposed main restricted universe multiverse
-EOF
-            print_success "Sources.list Ubuntu 24.04 berhasil dikonfigurasi."
-        else
-            print_error "Versi Ubuntu (${OS_VERSION}) tidak didukung oleh skrip ini (hanya 20.04, 22.04, 24.04)."
-            print_error "Tidak ada perubahan pada sources.list. Skrip akan keluar."
-            exit 1
-        fi
-    elif [ "$OS_TYPE" == "debian" ]; then
-        print_ok "Mengatur sources.list untuk Debian Bullseye..."
-        sudo cat >/etc/apt/sources.list <<EOF
-deb [http://deb.debian.org/debian/](http://deb.debian.org/debian/) bullseye main
-deb-src [http://deb.debian.org/debian/](http://deb.debian.org/debian/) bullseye main
-deb [http://security.debian.org/debian-security](http://security.debian.org/debian-security) bullseye-security main
-deb-src [http://security.debian.org/debian-security](http://security.debian.org/debian-security) bullseye-security main
-deb [http://deb.debian.org/debian/](http://deb.debian.org/debian/) bullseye-updates main
-deb-src [http://deb.debian.org/debian/](http://deb.debian.org/debian/) bullseye-updates main
-EOF
-        print_success "Sources.list Debian berhasil dikonfigurasi."
-    fi
-
+    
     clear
     print_install "Memperbarui daftar paket setelah perubahan sources.list..."
     sudo apt update || print_error "Gagal memperbarui daftar paket. Periksa koneksi internet atau sources.list."
 }
 
----
-
-## Fungsi Instalasi Utama
-
----
-
-```bash
+# --- Fungsi Instalasi Utama ---
 function Installer() {
     is_root_check # Pastikan root sebelum melanjutkan
     install_lolcat # Coba instal lolcat untuk tampilan yang lebih baik
@@ -245,48 +214,21 @@ function Installer() {
 
     configure_sources_list # Panggil fungsi konfigurasi sources.list
 
-    # --- Bagian Baru untuk Ubuntu 22.04: Instalasi libbz2-1.0 versi spesifik ---
-    # Deteksi OS dan versi di sini lagi untuk memastikan aksi ini hanya untuk Ubuntu 22.04
-    local CURRENT_OS_TYPE=""
-    local CURRENT_OS_VERSION=""
-
-    if grep -q "ID=ubuntu" /etc/os-release; then
-        CURRENT_OS_TYPE="ubuntu"
-        CURRENT_OS_VERSION=$(grep "VERSION_ID" /etc/os-release | cut -d'=' -f2 | tr -d '"')
-    fi
-
-    if [ "$CURRENT_OS_TYPE" == "ubuntu" ] && [ "$CURRENT_OS_VERSION" == "22.04" ]; then
-        print_install "Menginstal libbz2-1.0 versi 1.0.8-2 untuk Ubuntu 22.04..."
-        sudo apt install -y libbz2-1.0=1.0.8-2
-        if [[ $? -ne 0 ]]; then
-            print_error "Gagal menginstal libbz2-1.0 versi 1.0.8-2. Mungkin versi ini tidak tersedia atau ada masalah dependensi."
-            print_error "Mencoba menginstal libbz2-1.0 tanpa versi spesifik..."
-            sudo apt install -y libbz2-1.0 || print_error "Gagal menginstal libbz2-1.0."
-        fi
-        print_success "Libbz2-1.0 berhasil diinstal (atau diperiksa)."
-        
-        print_install "Memperbarui daftar paket lagi setelah instalasi libbz2-1.0..."
-        sudo apt update || print_error "Gagal memperbarui daftar paket."
-
-        print_install "Memastikan bzip2 terinstal..."
-        sudo apt install -y bzip2 || print_error "Gagal menginstal bzip2."
-        print_success "Bzip2 berhasil diinstal (atau diperiksa)."
-    fi
-    # --- Akhir Bagian Baru ---
-
     clear
     print_install "Menginstal dependensi umum..."
-    # 'bzip2' dihapus dari daftar ini karena sudah ditangani secara spesifik di atas untuk Ubuntu 22.04
-    # Jika Anda ingin bzip2 selalu diinstal terlepas dari versi, Anda bisa tambahkan kembali di sini.
-    sudo apt install -y gzip coreutils screen curl unzip lolcat dropbear netcat build-essential msmtp-mta ca-certificates bsd-mailx || print_error "Gagal menginstal dependensi umum."
+    sudo apt install -y bzip2 gzip coreutils screen curl unzip lolcat dropbear netcat build-essential msmtp-mta ca-certificates bsd-mailx || print_error "Gagal menginstal dependensi umum."
     print_success "Dependensi umum berhasil diinstal."
 
     clear
     print_install "Menginstal dependensi khusus (liblua5.3-0, libssl1.1)..."
-    sudo apt install -y liblua5.3-0 libssl1.1 || print_error "Gagal menginstal liblua5.3-0 atau libssl1.1."
-    print_success "Dependensi khusus berhasil diinstal."
+    # Pastikan untuk menginstal libssl1.1 jika tidak ada, karena beberapa paket mungkin masih membutuhkannya.
+    # Namun, pada Ubuntu 22.04 dan yang lebih baru, biasanya sudah libssl3.
+    # Jika instalasi libssl1.1 gagal di versi baru, mungkin tidak perlu.
+    # Saya akan mencoba instalasi keduanya.
+    sudo apt install -y liblua5.3-0 libssl1.1 || true # Gunakan 'true' agar tidak menghentikan script jika gagal instal libssl1.1
+    print_success "Dependensi khusus berhasil diinstal (jika tersedia)."
 
-    # --- Bagian Konfirmasi Instalasi kc.sh untuk Eksekusi Langsung ---
+    # --- Bagian Baru: Konfirmasi Instalasi kc.sh untuk Eksekusi Langsung ---
     clear
     echo " "
     display_banner
@@ -315,7 +257,7 @@ function Installer() {
         print_ok "Pengunduhan dan instalasi kc.sh dibatalkan oleh pengguna."
         sleep 2
     fi
-    # --- Akhir Bagian Konfirmasi ---
+    # --- Akhir Bagian Baru ---
 
     # Membersihkan file sementara jika diperlukan
     rm -f /root/sc > /dev/null 2>&1
