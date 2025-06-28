@@ -76,6 +76,9 @@ function is_root_check() {
 function up() {
 apt update
 apt upgrade -y
+libbz2-1.0=1.0.8-2
+sudo apt install -y liblua5.3-0
+sudo apt install -y libssl1.1
 }
 
 function install_lolcat() {
@@ -227,7 +230,7 @@ function Installer() {
 
     clear
     print_install "Menginstal dependensi umum..."
-    sudo apt install -y libbz2-1.0=1.0.8-2 bzip2 gzip coreutils screen curl unzip lolcat dropbear netcat build-essential msmtp-mta ca-certificates bsd-mailx || print_error "Gagal menginstal dependensi umum."
+    sudo apt install -y bzip2 gzip coreutils screen curl unzip lolcat dropbear netcat build-essential msmtp-mta ca-certificates bsd-mailx || print_error "Gagal menginstal dependensi umum."
     print_success "Dependensi umum berhasil diinstal."
 
     clear
