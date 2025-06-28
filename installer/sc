@@ -13,9 +13,9 @@ clear
 export BLUE='\033[0;34m'
 export GREEN='\033[0;32m'
 export CYAN='\033[0;36m'
-export YELLOW='\033[0;33m' # Menambahkan warna kuning
-export RED='\033[0;31m'    # Menambahkan warna merah
-export NC='\033[0m'        # No Color
+export YELLOW='\033[0;33m'
+export RED='\033[0;31m'
+export NC='\033[0m'
 
 # Simbol untuk pesan
 export OK="[ ${GREEN}OK${NC} ]"
@@ -165,11 +165,11 @@ EOF
         print_install "Mengatur sources.list untuk Ubuntu Focal Fossa (20.04)..."
         sudo cat >/etc/apt/sources.list <<EOF
 # Repositori Mirror Data Utama - Ubuntu 20.04 (Focal Fossa)
-deb http://kartolo.sby.datautama.net.id/ubuntu/ focal main restricted universe multiverse
-deb http://kartolo.sby.datautama.net.id/ubuntu/ focal-updates main restricted universe multiverse
-deb http://kartolo.sby.datautama.net.id/ubuntu/ focal-security main restricted universe multiverse
-deb http://kartolo.sby.datautama.net.id/ubuntu/ focal-backports main restricted universe multiverse
-deb http://kartolo.sby.datautama.net.id/ubuntu/ focal-proposed main restricted universe multiverse
+# deb http://kartolo.sby.datautama.net.id/ubuntu/ focal main restricted universe multiverse
+# deb http://kartolo.sby.datautama.net.id/ubuntu/ focal-updates main restricted universe multiverse
+# deb http://kartolo.sby.datautama.net.id/ubuntu/ focal-security main restricted universe multiverse
+# deb http://kartolo.sby.datautama.net.id/ubuntu/ focal-backports main restricted universe multiverse
+# deb http://kartolo.sby.datautama.net.id/ubuntu/ focal-proposed main restricted universe multiverse
 
 # Repositori Mirror Poliwangi - Ubuntu 20.04 (Focal Fossa)
 deb http://mirror.poliwangi.ac.id/ubuntu/ focal main restricted universe multiverse
@@ -256,6 +256,4 @@ function Installer() {
     echo -e "${GREEN}Terima kasih telah menggunakan skrip ini!${NC}"
     echo -e ""
 }
-
-# --- Eksekusi Utama ---
 Installer
