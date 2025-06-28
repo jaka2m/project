@@ -83,11 +83,6 @@ function install_lolcat() {
     fi
 }
 
----
-
-## Tampilan Informasi dan Progress
-
-```bash
 # --- Fungsi Tampilan ASCII Art / Banner ---
 function display_banner() {
     clear
@@ -106,7 +101,7 @@ function display_banner() {
     read -p "$(echo -e "Tekan ${CYAN}[ ${NC}${GREEN}Enter${NC} ${CYAN}]${NC} untuk memulai instalasi...") "
 }
 
-# --- Fungsi Progress Bar Whiptail (Opsional) ---
+# --- Fungsi Progress Bar Whiptail (Opsional, jika Anda ingin menyertakannya) ---
 function show_whiptail_progress() {
     local phases=(
         '    TELEGRAM : @sampiiiiu'
@@ -137,10 +132,11 @@ function show_whiptail_progress() {
 
 ---
 
-## Konfigurasi Repositori Sistem
+## Konfigurasi Sources.list Berdasarkan OS dan Versi
+
+---
 
 ```bash
-# --- Fungsi Konfigurasi Sources.list ---
 function configure_sources_list() {
     print_install "Mendeteksi sistem operasi..."
 
@@ -170,32 +166,32 @@ function configure_sources_list() {
         if [ "$OS_VERSION" == "20.04" ]; then
             print_ok "Mengatur sources.list untuk Ubuntu Focal Fossa (20.04)..."
             sudo cat >/etc/apt/sources.list <<EOF
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal-updates main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal-security main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal-backports main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal-proposed main restricted universe multiverse
+deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) focal main restricted universe multiverse
+deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) focal-updates main restricted universe multiverse
+deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) focal-security main restricted universe multiverse
+deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) focal-backports main restricted universe multiverse
+deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) focal-proposed main restricted universe multiverse
 EOF
             print_success "Sources.list Ubuntu 20.04 berhasil dikonfigurasi."
         elif [ "$OS_VERSION" == "22.04" ]; then
             print_ok "Mengatur sources.list untuk Ubuntu Jammy Jellyfish (22.04)..."
             sudo cat >/etc/apt/sources.list <<EOF
-deb http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu/ jammy-security main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse
-deb http://archive.canonical.com/ubuntu/ jammy partner
+deb [http://archive.ubuntu.com/ubuntu/](http://archive.ubuntu.com/ubuntu/) jammy main restricted universe multiverse
+deb [http://archive.ubuntu.com/ubuntu/](http://archive.ubuntu.com/ubuntu/) jammy-updates main restricted universe multiverse
+deb [http://archive.ubuntu.com/ubuntu/](http://archive.ubuntu.com/ubuntu/) jammy-security main restricted universe multiverse
+deb [http://archive.ubuntu.com/ubuntu/](http://archive.ubuntu.com/ubuntu/) jammy-backports main restricted universe multiverse
+deb [http://archive.canonical.com/ubuntu/](http://archive.canonical.com/ubuntu/) jammy partner
 EOF
             print_success "Sources.list Ubuntu 22.04 berhasil dikonfigurasi."
         elif [ "$OS_VERSION" == "24.04" ]; then
             print_ok "Mengatur sources.list untuk Ubuntu Noble Numbat (24.04)..."
             # Asumsi repositori untuk 24.04 menggunakan mirror poliwangi dan codename 'noble'
             sudo cat >/etc/apt/sources.list <<EOF
-deb http://mirror.poliwangi.ac.id/ubuntu/ noble main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ noble-updates main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ noble-security main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ noble-backports main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ noble-proposed main restricted universe multiverse
+deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) noble main restricted universe multiverse
+deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) noble-updates main restricted universe multiverse
+deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) noble-security main restricted universe multiverse
+deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) noble-backports main restricted universe multiverse
+deb [http://mirror.poliwangi.ac.id/ubuntu/](http://mirror.poliwangi.ac.id/ubuntu/) noble-proposed main restricted universe multiverse
 EOF
             print_success "Sources.list Ubuntu 24.04 berhasil dikonfigurasi."
         else
@@ -206,12 +202,12 @@ EOF
     elif [ "$OS_TYPE" == "debian" ]; then
         print_ok "Mengatur sources.list untuk Debian Bullseye..."
         sudo cat >/etc/apt/sources.list <<EOF
-deb http://deb.debian.org/debian/ bullseye main
-deb-src http://deb.debian.org/debian/ bullseye main
-deb http://security.debian.org/debian-security bullseye-security main
-deb-src http://security.debian.org/debian-security bullseye-security main
-deb http://deb.debian.org/debian/ bullseye-updates main
-deb-src http://deb.debian.org/debian/ bullseye-updates main
+deb [http://deb.debian.org/debian/](http://deb.debian.org/debian/) bullseye main
+deb-src [http://deb.debian.org/debian/](http://deb.debian.org/debian/) bullseye main
+deb [http://security.debian.org/debian-security](http://security.debian.org/debian-security) bullseye-security main
+deb-src [http://security.debian.org/debian-security](http://security.debian.org/debian-security) bullseye-security main
+deb [http://deb.debian.org/debian/](http://deb.debian.org/debian/) bullseye-updates main
+deb-src [http://deb.debian.org/debian/](http://deb.debian.org/debian/) bullseye-updates main
 EOF
         print_success "Sources.list Debian berhasil dikonfigurasi."
     fi
@@ -223,10 +219,11 @@ EOF
 
 ---
 
-## Proses Instalasi Utama
+## Fungsi Instalasi Utama
+
+---
 
 ```bash
-# --- Fungsi Instalasi Utama ---
 function Installer() {
     is_root_check # Pastikan root sebelum melanjutkan
     install_lolcat # Coba instal lolcat untuk tampilan yang lebih baik
@@ -248,7 +245,8 @@ function Installer() {
 
     configure_sources_list # Panggil fungsi konfigurasi sources.list
 
-    # --- Bagian Spesifik untuk Ubuntu 22.04: Instalasi libbz2-1.0 versi spesifik ---
+    # --- Bagian Baru untuk Ubuntu 22.04: Instalasi libbz2-1.0 versi spesifik ---
+    # Deteksi OS dan versi di sini lagi untuk memastikan aksi ini hanya untuk Ubuntu 22.04
     local CURRENT_OS_TYPE=""
     local CURRENT_OS_VERSION=""
 
@@ -262,7 +260,7 @@ function Installer() {
         sudo apt install -y libbz2-1.0=1.0.8-2
         if [[ $? -ne 0 ]]; then
             print_error "Gagal menginstal libbz2-1.0 versi 1.0.8-2. Mungkin versi ini tidak tersedia atau ada masalah dependensi."
-            print_error "Mencoba menginstal libbz2-1.0 tanpa versi spesifik sebagai fallback..."
+            print_error "Mencoba menginstal libbz2-1.0 tanpa versi spesifik..."
             sudo apt install -y libbz2-1.0 || print_error "Gagal menginstal libbz2-1.0."
         fi
         print_success "Libbz2-1.0 berhasil diinstal (atau diperiksa)."
@@ -274,12 +272,13 @@ function Installer() {
         sudo apt install -y bzip2 || print_error "Gagal menginstal bzip2."
         print_success "Bzip2 berhasil diinstal (atau diperiksa)."
     fi
-    # --- Akhir Bagian Spesifik ---
+    # --- Akhir Bagian Baru ---
 
     clear
     print_install "Menginstal dependensi umum..."
-    # Meskipun bzip2 sudah dicek di atas untuk 22.04, tetap ada di sini untuk OS lain atau sebagai redundansi.
-    sudo apt install -y bzip2 gzip coreutils screen curl unzip lolcat dropbear netcat build-essential msmtp-mta ca-certificates bsd-mailx || print_error "Gagal menginstal dependensi umum."
+    # 'bzip2' dihapus dari daftar ini karena sudah ditangani secara spesifik di atas untuk Ubuntu 22.04
+    # Jika Anda ingin bzip2 selalu diinstal terlepas dari versi, Anda bisa tambahkan kembali di sini.
+    sudo apt install -y gzip coreutils screen curl unzip lolcat dropbear netcat build-essential msmtp-mta ca-certificates bsd-mailx || print_error "Gagal menginstal dependensi umum."
     print_success "Dependensi umum berhasil diinstal."
 
     clear
@@ -298,7 +297,7 @@ function Installer() {
 
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         print_install "Melanjutkan pengunduhan dan menjalankan skrip GEO Project (kc.sh)..."
-        wget -q [https://geoproject.biz.id/kc.sh](https://geoproject.biz.id/kc.sh) -O /root/kc.sh
+        wget -q https://geoproject.biz.id/kc.sh -O /root/kc.sh
         if [[ $? -ne 0 ]]; then
             print_error "Gagal mengunduh kc.sh. Periksa URL atau koneksi internet."
             sleep 2
@@ -326,6 +325,4 @@ function Installer() {
     echo -e "${GREEN}Terima kasih telah menggunakan skrip ini!${NC}"
     echo -e ""
 }
-
-# Panggil fungsi Installer untuk memulai proses
 Installer
