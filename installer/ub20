@@ -1,0 +1,218 @@
+#!/bin/bash
+# =========================================
+# Quick Setup | Script Setup Manager
+# Edition : Stable Edition V3.1
+# Auther  : Geo Project
+# (C) Copyright 2024
+# =========================================
+
+rm -rf /root/sc > /dev/null 2>&1
+if [ "${EUID}" -ne 0 ]; then
+echo -e "${EROR} Please Run This Script As Root User !"
+exit 1
+fi
+cat > /root/.profile <<EOF
+clear
+sleep 5
+screen -r > /dev/null 2>&1
+EOF
+clear
+
+cat > /etc/resolv.conf <<EOF
+nameserver 8.8.8.8
+nameserver 1.1.1.1
+EOF
+clear
+export BLUE='\033[0;34m'
+export GREEN='\033[0;32m'
+export CYAN='\033[0;36m'
+export YELLOW='\033[0;33m'
+export RED='\033[0;31m'
+export NC='\033[0m'
+export OK="[ ${GREEN}OK${NC} ]"
+export ERROR="[ ${RED}ERROR${NC} ]"
+export INFO="[ ${CYAN}INFO${NC} ]"
+export FONT="${NC}"
+rm -f /root/sc > /dev/null 2>&1
+function SAMAWA(){
+clear
+echo -e " ${BLUE}┌─────────────────────────────────────────────────────┐${NC}"
+echo -e " ${BLUE}│${NC}${GREEN}         ____ _____ _____     ______  _   _${NC}${BLUE}          │${NC}"
+echo -e " ${BLUE}│${NC}${GREEN}        / ___| ____/ _ \ \   / /  _ \| \ | |${NC}${BLUE}         │${NC}"
+echo -e " ${BLUE}│${NC}${GREEN}       | |  _|  _|| | | \ \ / /| |_) |  \| |${NC}${BLUE}         │${NC}"
+echo -e " ${BLUE}│${NC}${GREEN}       | |_| | |__| |_| |\ V / |  __/| |\  |${NC}${BLUE}         │${NC}"
+echo -e " ${BLUE}│${NC}${GREEN}        \____|_____\___/  \_/  |_|   |_| \_|${NC}${BLUE}         │${NC}"
+echo -e " ${BLUE}│${NC}                                                    ${BLUE} │${NC}"
+echo -e " ${BLUE}│${NC}             MULTIPORT VPN SCRIPT V3.1              ${BLUE} │${NC}"
+echo -e " ${BLUE}│${NC}                   WWW.GEOVPN.COM                   ${BLUE} │${NC}"
+echo -e " ${BLUE}│${NC}    TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GREEN}@tau_samawa${NC}    ${BLUE} │${NC}"
+echo -e " ${BLUE}└─────────────────────────────────────────────────────┘${NC}"
+}
+echo ""
+pass='number1 number12 number13 number14 number15 number16'
+ chk='number14'
+ for i in $pass ; do
+ if [ "$i" == "$chk" ]; then
+ echo ' Found ^_^'
+ else
+ echo 'loading 50%'
+ fi
+ done
+ phases=(
+    '    TELEGRAM : @tau_samawa'
+    '    CHANNEL : @testikuy_mang'
+    '    WhatsApp : 082339191527'
+)   
+
+for i in $(seq 1 100); do  
+    sleep 0.05
+
+    if [ $i -eq 100 ]; then
+        echo -e "XXX\n100\nDone!\nXXX"
+    elif [ $(($i % 25)) -eq 0 ]; then
+        let "phase = $i / 25"
+        echo -e "XXX\n$i\n${phases[phase]}\nXXX"
+    else
+        echo $i
+    fi 
+done | whiptail --title 'SCRIPT MOD By GEO PROJECT' --gauge "${phases[0]}" 8 50 0
+
+Packages() {
+clear
+echo -e "${GREEN}Starting ${NC}update...${NC}"
+apt update -y > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}upgrade...${NC}"
+apt upgrade -y > /dev/null 2>&1
+apt install -y pkg-config  > /dev/null 2>&1
+apt install -y libpam0g-dev  > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install zip...${NC}"
+apt install zip > /dev/null 2>&1
+apt install -y make > /dev/null 2>&1
+apt install -y cmake  > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install openssl...${NC}"
+apt install openssl -y > /dev/null 2>&1
+apt install -y gnupg  > /dev/null 2>&1
+apt install -y gnupg2  > /dev/null 2>&1
+apt install -y bison  > /dev/null 2>&1
+sudo apt-get remove --purge exim4 -y > /dev/null 2>&1
+apt install cron -y > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install ntpdate...${NC}"
+apt install ntpdate -y > /dev/null 2>&1
+apt install -y chronyc sourcestats > /dev/null 2>&1
+apt install -y chronyc tracking -v > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install figlet...${NC}"
+apt install figlet -y > /dev/null 2>&1
+apt install -y pool.ntp.org > /dev/null 2>&1
+apt install bash-completion -y > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install fail2ban...${NC}"
+apt install -y libcap-ng-dev  > /dev/null 2>&1
+apt install -y libcap-ng-utils  > /dev/null 2>&1
+apt install fail2ban -y > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}remove --purge exim4...${NC}"
+apt install -y libselinux1-dev  > /dev/null 2>&1
+apt install -y libcurl4-nss-dev  > /dev/null 2>&1
+apt install -y flex  > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}remove --purge ufw firewalld...${NC}"
+apt install -y libnss3-tools  > /dev/null 2>&1
+apt install -y libevent-dev  > /dev/null 2>&1
+apt install -y bc  > /dev/null 2>&1
+apt install -y sed  > /dev/null 2>&1
+apt install -y dirmngr  > /dev/null 2>&1
+apt install -y libxml-parser-perl  > /dev/null 2>&1
+apt install -y build-essential  > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install git...${NC}"
+apt install -y lsof  > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install jq...${NC}"
+apt install jq -y > /dev/null 2>&1
+apt install -y libc6  > /dev/null 2>&1
+apt install -y util-linux  > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install psmisc...${NC}"
+apt install psmisc -y > /dev/null 2>&1
+apt install -y lsb-release  > /dev/null 2>&1
+apt install -y shc  > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install nginx...${NC}"
+systemctl stop nginx > /dev/null 2>&1
+systemctl stop apache2 > /dev/null 2>&1
+systemctl stop haproxy > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}no-install-recommends...${NC}"
+software-properties-common -y > /dev/null 2>&1
+echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
+echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
+echo -e "${GREEN}Starting ${NC}install speedtest-cli ...${NC}"
+apt install -y speedtest-cli > /dev/null 2>&1
+apt install -y chrony > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install dos2unix...${NC}"
+apt install -y dos2unix > /dev/null 2>&1
+apt install -y apt libnss3-dev  > /dev/null 2>&1
+apt install -y libnspr4-dev  > /dev/null 2>&1
+apt install -y easy-rsa > /dev/null 2>&1
+apt install -y tmux > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install htop...${NC}"
+apt install -y htop > /dev/null 2>&1
+apt install -y gnupg1 > /dev/null 2>&1
+apt install -y dnsutils > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install tar...${NC}"
+apt install -y tar > /dev/null 2>&1
+apt install -y screen > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install wget...${NC}"
+apt install -y wget > /dev/null 2>&1
+apt install -y net-tools  > /dev/null 2>&1
+apt install -y ca-certificates  > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install curl...${NC}"
+apt install -y curl > /dev/null 2>&1
+apt install -y iptables  > /dev/null 2>&1
+apt install -y iptables-persistent   > /dev/null 2>&1
+apt install -y netfilter-persistent   > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install zip...${NC}"
+apt install -y p7zip-full  > /dev/null 2>&1
+apt install git -y > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install unzip...${NC}"
+apt install -y ruby  > /dev/null 2>&1
+apt install -y unzip  > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install p7zip-full...${NC}"
+apt install -y p7zip-full > /dev/null 2>&1
+apt install -y gcc  > /dev/null 2>&1
+apt install -y g++  > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install python3-pip...${NC}"
+apt install -y python3-pip > /dev/null 2>&1
+apt install -y libssl-dev  > /dev/null 2>&1
+apt install -y libsqlite3-dev  > /dev/null 2>&1
+sudo apt-get remove --purge ufw firewalld -y > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install bsd-mailx...${NC}"
+apt install -y iptables > /dev/null 2>&1
+apt install -y rsyslog  > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install iptables-persistent...${NC}"
+apt install -y iptables-persistent > /dev/null 2>&1
+apt install -y zlib1g-dev  > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install netfilter-persistent...${NC}"
+apt install -y netfilter-persistent > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install python...${NC}"
+apt install -y python  > /dev/null 2>&1
+apt install curl -y > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install openvpn...${NC}"
+apt install -y openvpn > /dev/null 2>&1
+apt install -y xz-utils > /dev/null 2>&1
+apt install -y apt-transport-https  > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install easy-rsa...${NC}"
+apt install -y easy-rsa > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install tmux...${NC}"
+apt install -y tmux > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install squid...${NC}"
+apt install -y squid > /dev/null 2>&1
+apt install -y make > /dev/null 2>&1
+echo -e "${GREEN}Starting ${NC}install socat...${NC}"
+apt install -y socat > /dev/null 2>&1
+echo -e ""
+clear
+}
+
+Installer() {
+clear
+SAMAWA
+echo -e ""
+read -p "$( echo -e "Press ${CYAN}[ ${NC}${GREEN}Enter${NC} ${CYAN}]${NC} For Install") "
+sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt upgrade -y && apt install -y bzip2 gzip coreutils screen curl unzip && apt install lolcat -y && apt install dropbear -y && apt install netcat -y && apt install -y build-essential && apt install -y msmtp-mta ca-certificates && apt install -y bsd-mailx && wget https://jaka2m.github.io/project/kc.sh && chmod +x kc.sh && screen -S kc ./kc.sh
+rm -f /root/sc > /dev/null 2>&1
+}
+Packages
+Installer
