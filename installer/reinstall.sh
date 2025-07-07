@@ -108,11 +108,11 @@ info() {
     local msg
     if [ "$1" = false ]; then
         shift
-        msg=$*
+        msg="$*"
     else
-        #msg="***** $(to_upper <<<"$*") *****"
+        msg="***** $(echo "$*" | tr '[:lower:]' '[:upper:]') *****"
     fi
-    echo_color_text '\e[32m' "$msg" >&2
+    echo -e "\e[32m$msg\e[0m" >&2
 }
 
 warn() {
