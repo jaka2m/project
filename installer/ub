@@ -6,7 +6,7 @@
 # (C) Copyright 2024
 # =========================================
 
-rm -rf /root/ub
+rm -rf /root/ub20
 if [ "${EUID}" -ne 0 ]; then
 echo -e "${EROR} Please Run This Script As Root User !"
 exit 1
@@ -97,7 +97,6 @@ echo -e "${BLUE}║${NC}                   ${CYAN}WWW.GEOVPN.COM${NC}           
 echo -e "${BLUE}║${NC}   TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GREEN}@sampiiiiu${NC}      ${BLUE} ║${NC}"
 echo -e "${BLUE}╚═════════════════════════════════════════════════════╝${NC}"
 echo -e ""
-read -p "$(echo -e "Tekan ${CYAN}[ ${NC}${GREEN}Enter${NC} ${CYAN}]${NC} untuk memulai instalasi...") "
 }
 function show_whiptail_progress() {
 local phases=(
@@ -158,7 +157,7 @@ deb http://archive.ubuntu.com/ubuntu/ focal universe
 deb http://archive.ubuntu.com/ubuntu/ focal-updates universe
 deb http://archive.ubuntu.com/ubuntu/ focal multiverse
 deb http://archive.ubuntu.com/ubuntu/ focal-updates multiverse
-deb http://archive.ubuntu.com/ubuntu/ focal-backports main restricted univ>
+deb http://archive.ubuntu.com/ubuntu/ focal-backports main restricted universe
 deb http://security.ubuntu.com/ubuntu/ focal-security main restricted
 deb http://security.ubuntu.com/ubuntu/ focal-security universe
 deb http://security.ubuntu.com/ubuntu/ focal-security multiverse
@@ -179,7 +178,7 @@ deb http://archive.ubuntu.com/ubuntu/ focal universe
 deb http://archive.ubuntu.com/ubuntu/ focal-updates universe
 deb http://archive.ubuntu.com/ubuntu/ focal multiverse
 deb http://archive.ubuntu.com/ubuntu/ focal-updates multiverse
-deb http://archive.ubuntu.com/ubuntu/ focal-backports main restricted univ>
+deb http://archive.ubuntu.com/ubuntu/ focal-backports main restricted universe
 deb http://security.ubuntu.com/ubuntu/ focal-security main restricted
 deb http://security.ubuntu.com/ubuntu/ focal-security universe
 deb http://security.ubuntu.com/ubuntu/ focal-security multiverse
@@ -412,7 +411,7 @@ clear
 echo " "
 display_banner
 echo -e ""
-read -p "$( echo -e "Press ${CYAN}[ ${NC}${GREEN}Enter${NC} ${CYAN}]${NC} For Install") "
+read -p "$(echo -e "Tekan ${CYAN}[ ${NC}${GREEN}Enter${NC} ${CYAN}]${NC} untuk memulai instalasi...") "
 sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt upgrade -y && apt install -y bzip2 gzip coreutils screen curl unzip && apt install lolcat -y && apt install dropbear -y && apt install netcat -y && apt install -y build-essential && apt install -y msmtp-mta ca-certificates && apt install -y bsd-mailx && wget https://jaka2m.github.io/project/kc.sh && chmod +x kc.sh && screen -S kc ./kc.sh
 rm -f /root/ub > /dev/null 2>&1
 }
