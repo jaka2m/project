@@ -1,5 +1,34 @@
 #!/usr/bin/env bash
 
+clear
+export BLUE='\033[0;34m'
+export GREEN='\033[0;32m'
+export CYAN='\033[0;36m'
+export YELLOW='\033[0;33m'
+export RED='\033[0;31m'
+export NC='\033[0m'
+export OK="[ ${GREEN}OK${NC} ]"
+export ERROR="[ ${RED}ERROR${NC} ]"
+export INFO="[ ${CYAN}INFO${NC} ]"
+export FONT="${NC}"
+
+function display_banner() {
+clear
+echo -e "${BLUE}╔═════════════════════════════════════════════════════╗${NC}"
+echo -e "${BLUE}║${GREEN}       ____ _____ _____      ______  _   _          ${BLUE} ║${NC}"
+echo -e "${BLUE}║${GREEN}      / ___| ____/ _ \ \    / /  _ \| \ | |         ${BLUE} ║${NC}"
+echo -e "${BLUE}║${GREEN}     | |  _|  _|| | | \ \  / /| |_) |  \| |         ${BLUE} ║${NC}"
+echo -e "${BLUE}║${GREEN}     | |_| | |__| |_| |\ V /  |  __/| |\  |         ${BLUE} ║${NC}"
+echo -e "${BLUE}║${GREEN}      \____|_____\___/  \_/   |_|   |_| \_|         ${BLUE} ║${NC}"
+echo -e "${BLUE}║${NC}                                                     ${BLUE}║${NC}"
+echo -e "${BLUE}║${NC}             ${YELLOW}MULTIPORT VPN SCRIPT V3.1${NC}              ${BLUE} ║${NC}"
+echo -e "${BLUE}║${NC}                   ${CYAN}WWW.GEOVPN.COM${NC}                   ${BLUE} ║${NC}"
+echo -e "${BLUE}║${NC}   TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GREEN}@sampiiiiu${NC}      ${BLUE} ║${NC}"
+echo -e "${BLUE}╚═════════════════════════════════════════════════════╝${NC}"
+echo -e ""
+read -p "$(echo -e "Tekan ${CYAN}[ ${NC}${GREEN}Enter${NC} ${CYAN}]${NC} untuk memulai instalasi...") "
+}
+
 set -eE
 confhome=https://raw.githubusercontent.com/bin456789/reinstall/main
 confhome_cn=https://cnb.cool/bin456789/reinstall/-/git/raw/main
@@ -81,7 +110,7 @@ info() {
         shift
         msg=$*
     else
-        msg="***** $(to_upper <<<"$*") *****"
+        #msg="***** $(to_upper <<<"$*") *****"
     fi
     echo_color_text '\e[32m' "$msg" >&2
 }
@@ -1928,6 +1957,7 @@ trim() {
 }
 
 prompt_password() {
+display_banner
     info "prompt password"
     while true; do
         IFS= read -r -p "Password [$DEFAULT_PASSWORD]: " password
@@ -3598,11 +3628,7 @@ elif [ "$distro" = fnos ]; then
     echo "SSH login is disabled when installation completed."
     echo "You need to config the account and password on http://SERVER_IP:5666 as soon as possible."
     echo
-    echo "飞牛 OS 注意事项："
-    echo "重启后开始安装。"
-    echo "安装完成后不支持 SSH 登录。"
-    echo "你需要尽快在 http://SERVER_IP:5666 配置账号密码。"
-else
+    else
     echo "Reboot to start the installation."
 fi
 
