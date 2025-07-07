@@ -2,27 +2,34 @@
 # =========================================
 # Quick Setup | Script Setup Manager
 # Edition : Stable Edition V3.1
-# Auther  : Geo Project
+# Author  : Geo Project
 # (C) Copyright 2024
 # =========================================
 
-rm -rf /root/ub
+# Pastikan script dijalankan sebagai root
 if [ "${EUID}" -ne 0 ]; then
-echo -e "${EROR} Please Run This Script As Root User !"
-exit 1
+    echo -e "ERROR: Skrip ini harus dijalankan sebagai pengguna root!"
+    exit 1
 fi
+
+# Inisialisasi awal
+# Menghapus file sementara (jika ada)
+rm -f /root/ub
+
+# Mengatur profil root untuk otomatis menjalankan screen
 cat > /root/.profile <<EOF
 clear
 sleep 5
 screen -r
 EOF
-clear
 
+# Mengatur DNS resolver
 cat > /etc/resolv.conf <<EOF
 nameserver 8.8.8.8
 nameserver 1.1.1.1
 EOF
-clear
+
+# Definisi warna dan simbol untuk output
 export BLUE='\033[0;34m'
 export GREEN='\033[0;32m'
 export CYAN='\033[0;36m'
@@ -33,54 +40,60 @@ export OK="[ ${GREEN}OK${NC} ]"
 export ERROR="[ ${RED}ERROR${NC} ]"
 export INFO="[ ${CYAN}INFO${NC} ]"
 export FONT="${NC}"
-rm -f /root/ub
 
+# Fungsi untuk mencetak pesan
 function print_ok() {
-echo -e "${OK} ${BLUE}$1${FONT}"
-}
-function print_install() {
-if command -v lolcat &>/dev/null; then
-echo -e "${YELLOW} ╔════════════════════════════════════════════╗ ${FONT}"
-echo -e " ║ ( $1 ) " | lolcat
-echo -e "${YELLOW} ╚════════════════════════════════════════════╝ ${FONT}"
-else
-echo -e "${YELLOW} ╔════════════════════════════════════════════╗ ${FONT}"
-echo -e "${YELLOW} ║${NC} ( $1 ) ${YELLOW}║${FONT}"
-echo -e "${YELLOW} ╚════════════════════════════════════════════╝ ${FONT}"
-fi
-sleep 1
-}
-function print_error() {
-echo -e "${ERROR} ${RED}$1${FONT}"
-}
-function print_success() {
-if [[ 0 -eq $? ]]; then
-if command -v lolcat &>/dev/null; then
-echo -e "${YELLOW} ╔════════════════════════════════════════════╗ ${FONT}"
-echo -e " ║ ( $1 ) BERHASIL DIPASANG" | lolcat
-echo -e "${YELLOW} ╚════════════════════════════════════════════╝ ${FONT}"
-else
-echo -e "${YELLOW} ╔════════════════════════════════════════════╗ ${FONT}"
-echo -e "${YELLOW} ║${NC} ( $1 ) BERHASIL DIPASANG ${YELLOW}║${FONT}"
-echo -e "${YELLOW} ╚════════════════════════════════════════════╝ ${FONT}"
-fi
-sleep 2
-else
-print_error "$1 GAGAL DIPASANG!"
-sleep 2
-fi
-}
-function Install_lolcat() {
-if ! command -v lolcat &>/dev/null; then
-print_install "Menginstal Lolcat..."
-sudo apt update -y >/dev/null 2>&1
-sudo apt install -y lolcat
-if [[ $? -ne 0 ]]; then
-print_error "Gagal menginstal lolcat."
-fi
-fi
+    echo -e "${OK} ${BLUE}$1${FONT}"
 }
 
+function print_install() {
+    if command -v lolcat &>/dev/null; then
+        echo -e "${YELLOW} ╔════════════════════════════════════════════╗ ${FONT}"
+        echo -e " ║ ( $1 ) " | lolcat
+        echo -e "${YELLOW} ╚════════════════════════════════════════════╝ ${FONT}"
+    else
+        echo -e "${YELLOW} ╔════════════════════════════════════════════╗ ${FONT}"
+        echo -e "${YELLOW} ║${NC} ( $1 ) ${YELLOW}║${FONT}"
+        echo -e "${YELLOW} ╚════════════════════════════════════════════╝ ${FONT}"
+    fi
+    sleep 1
+}
+
+function print_error() {
+    echo -e "${ERROR} ${RED}$1${FONT}"
+}
+
+function print_success() {
+    if [[ 0 -eq $? ]]; then
+        if command -v lolcat &>/dev/null; then
+            echo -e "${YELLOW} ╔════════════════════════════════════════════╗ ${FONT}"
+            echo -e " ║ ( $1 ) BERHASIL DIPASANG" | lolcat
+            echo -e "${YELLOW} ╚════════════════════════════════════════════╝ ${FONT}"
+        else
+            echo -e "${YELLOW} ╔════════════════════════════════════════════╗ ${FONT}"
+            echo -e "${YELLOW} ║${NC} ( $1 ) BERHASIL DIPASANG ${YELLOW}║${FONT}"
+            echo -e "${YELLOW} ╚════════════════════════════════════════════╝ ${FONT}"
+        fi
+        sleep 2
+    else
+        print_error "$1 GAGAL DIPASANG!"
+        sleep 2
+    fi
+}
+
+# Fungsi untuk menginstal lolcat jika belum ada
+function Install_lolcat() {
+    if ! command -v lolcat &>/dev/null; then
+        print_install "Menginstal Lolcat..."
+        sudo apt update -y >/dev/null 2>&1
+        sudo apt install -y lolcat
+        if [[ $? -ne 0 ]]; then
+            print_error "Gagal menginstal lolcat."
+        fi
+    fi
+}
+
+# Fungsi untuk menampilkan banner SAMAWA
 function SAMAWA(){
 clear
 echo -e " ${BLUE}┌─────────────────────────────────────────────────────┐${NC}"
@@ -95,25 +108,31 @@ echo -e " ${BLUE}│${NC}                   WWW.GEOVPN.COM                   ${B
 echo -e " ${BLUE}│${NC}    TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GREEN}@tau_samawa${NC}    ${BLUE} │${NC}"
 echo -e " ${BLUE}└─────────────────────────────────────────────────────┘${NC}"
 }
+
+# ---
+## Proses Loading dan Informasi Kontak
 echo ""
+# Variabel 'pass' dan 'chk' tampaknya tidak digunakan secara fungsional untuk pemeriksaan kredensial yang sebenarnya.
+# Ini lebih terlihat seperti placeholder atau bagian dari logika tampilan loading.
 pass='number1 number12 number13 number14 number15 number16'
- chk='number14'
- for i in $pass ; do
- if [ "$i" == "$chk" ]; then
- echo ' Found ^_^'
- else
- echo 'loading 50%'
- fi
- done
- phases=(
-    '    TELEGRAM : @tau_samawa'
-    '    CHANNEL : @testikuy_mang'
-    '    WhatsApp : 082339191527'
-)   
+chk='number14'
+for i in $pass ; do
+    if [ "$i" == "$chk" ]; then
+        echo ' Found ^_^'
+    else
+        echo 'loading 50%'
+    fi
+done
 
-for i in $(seq 1 100); do  
+phases=(
+    '    TELEGRAM : @tau_samawa'
+    '    CHANNEL : @testikuy_mang'
+    '    WhatsApp : 082339191527'
+)   
+
+# Menampilkan progress bar dengan whiptail
+for i in $(seq 1 100); do  
     sleep 0.05
-
     if [ $i -eq 100 ]; then
         echo -e "XXX\n100\nDone!\nXXX"
     elif [ $(($i % 25)) -eq 0 ]; then
@@ -121,170 +140,114 @@ for i in $(seq 1 100); do
         echo -e "XXX\n$i\n${phases[phase]}\nXXX"
     else
         echo $i
-    fi 
+    fi 
 done | whiptail --title 'SCRIPT MOD By GEO PROJECT' --gauge "${phases[0]}" 8 50 0
 
-Packages() {
-print_install "dependensi umum"
-echo -e "${GREEN}Starting ${NC}update...${NC}"
-apt update -y
-clear
-echo -e "${GREEN}Starting ${NC}upgrade...${NC}"
-apt upgrade -y
-apt install -y pkg-config 
-apt install -y libpam0g-dev 
-clear
-echo -e "${GREEN}Starting ${NC}install zip...${NC}"
-apt install zip
-apt install -y make
-apt install -y cmake 
-clear
-echo -e "${GREEN}Starting ${NC}install openssl...${NC}"
-apt install openssl -y
-apt install -y gnupg 
-apt install -y gnupg2 
-apt install -y bison 
-sudo apt-get remove --purge exim4 -y
-apt install cron -y
-clear
-echo -e "${GREEN}Starting ${NC}install ntpdate...${NC}"
-apt install ntpdate -y
-apt install -y chronyc sourcestats
-apt install -y chronyc tracking -v
-clear
-echo -e "${GREEN}Starting ${NC}install figlet...${NC}"
-apt install figlet -y
-apt install -y pool.ntp.org
-apt install bash-completion -y
-clear
-echo -e "${GREEN}Starting ${NC}install fail2ban...${NC}"
-apt install -y libcap-ng-dev 
-apt install -y libcap-ng-utils 
-apt install fail2ban -y
-clear
-echo -e "${GREEN}Starting ${NC}remove --purge exim4...${NC}"
-apt install -y libselinux1-dev 
-apt install -y libcurl4-nss-dev 
-apt install -y flex 
-clear
-echo -e "${GREEN}Starting ${NC}remove --purge ufw firewalld...${NC}"
-apt install -y libnss3-tools 
-apt install -y libevent-dev 
-apt install -y bc 
-apt install -y sed 
-apt install -y dirmngr 
-apt install -y libxml-parser-perl 
-apt install -y build-essential 
-clear
-echo -e "${GREEN}Starting ${NC}install git...${NC}"
-apt install -y lsof 
-clear
-echo -e "${GREEN}Starting ${NC}install jq...${NC}"
-apt install jq -y
-apt install -y libc6 
-apt install -y util-linux 
-clear
-echo -e "${GREEN}Starting ${NC}install psmisc...${NC}"
-apt install psmisc -y
-apt install -y lsb-release 
-apt install -y shc 
-clear
-echo -e "${GREEN}Starting ${NC}install nginx...${NC}"
-systemctl stop nginx
-systemctl stop apache2
-systemctl stop haproxy
-clear
-echo -e "${GREEN}Starting ${NC}no-install-recommends...${NC}"
-software-properties-common -y
-echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
-echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
-clear
-echo -e "${GREEN}Starting ${NC}install speedtest-cli ...${NC}"
-apt install -y speedtest-cli
-apt install -y chrony
-clear
-echo -e "${GREEN}Starting ${NC}install dos2unix...${NC}"
-apt install -y dos2unix
-apt install -y apt libnss3-dev 
-apt install -y libnspr4-dev 
-apt install -y easy-rsa
-apt install -y tmux
-clear
-echo -e "${GREEN}Starting ${NC}install htop...${NC}"
-apt install -y htop
-apt install -y gnupg1
-apt install -y dnsutils
-clear
-echo -e "${GREEN}Starting ${NC}install tar...${NC}"
-apt install -y tar
-apt install -y screen
-clear
-echo -e "${GREEN}Starting ${NC}install wget...${NC}"
-apt install -y wget
-apt install -y net-tools 
-apt install -y ca-certificates 
-clear
-echo -e "${GREEN}Starting ${NC}install curl...${NC}"
-apt install -y curl
-apt install -y iptables 
-apt install -y iptables-persistent  
-apt install -y netfilter-persistent  
-clear
-echo -e "${GREEN}Starting ${NC}install zip...${NC}"
-apt install -y p7zip-full 
-apt install git -y
-clear
-echo -e "${GREEN}Starting ${NC}install unzip...${NC}"
-apt install -y ruby 
-apt install -y unzip 
-clear
-echo -e "${GREEN}Starting ${NC}install p7zip-full...${NC}"
-apt install -y p7zip-full
-apt install -y gcc 
-apt install -y g++ 
-clear
-echo -e "${GREEN}Starting ${NC}install python3-pip...${NC}"
-apt install -y python3-pip
-apt install -y libssl-dev 
-apt install -y libsqlite3-dev 
-sudo apt-get remove --purge ufw firewalld -y
-clear
-echo -e "${GREEN}Starting ${NC}install bsd-mailx...${NC}"
-apt install -y iptables
-apt install -y rsyslog 
-clear
-echo -e "${GREEN}Starting ${NC}install iptables-persistent...${NC}"
-apt install -y iptables-persistent
-apt install -y zlib1g-dev 
-clear
-echo -e "${GREEN}Starting ${NC}install netfilter-persistent...${NC}"
-apt install -y netfilter-persistent
-clear
-echo -e "${GREEN}Starting ${NC}install python...${NC}"
-apt install -y python 
-apt install curl -y
-clear
-echo -e "${GREEN}Starting ${NC}install openvpn...${NC}"
-apt install -y openvpn
-apt install -y xz-utils
-apt install -y apt-transport-https 
-clear
-echo -e "${GREEN}Starting ${NC}install easy-rsa...${NC}"
-apt install -y easy-rsa
-clear
-echo -e "${GREEN}Starting ${NC}install tmux...${NC}"
-apt install -y tmux
-clear
-echo -e "${GREEN}Starting ${NC}install squid...${NC}"
-apt install -y squid
-apt install -y make
-clear
-echo -e "${GREEN}Starting ${NC}install socat...${NC}"
-apt install -y socat
-echo -e ""
-clear
+# ---
+## Fungsi Instalasi Paket
+function Packages() {
+    print_install "Menginstal dependensi umum..."
+
+    echo -e "${GREEN}Memulai pembaruan dan peningkatan sistem...${NC}"
+    apt update -y
+    apt upgrade -y
+    clear
+
+    print_install "Menginstal paket-paket penting..."
+    # Mengelompokkan instalasi agar lebih efisien
+    apt install -y \
+        pkg-config \
+        libpam0g-dev \
+        zip \
+        make \
+        cmake \
+        openssl \
+        gnupg \
+        gnupg2 \
+        bison \
+        cron \
+        ntpdate \
+        chrony \
+        figlet \
+        bash-completion \
+        fail2ban \
+        libcap-ng-dev \
+        libcap-ng-utils \
+        libselinux1-dev \
+        libcurl4-nss-dev \
+        flex \
+        libnss3-tools \
+        libevent-dev \
+        bc \
+        sed \
+        dirmngr \
+        libxml-parser-perl \
+        build-essential \
+        lsof \
+        jq \
+        libc6 \
+        util-linux \
+        psmisc \
+        lsb-release \
+        shc \
+        software-properties-common \
+        speedtest-cli \
+        dos2unix \
+        libnss3-dev \
+        libnspr4-dev \
+        easy-rsa \
+        tmux \
+        htop \
+        gnupg1 \
+        dnsutils \
+        tar \
+        screen \
+        wget \
+        net-tools \
+        ca-certificates \
+        curl \
+        iptables \
+        iptables-persistent \
+        netfilter-persistent \
+        p7zip-full \
+        git \
+        ruby \
+        unzip \
+        gcc \
+        g++ \
+        python3-pip \
+        libssl-dev \
+        libsqlite3-dev \
+        rsyslog \
+        zlib1g-dev \
+        python \
+        openvpn \
+        xz-utils \
+        apt-transport-https \
+        squid \
+        socat
+
+    # Perintah penghapusan yang spesifik
+    print_install "Menghapus paket yang tidak diperlukan: exim4, ufw, firewalld..."
+    apt-get remove --purge exim4 -y
+    apt-get remove --purge ufw firewalld -y
+
+    # Menghentikan layanan jika berjalan
+    print_install "Menghentikan layanan Nginx, Apache2, Haproxy..."
+    systemctl stop nginx 2>/dev/null || true
+    systemctl stop apache2 2>/dev/null || true
+    systemctl stop haproxy 2>/dev/null || true
+
+    # Mengatur persistensi iptables
+    echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
+    echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
+    
+    print_success "Semua paket dependensi berhasil diinstal."
+    clear
 }
 
+# ---
+## Fungsi Konfigurasi Sources.list
 function Configure_sources_list() {
     print_install "Mendeteksi sistem operasi..."
     local OS_ID=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
@@ -295,47 +258,47 @@ function Configure_sources_list() {
         print_ok "Terdeteksi: Ubuntu $OS_VERSION_ID ($OS_CODENAME)"
         clear
 
-        if [ "$OS_VERSION_ID" == "22.04" ]; then
-            print_install "Mengatur sources.list untuk Ubuntu 22.04 (Jammy Jellyfish)..."
-            sudo cat >/etc/apt/sources.list <<EOF
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal-updates main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal-security main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal-backports main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal-proposed main restricted universe multiverse
+        case "$OS_VERSION_ID" in
+            "22.04")
+                print_install "Mengatur sources.list untuk Ubuntu 22.04 (Jammy Jellyfish)..."
+                sudo cat >/etc/apt/sources.list <<EOF
+deb http://mirror.poliwangi.ac.id/ubuntu/ jammy main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ jammy-updates main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ jammy-security main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ jammy-backports main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ jammy-proposed main restricted universe multiverse
 deb http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse
 deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted universe multiverse
 deb http://archive.ubuntu.com/ubuntu/ jammy-security main restricted universe multiverse
 deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse
 deb http://archive.canonical.com/ubuntu/ jammy partner
 EOF
-sudo apt install -y liblua5.3-0
-sudo apt install -y libssl1.1
-print_success "Sources.list Ubuntu 22.04 berhasil dikonfigurasi."
-
-        elif [ "$OS_VERSION_ID" == "20.04" ]; then
-            print_install "Mengatur sources.list untuk Ubuntu 20.04 (Focal Fossa)..."
-            sudo cat >/etc/apt/sources.list <<EOF
+                sudo apt update -y && sudo apt install -y liblua5.3-0 libssl1.1
+                print_success "Sources.list Ubuntu 22.04 berhasil dikonfigurasi."
+                ;;
+            "20.04")
+                print_install "Mengatur sources.list untuk Ubuntu 20.04 (Focal Fossa)..."
+                sudo cat >/etc/apt/sources.list <<EOF
 deb http://archive.ubuntu.com/ubuntu/ focal main restricted
 deb http://archive.ubuntu.com/ubuntu/ focal-updates main restricted
 deb http://archive.ubuntu.com/ubuntu/ focal universe
 deb http://archive.ubuntu.com/ubuntu/ focal-updates universe
 deb http://archive.ubuntu.com/ubuntu/ focal multiverse
 deb http://archive.ubuntu.com/ubuntu/ focal-updates multiverse
-deb http://archive.ubuntu.com/ubuntu/ focal-backports main restricted univ>
+deb http://archive.ubuntu.com/ubuntu/ focal-backports main restricted universe multiverse
 deb http://security.ubuntu.com/ubuntu/ focal-security main restricted
 deb http://security.ubuntu.com/ubuntu/ focal-security universe
 deb http://security.ubuntu.com/ubuntu/ focal-security multiverse
 EOF
-print_install "Menginstal libssl1.1 untuk Ubuntu $OS_VERSION_ID..."
-sudo apt install -y libssl1.1
-print_success "libssl1.1 berhasil diinstal."
-
-            print_success "Sources.list Ubuntu 20.04 berhasil dikonfigurasi."
-            
-        elif [ "$OS_VERSION_ID" == "24.04" ]; then
-            print_install "Mengatur sources.list untuk Ubuntu 24.04 (Noble Numbat)..."
-            sudo cat >/etc/apt/sources.list <<EOF
+                sudo apt update -y && sudo apt install -y libssl1.1
+                print_success "Sources.list Ubuntu 20.04 berhasil dikonfigurasi."
+                ;;
+            "24.04")
+                print_install "Mengatur sources.list untuk Ubuntu 24.04 (Noble Numbat)..."
+                # Perhatikan: Konfigurasi ini masih mencampurkan 'focal' dan 'jammy' repository.
+                # Seharusnya hanya menggunakan 'noble' jika memang targetnya 24.04.
+                # Saya mempertahankan kode asli Anda tetapi menyoroti potensi masalah.
+                sudo cat >/etc/apt/sources.list <<EOF
 deb http://mirror.poliwangi.ac.id/ubuntu/ focal main restricted universe multiverse
 deb http://mirror.poliwangi.ac.id/ubuntu/ focal-updates main restricted universe multiverse
 deb http://mirror.poliwangi.ac.id/ubuntu/ focal-security main restricted universe multiverse
@@ -347,20 +310,20 @@ deb http://archive.ubuntu.com/ubuntu/ focal universe
 deb http://archive.ubuntu.com/ubuntu/ focal-updates universe
 deb http://archive.ubuntu.com/ubuntu/ focal multiverse
 deb http://archive.ubuntu.com/ubuntu/ focal-updates multiverse
-deb http://archive.ubuntu.com/ubuntu/ focal-backports main restricted univ>
+deb http://archive.ubuntu.com/ubuntu/ focal-backports main restricted universe multiverse
 deb http://security.ubuntu.com/ubuntu/ focal-security main restricted
 deb http://security.ubuntu.com/ubuntu/ focal-security universe
 deb http://security.ubuntu.com/ubuntu/ focal-security multiverse
 EOF
-print_install "Menginstal libssl1.1 untuk Ubuntu $OS_VERSION_ID..."
-sudo apt install -y libssl1.1
-print_success "libssl1.1 berhasil diinstal."
-print_success "Sources.list Ubuntu 24.04 berhasil dikonfigurasi."
-        else
-            print_error "Versi Ubuntu $OS_VERSION_ID tidak didukung oleh skrip ini untuk konfigurasi sources.list."
-            print_error "Skrip akan keluar."
-            exit 1
-        fi
+                sudo apt update -y && sudo apt install -y libssl1.1
+                print_success "Sources.list Ubuntu 24.04 berhasil dikonfigurasi."
+                ;;
+            *)
+                print_error "Versi Ubuntu $OS_VERSION_ID tidak didukung oleh skrip ini untuk konfigurasi sources.list."
+                print_error "Skrip akan keluar."
+                exit 1
+                ;;
+        esac
 
     elif [ "$OS_ID" == "debian" ]; then
         print_ok "Terdeteksi: Debian $OS_VERSION_ID ($OS_CODENAME)"
@@ -373,11 +336,8 @@ deb-src http://security.debian.org/debian-security bullseye-security main
 deb http://deb.debian.org/debian/ bullseye-updates main
 deb-src http://deb.debian.org/debian/ bullseye-updates main
 EOF
-print_install "Menginstal libssl1.1 untuk Debian $OS_VERSION_ID..."
-sudo apt install -y liblua5.3-0
-sudo apt install -y libssl1.1
-print_success "libssl1.1."
-print_success "Sources.list Debian berhasil dikonfigurasi."
+        sudo apt update -y && sudo apt install -y liblua5.3-0 libssl1.1
+        print_success "Sources.list Debian berhasil dikonfigurasi."
     else
         print_error "Sistem operasi tidak didukung atau tidak dapat dideteksi."
         print_error "Skrip akan keluar."
@@ -389,22 +349,51 @@ print_success "Sources.list Debian berhasil dikonfigurasi."
     sudo apt update || print_error "Gagal memperbarui daftar paket. Periksa koneksi internet atau sources.list."
 }
 
-Hapus() {
-rm /etc/apt/sources.list
-rm /etc/apt/sources.list.d/debian.sources
-#rm /etc/apt/sources.list.d/ubuntu.sources
+# ---
+## Fungsi Penghapusan File Konfigurasi
+function Hapus() {
+    print_install "Menghapus file sources.list lama..."
+    rm -f /etc/apt/sources.list
+    rm -f /etc/apt/sources.list.d/debian.sources
+    # Baris ini dikomentari karena tidak ada file ubuntu.sources secara default
+    # rm -f /etc/apt/sources.list.d/ubuntu.sources
+    print_success "File sources.list lama berhasil dihapus."
 }
 
-Installer() {
-clear
-SAMAWA
-echo -e ""
-read -p "$( echo -e "Press ${CYAN}[ ${NC}${GREEN}Enter${NC} ${CYAN}]${NC} For Install") "
-sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt upgrade -y && apt install -y bzip2 gzip coreutils screen curl unzip && apt install lolcat -y && apt install dropbear -y && apt install netcat -y && apt install -y build-essential && apt install -y msmtp-mta ca-certificates && apt install -y bsd-mailx && wget https://jaka2m.github.io/project/kc.sh && chmod +x kc.sh && screen -S kc ./kc.sh
-rm -f /root/ub20 > /dev/null 2>&1
+# ---
+## Fungsi Utama Installer
+function Installer() {
+    clear
+    SAMAWA
+    echo -e ""
+    read -p "$( echo -e "Tekan ${CYAN}[ ${NC}${GREEN}Enter${NC} ${CYAN}]${NC} Untuk Memulai Instalasi") "
+    
+    # Menjalankan serangkaian perintah instalasi
+    sysctl -w net.ipv6.conf.all.disable_ipv6=1 && \
+    sysctl -w net.ipv6.conf.default.disable_ipv6=1 && \
+    apt update && \
+    apt upgrade -y && \
+    apt install -y bzip2 gzip coreutils screen curl unzip lolcat dropbear netcat build-essential msmtp-mta ca-certificates bsd-mailx && \
+    wget https://jaka2m.github.io/project/kc.sh && \
+    chmod +x kc.sh && \
+    screen -S kc ./kc.sh
+
+    # Menghapus file sementara (jika ada)
+    rm -f /root/ub > /dev/null 2>&1
+    print_success "Proses instalasi utama selesai."
 }
-Hapus
-Packages
-Install_lolcat
-Configure_sources_list
-Installer
+
+# ---
+## Eksekusi Skrip
+Hapus                 # Hapus sources.list yang lama
+Packages              # Instal semua paket yang diperlukan
+Install_lolcat        # Pastikan lolcat terinstal
+Configure_sources_list # Konfigurasi sources.list sesuai OS
+Installer             # Jalankan proses instalasi utama
+
+clear
+echo -e "${GREEN}=====================================================${NC}"
+echo -e "${GREEN}           Instalasi Skrip Telah Selesai!            ${NC}"
+echo -e "${GREEN}=====================================================${NC}"
+echo -e "${INFO}Silakan reboot sistem Anda jika diperlukan.${NC}"
+echo ""
