@@ -27,6 +27,8 @@ echo -e "${BLUE}║${NC}   TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GREEN
 echo -e "${BLUE}╚═════════════════════════════════════════════════════╝${NC}"
 echo -e ""
 read -p "$(echo -e "Tekan ${CYAN}[ ${NC}${GREEN}Enter${NC} ${CYAN}]${NC} untuk memulai instalasi...") "
+echo -e ""
+echo -e ""
 }
 
 set -eE
