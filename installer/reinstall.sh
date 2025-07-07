@@ -1959,8 +1959,7 @@ trim() {
 }
 
 prompt_password() {
-display_banner
-    info "prompt password"
+    display_banner "prompt password"
     while true; do
         IFS= read -r -p "Password [$DEFAULT_PASSWORD]: " password
         IFS= read -r -p "Retype password [$DEFAULT_PASSWORD]: " password_confirm
