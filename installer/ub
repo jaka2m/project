@@ -6,7 +6,7 @@
 # (C) Copyright 2024
 # =========================================
 
-rm -rf /root/ub20
+rm -rf /root/ub
 if [ "${EUID}" -ne 0 ]; then
 echo -e "${EROR} Please Run This Script As Root User !"
 exit 1
