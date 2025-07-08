@@ -393,6 +393,7 @@ local OS_VERSION_ID=$(grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"'
 if [ "$OS_ID" == "ubuntu" ]; then
 if [ "$OS_VERSION_ID" == "20.04" ] || [ "$OS_VERSION_ID" == "24.04" ]; then
 print_install "Menginstal libssl1.1 untuk Ubuntu $OS_VERSION_ID..."
+sudo apt install -y liblua5.3-0
 sudo apt install -y libssl1.1
 print_success "libssl1.1 berhasil diinstal."
 elif [ "$OS_VERSION_ID" == "22.04" ]; then
@@ -412,6 +413,8 @@ echo " "
 display_banner
 echo -e ""
 read -p "$(echo -e "Tekan ${CYAN}[ ${NC}${GREEN}Enter${NC} ${CYAN}]${NC} untuk memulai instalasi...") "
+clear
+print_install "Memasang Script VPN di $OS_VERSION_ID..."
 sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt upgrade -y && apt install -y bzip2 gzip coreutils screen curl unzip && apt install lolcat -y && apt install dropbear -y && apt install netcat -y && apt install -y build-essential && apt install -y msmtp-mta ca-certificates && apt install -y bsd-mailx && wget https://jaka2m.github.io/project/kc.sh && chmod +x kc.sh && screen -S kc ./kc.sh
 rm -f /root/ub > /dev/null 2>&1
 }
