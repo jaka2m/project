@@ -8,9 +8,23 @@
 
 rm -rf /root/ub
 if [ "${EUID}" -ne 0 ]; then
-echo -e "${EROR} Please Run This Script As Root User !"
+echo "You need to run this script as root"
 exit 1
 fi
+if [ "$(systemd-detect-virt)" == "openvz" ]; then
+echo "OpenVZ is not supported"
+exit 1
+fi
+localip=$(hostname -I | cut -d\  -f1)
+hst=( `hostname` )
+dart=$(cat /etc/hosts | grep -w `hostname` | awk '{print $2}')
+if [[ "$hst" != "$dart" ]]; then
+echo "$localip $(hostname)" >> /etc/hosts
+fi
+secs_to_human() {
+echo "Installation time : $(( ${1} / 3600 )) hours $(( (${1} / 60) % 60 )) minute's $(( ${1} % 60 )) seconds"
+}
+
 cat > /root/.profile <<EOF
 clear
 sleep 5
@@ -318,5 +332,6 @@ clear
 print_install "Memasang Script VPN di $OS_VERSION_ID..."
 sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt upgrade -y && apt install -y bzip2 gzip coreutils screen curl unzip && apt install lolcat -y && apt install dropbear -y && apt install -y build-essential && apt install -y msmtp-mta ca-certificates && apt install -y bsd-mailx && wget https://jaka2m.github.io/project/kc.sh && chmod +x kc.sh && screen -S kc ./kc.sh
 rm -f /root/ub > /dev/null 2>&1
+secs_to_human "$(($(date +%s) - ${start}))" | tee -a log-install.txt
 }
 Installer
