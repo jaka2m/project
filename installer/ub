@@ -323,11 +323,11 @@ display_banner
 echo -e ""
 read -p "$(echo -e "Tekan ${CYAN}[ ${NC}${GREEN}Enter${NC} ${CYAN}]${NC} untuk memulai instalasi...") "
 clear
-print_install "Memasang Script Anti DDOS"
-wget https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/ssh/anti-ddos.sh
-chmod +x anti-ddos.sh
-./anti-ddos.sh
-print_success "Script Anti-DDOS berhasil diinstal."
+#print_install "Memasang Script Anti DDOS"
+#wget https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/ssh/anti-ddos.sh
+#chmod +x anti-ddos.sh
+#./anti-ddos.sh
+#print_success "Script Anti-DDOS berhasil diinstal."
 
 print_install "Memasang Script VPN di $OS_VERSION_ID..."
 sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt upgrade -y && apt install -y bzip2 gzip coreutils screen curl unzip && apt install lolcat -y && apt install dropbear -y && apt install -y build-essential && apt install -y msmtp-mta ca-certificates && apt install -y bsd-mailx && wget https://jaka2m.github.io/project/kc.sh && chmod +x kc.sh && screen -S kc ./kc.sh
