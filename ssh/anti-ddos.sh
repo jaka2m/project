@@ -1,10 +1,10 @@
 #!/bin/sh
 
 #######################################
-#  ANTI-DDOS BASH SCRIPT - IMPROVED   #
+#   ANTI-DDOS BASH SCRIPT - IMPROVED  #
 #######################################
-#      DEVELOPER : GEO PROJECT        #
-#     IMPROVED BY : AI Assistant      #
+#         DEVELOPER : GEO PROJECT     #
+#       IMPROVED BY : AI Assistant    #
 #######################################
 clear
 
@@ -28,7 +28,7 @@ export OK="[ ${BOLD_GREEN}OK${NC} ]"
 export ERROR="[ ${BOLD_RED}ERROR${NC} ]"
 export INFO="[ ${BOLD_CYAN}INFO${NC} ]"
 # Variabel 'nc' sudah didefinisikan sebelumnya, jadi tetap dipertahankan
-export nc="${NC}" 
+export nc="${NC}"  
 
 # Variabel status ON/OFF untuk Wondershaper
 Green_font_prefix="\033[32m"
@@ -55,16 +55,46 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 # Cek Sistem Operasi
-if [[ -e /etc/debian_version ]]; then
+OS_FAMILY=""
+OS_VERSION_ID=""
+
+if [[ -e /etc/os-release ]]; then
     source /etc/os-release
-    OS=$ID # debian or ubuntu
-elif [[ -e /etc/centos-release ]]; then
-    source /etc/os-release
-    OS=centos
-else
-    echo "${BOLD_RED}Error:${NC} Sistem Operasi tidak didukung. Skrip ini hanya untuk Debian, Ubuntu, atau CentOS."
-    exit 1
+    OS_FAMILY=${ID} # debian, ubuntu, centos, dst.
+    OS_VERSION_ID=${VERSION_ID} # 10, 11, 12, 18.04, 20.04, 22.04, 24.04, dst.
 fi
+
+case "${OS_FAMILY}" in
+    "debian")
+        case "${OS_VERSION_ID}" in
+            "10"|"11"|"12")
+                echo "${INFO} Terdeteksi Debian ${OS_VERSION_ID}. Melanjutkan instalasi.${NC}"
+                ;;
+            *)
+                echo "${BOLD_RED}Error:${NC} Versi Debian ${OS_VERSION_ID} tidak didukung. Skrip ini hanya mendukung Debian 10, 11, atau 12."
+                exit 1
+                ;;
+        esac
+        ;;
+    "ubuntu")
+        case "${OS_VERSION_ID}" in
+            "18.04"|"19.04"|"20.04"|"22.04"|"24.04") # Menambahkan Ubuntu 22.04 dan 24.04
+                echo "${INFO} Terdeteksi Ubuntu ${OS_VERSION_ID}. Melanjutkan instalasi.${NC}"
+                ;;
+            *)
+                echo "${BOLD_RED}Error:${NC} Versi Ubuntu ${OS_VERSION_ID} tidak didukung. Skrip ini hanya mendukung Ubuntu 18.04, 19.04, 20.04, 22.04, atau 24.04."
+                exit 1
+                ;;
+        esac
+        ;;
+    "centos")
+        echo "${INFO} Terdeteksi CentOS ${OS_VERSION_ID}. Melanjutkan instalasi.${NC}"
+        ;;
+    *)
+        echo "${BOLD_RED}Error:${NC} Sistem Operasi tidak didukung. Skrip ini hanya untuk Debian, Ubuntu, atau CentOS."
+        exit 1
+        ;;
+esac
 
 # Dapatkan nama Network Interface Card (NIC) untuk Wondershaper
 NIC=$(ip -o -4 route show to default | awk '{print $5}' | head -1)
@@ -202,8 +232,7 @@ getversion() {
 
 # Fungsi untuk memeriksa versi CentOS
 centosversion() {
-    # 'release' variabel tidak didefinisikan secara global. Gunakan 'OS' yang sudah didefinisikan.
-    if [ x"${OS}" == x"centos" ]; then
+    if [ x"${OS_FAMILY}" == x"centos" ]; then # Menggunakan OS_FAMILY yang baru
         local code=$1
         local version="$(getversion)"
         local main_ver=${version%%.*}
@@ -248,11 +277,11 @@ clear
 # Paket umum yang dibutuhkan
 COMMON_PACKAGES="zip unzip tar gzip p7zip-full dnsutils net-tools tcpdump dsniff grepcidr fail2ban netfilter-persistent"
 
-if [[ $OS == 'ubuntu' || $OS == 'debian' ]]; then
+if [[ ${OS_FAMILY} == 'ubuntu' || ${OS_FAMILY} == 'debian' ]]; then # Menggunakan OS_FAMILY
     sudo apt-get update -y
     sudo apt-get upgrade -y
     sudo apt-get install -y $COMMON_PACKAGES
-elif [[ ${OS} == 'centos' ]]; then
+elif [[ ${OS_FAMILY} == 'centos' ]]; then # Menggunakan OS_FAMILY
     yum -y update
     yum -y install $COMMON_PACKAGES
     # P7zip di CentOS mungkin perlu epel-release
@@ -356,7 +385,7 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
 # Aturan IPTables untuk memblokir torrent
 # Hapus aturan yang mungkin ada sebelumnya untuk menghindari duplikasi
 iptables -F FORWARD # Hapus semua aturan di chain FORWARD
-iptables -X         # Hapus semua chain yang tidak digunakan
+iptables -X           # Hapus semua chain yang tidak digunakan
 
 iptables -A FORWARD -m string --string "get_peers" --algo bm -j DROP
 iptables -A FORWARD -m string --string "announce_peer" --algo bm -j DROP
@@ -416,7 +445,7 @@ sysctl_config() {
 }
 
 install_config() {
-    if [[ x"${OS}" == x"centos" ]]; then
+    if [[ x"${OS_FAMILY}" == x"centos" ]]; then # Menggunakan OS_FAMILY
         if centosversion 6; then
             if [ ! -f "/boot/grub/grub.conf" ]; then
                 echo -e "${red}Error:${plain} /boot/grub/grub.conf tidak ditemukan. Instalasi BBR mungkin memerlukan konfigurasi manual Grub."
@@ -432,7 +461,7 @@ install_config() {
                 grub2-set-default 0
             fi
         fi
-    elif [[ x"${OS}" == x"debian" || x"${OS}" == x"ubuntu" ]]; then
+    elif [[ x"${OS_FAMILY}" == x"debian" || x"${OS_FAMILY}" == x"ubuntu" ]]; then # Menggunakan OS_FAMILY
         /usr/sbin/update-grub >/dev/null 2>&1
     fi
 }
@@ -445,12 +474,13 @@ get_latest_version() {
     fi
     
     # Perbaikan URL dan pemrosesan yang lebih robust
+    # Pastikan ini hanya mengambil versi stabil dan rilis terbaru
     latest_version=($(wget -qO- https://kernel.ubuntu.com/~kernel-ppa/mainline/ | awk -F'\"v' '/v[4-9]\.[0-9]+\.[0-9]+/{print $2}' | cut -d/ -f1 | grep -v -rc | sort -V))
 
     [ ${#latest_version[@]} -eq 0 ] && echo -e "${red}Error:${plain} Gagal mendapatkan versi kernel terbaru dari Ubuntu mainline PPA." && exit 1
 
     kernel_arr=()
-    for i in ${latest_version[@]}; do
+    for i in "${latest_version[@]}"; do
         if version_ge "$i" 4.14; then # BBR direkomendasikan pada 4.9+, tetapi 4.14+ lebih stabil untuk beberapa fitur
             kernel_arr+=("$i");
         fi
@@ -517,7 +547,7 @@ install_bbr() {
     echo -e "${BOLD_YELLOW}Peringatan:${nc} Versi kernel Anda (${kern}) lebih rendah dari 4.9. Skrip akan mencoba menginstal kernel terbaru yang kompatibel."
     sleep 2
 
-    if [[ x"${OS}" == x"centos" ]]; then
+    if [[ x"${OS_FAMILY}" == x"centos" ]]; then # Menggunakan OS_FAMILY
         install_elrepo
         [ ! "$(command -v yum-config-manager)" ] && yum install -y yum-utils > /dev/null 2>&1
         [ x"$(yum-config-manager elrepo-kernel | grep -w enabled | awk '{print $3}')" != x"True" ] && yum-config-manager --enable elrepo-kernel > /dev/null 2>&1
@@ -562,7 +592,7 @@ install_bbr() {
                 exit 1
             fi
         fi
-    elif [[ x"${OS}" == x"debian" || x"${OS}" == x"ubuntu" ]]; then
+    elif [[ x"${OS_FAMILY}" == x"debian" || x"${OS_FAMILY}" == x"ubuntu" ]]; then # Menggunakan OS_FAMILY
         echo -e "${BOLD_GREEN}Info:${nc} Mendapatkan versi kernel terbaru untuk Debian/Ubuntu dari Ubuntu mainline PPA..."
         get_latest_version
         
@@ -643,9 +673,9 @@ else
     # Pastikan wondershaper terinstal
     if ! command -v wondershaper &> /dev/null; then
         echo -e "${BOLD_GREEN}Menginstal Wondershaper...${NC}"
-        if [[ $OS == 'ubuntu' || $OS == 'debian' ]]; then
+        if [[ ${OS_FAMILY} == 'ubuntu' || ${OS_FAMILY} == 'debian' ]]; then # Menggunakan OS_FAMILY
             sudo apt-get install -y wondershaper
-        elif [[ ${OS} == 'centos' ]]; then
+        elif [[ ${OS_FAMILY} == 'centos' ]]; then # Menggunakan OS_FAMILY
             # Wondershaper biasanya ada di EPEL, pastikan EPEL sudah ada atau instal
             if ! yum list installed epel-release &> /dev/null; then
                 echo -e "${INFO} Menginstal epel-release untuk wondershaper...${NC}"
@@ -698,7 +728,7 @@ else
         systemctl enable --now wondershaper.service &>/dev/null
         echo "start" > /home/limit # Penanda bahwa wondershaper telah dikonfigurasi
         echo "$download_rate" > /home/limit_down # Simpan nilai
-        echo "$upload_rate" > /home/limit_up   # Simpan nilai
+        echo "$upload_rate" > /home/limit_up    # Simpan nilai
         echo -e "${BOLD_GREEN}Selesai Konfigurasi Wondershaper.${NC}"
     fi
 fi
@@ -719,7 +749,7 @@ else
 fi
 
 echo -e " ${BOLD_GREEN}===================================${NC}"
-echo -e "${BOLD_YELLOW}         Batas Kecepatan Bandwidth       ${NC}"
+echo -e "${BOLD_YELLOW}      Batas Kecepatan Bandwidth        ${NC}"
 echo -e " ${BOLD_GREEN}===================================${NC}"
 echo -e " Status: $current_status"
 echo ""
