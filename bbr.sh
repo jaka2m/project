@@ -10,16 +10,8 @@ purple='\e[0;35m'
 orange='\e[0;33m'
 NC='\e[0m'
 clear
-#if [[ -e /usr/local/sbin/bbr ]]; then
-     echo ""
-#     echo -e "${green}TCP BBR Already Install${NC}"
-     echo ""
-#	 read -n1 -r -p "Press any key to continue..."
-#	 menu
-#else
-
-echo -e "Installing TCP BBR Mod By Geo"
-echo -e "Please Wait BBR Installation Will Starting . . ."
+echo -e "\e[32;1mInstalling TCP BBR Mod By Geo"
+echo -e "\e[32;1mPlease Wait BBR Installation Will Starting . . ."
 sleep 5
 clear
 
