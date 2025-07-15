@@ -44,257 +44,68 @@ yellow='\033[0;33m'
 plain='\033[0m'
 cur_dir=$(pwd) # Direktori saat ini untuk log BBR
 
-
-### Pengecekan Awal
-
-
-# Cek apakah skrip dijalankan sebagai root
+# Check if the script is executed as root
 if [ "$(id -u)" -ne 0 ]; then
-    echo "${BOLD_RED}Error:${NC} Harap jalankan skrip ini sebagai root."
+    echo "Please execute this script as root."
     exit 1
 fi
 
-# Cek Sistem Operasi
-OS_FAMILY=""
-OS_VERSION_ID=""
-
-if [[ -e /etc/os-release ]]; then
-    source /etc/os-release
-    OS_FAMILY=${ID} # debian, ubuntu, centos, dst.
-    OS_VERSION_ID=${VERSION_ID} # 10, 11, 12, 18.04, 20.04, 22.04, 24.04, dst.
+# Check OS version
+if [[ -e /etc/debian_version ]]; then
+	source /etc/os-release
+	OS=$ID # debian or ubuntu
+elif [[ -e /etc/centos-release ]]; then
+	source /etc/os-release
+	OS=centos
 fi
 
-case "${OS_FAMILY}" in
-    "debian")
-        case "${OS_VERSION_ID}" in
-            "10"|"11"|"12")
-                echo "${INFO} Terdeteksi Debian ${OS_VERSION_ID}. Melanjutkan instalasi.${NC}"
-                ;;
-            *)
-                echo "${BOLD_RED}Error:${NC} Versi Debian ${OS_VERSION_ID} tidak didukung. Skrip ini hanya mendukung Debian 10, 11, atau 12."
-                exit 1
-                ;;
-        esac
-        ;;
-    "ubuntu")
-        case "${OS_VERSION_ID}" in
-            "18.04"|"19.04"|"20.04"|"22.04"|"24.04") # Menambahkan Ubuntu 22.04 dan 24.04
-                echo "${INFO} Terdeteksi Ubuntu ${OS_VERSION_ID}. Melanjutkan instalasi.${NC}"
-                ;;
-            *)
-                echo "${BOLD_RED}Error:${NC} Versi Ubuntu ${OS_VERSION_ID} tidak didukung. Skrip ini hanya mendukung Ubuntu 18.04, 19.04, 20.04, 22.04, atau 24.04."
-                exit 1
-                ;;
-        esac
-        ;;
-    "centos")
-        echo "${INFO} Terdeteksi CentOS ${OS_VERSION_ID}. Melanjutkan instalasi.${NC}"
-        ;;
-    *)
-        echo "${BOLD_RED}Error:${NC} Sistem Operasi tidak didukung. Skrip ini hanya untuk Debian, Ubuntu, atau CentOS."
-        exit 1
-        ;;
-esac
-
-# Dapatkan nama Network Interface Card (NIC) untuk Wondershaper
-NIC=$(ip -o -4 route show to default | awk '{print $5}' | head -1)
-if [ -z "$NIC" ]; then
-    echo "${BOLD_RED}Error:${NC} Tidak dapat mendeteksi Network Interface Card (NIC). Wondershaper mungkin tidak berfungsi."
-    # Lanjutkan skrip, tetapi Wondershaper akan dilewati jika NIC tidak terdeteksi.
-fi
-
-
-### Fungsi Umum
-
-
-# Fungsi untuk memeriksa apakah input adalah digit
-is_digit(){
-    local input=${1}
-    if [[ "$input" =~ ^[0-9]+$ ]]; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-# Fungsi untuk memeriksa arsitektur 64-bit
-is_64bit(){
-    if [ $(getconf WORD_BIT) = '32' ] && [ $(getconf LONG_BIT) = '64' ]; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-# Fungsi untuk mendapatkan nama variabel yang valid
-get_valid_valname(){
-    local val=${1}
-    local new_val=$(eval echo "$val" | sed 's/[-.]/_/g')
-    echo "${new_val}"
-}
-
-# Fungsi untuk mendapatkan hint dari variabel
-get_hint(){
-    local val=${1}
-    local new_val=$(get_valid_valname "$val")
-    eval echo "\$hint_${new_val}"
-}
-
-# Fungsi untuk menampilkan menu (digunakan oleh BBR)
-display_menu(){
-    local soft=${1}
-    local default=${2}
-    eval local arr=(\${${soft}_arr[@]})
-    local default_prompt
-    if [[ "$default" != "" ]]; then
-        if [[ "$default" == "last" ]]; then
-            default=${#arr[@]}
-        fi
-        default_prompt="(default ${arr[$default-1]})"
-    fi
-    local pick
-    local hint
-    local vname
-    local prompt="which ${soft} you'd select ${default_prompt}: "
-
-    while :
-    do
-        echo -e "\n ${soft} setting \n"
-        for ((i=1;i<=${#arr[@]};i++ )); do
-            vname="$(get_valid_valname "${arr[$i-1]}")"
-            hint="$(get_hint "$vname")"
-            [[ "$hint" == "" ]] && hint="${arr[$i-1]}"
-            echo -e "${green}${i}${plain}) $hint"
-        done
-        echo
-        read -p "${prompt}" pick
-        if [[ "$pick" == "" && "$default" != "" ]]; then
-            pick=${default}
-            break
-        fi
-
-        if ! is_digit "$pick"; then
-            prompt="Input error, please input a number: "
-            continue
-        fi
-
-        if [[ "$pick" -lt 1 || "$pick" -gt ${#arr[@]} ]]; then
-            prompt="Input error, please input a number between 1 and ${#arr[@]}: "
-            continue
-        fi
-
-        break
-    done
-
-    eval ${soft}=${arr[$pick-1]}
-    vname="$(get_valid_valname "${arr[$pick-1]}")"
-    hint="$(get_hint "$vname")"
-    [[ "$hint" == "" ]] && hint="${arr[$pick-1]}"
-    echo -e "\nyour selection: $hint\n"
-}
-
-# Fungsi untuk membandingkan versi
-version_ge(){
-    test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"
-}
-
-# Fungsi untuk mendapatkan versi OS
-get_opsy() {
-    [ -f /etc/redhat-release ] && awk '{print ($1,$3~/^[0-9]/?$3:$4)}' /etc/redhat-release && return
-    [ -f /etc/os-release ] && awk -F'[= "]' '/PRETTY_NAME/{print $3,$4,$5}' /etc/os-release && return
-    [ -f /etc/lsb-release ] && awk -F'[="]+' '/DESCRIPTION/{print $2}' /etc/lsb-release && return
-}
-
-opsy=$( get_opsy )
-arch=$( uname -m )
-lbit=$( getconf LONG_BIT )
-kern=$( uname -r )
-
-# Fungsi untuk mendapatkan input karakter tunggal (tidak digunakan langsung, tapi dipertahankan)
-get_char() {
-    SAVEDSTTY=`stty -g`
-    stty -echo
-    stty cbreak
-    # dd if=/dev/tty bs=1 count=1 2> /dev/null
-    stty -raw
-    stty echo
-    stty $SAVEDSTTY
-}
-
-# Fungsi untuk mendapatkan versi
-getversion() {
-    if [[ -s /etc/redhat-release ]]; then
-        grep -oE "[0-9.]+" /etc/redhat-release
-    else
-        grep -oE "[0-9.]+" /etc/issue
-    fi
-}
-
-# Fungsi untuk memeriksa versi CentOS
-centosversion() {
-    if [ x"${OS_FAMILY}" == x"centos" ]; then # Menggunakan OS_FAMILY yang baru
-        local code=$1
-        local version="$(getversion)"
-        local main_ver=${version%%.*}
-        if [ "$main_ver" == "$code" ]; then
-            return 0
-        else
-            return 1
-        fi
-    else
-        return 1
-    fi
-}
-
-# Fungsi untuk memeriksa status BBR
-check_bbr_status() {
-    local param=$(sysctl net.ipv4.tcp_congestion_control | awk '{print $3}')
-    if [[ x"${param}" == x"bbr" ]]; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-# Fungsi untuk memeriksa versi kernel
-check_kernel_version() {
-    local kernel_version=$(uname -r | cut -d- -f1)
-    if version_ge "${kernel_version}" 4.9; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-
-### Instalasi dan Pembaruan Sistem
+# Update & Upgrade | Install 
+	if [[ $OS == 'ubuntu' ]]; then
+    sudo apt-get update -y 
+    sudo apt-get upgrade -y
+    sudo apt-get install zip -y
+    sudo apt-get install unzip -y
+    sudo apt-get install tar -y
+    sudo apt-get install gzip -y
+    sudo apt-get install p7zip-full -y
+    sudo apt install dnsutils -
+    sudo apt-get install net-tools -y
+    sudo apt-get install tcpdump -y
+    sudo apt-get install dsniff -y
+    sudo apt install grepcidr -y
+    sudo apt-get install fail2ban -y
+	sudo apt-get install netfilter-persistent -y
+elif [[ $OS == 'debian' ]]; then
+	sudo apt-get update -y
+    sudo apt-get upgrade -y
+    sudo apt-get install zip -y
+    sudo apt-get install unzip -y
+    sudo apt-get install tar -y
+    sudo apt-get install gzip -y
+    sudo apt-get install p7zip-full -y
+    sudo apt install dnsutils -y
+    sudo apt-get install net-tools -y
+    sudo apt-get install tcpdump -y
+    sudo apt-get install dsniff -y
+    sudo apt install grepcidr -y
+    sudo apt-get install fail2ban -y
+	sudo apt-get install netfilter-persistent -y
+elif [[ ${OS} == 'centos' ]]; then
+	yum -y update
+    yum -y install zip
+    yum -y install unzip
+    yum -y install tar
+    yum -y install gzip
+    yum -y install p7zip-full
+    yum -y install dnsutils
+    yum -y install net-tools
+    yum -y install tcpdump
+    yum -y install dsniff
+    yum -y install grepcidr
+	yum -y install netfilter-persistent
+	fi
 
 echo ""
-echo -e "${BOLD_GREEN}Memperbarui dan menginstal paket yang diperlukan...${NC}"
-sleep 1.0
-clear
-
-# Paket umum yang dibutuhkan
-COMMON_PACKAGES="zip unzip tar gzip p7zip-full dnsutils net-tools tcpdump dsniff grepcidr fail2ban netfilter-persistent"
-
-if [[ ${OS_FAMILY} == 'ubuntu' || ${OS_FAMILY} == 'debian' ]]; then # Menggunakan OS_FAMILY
-    sudo apt-get update -y
-    sudo apt-get upgrade -y
-    sudo apt-get install -y $COMMON_PACKAGES
-elif [[ ${OS_FAMILY} == 'centos' ]]; then # Menggunakan OS_FAMILY
-    yum -y update
-    yum -y install $COMMON_PACKAGES
-    # P7zip di CentOS mungkin perlu epel-release
-    if ! command -v p7zip &> /dev/null; then
-        echo -e "${INFO} Menginstal epel-release untuk p7zip...${NC}"
-        yum install -y epel-release
-        yum -y install p7zip p7zip-plugins
-    fi
-fi
-
-
-### Informasi Awal Skrip
-
 clear
 echo -e "${BOLD_GREEN} ============================="
 echo -e "${BOLD_YELLOW} # Protection VPS V2.0         #${NC}"
@@ -313,37 +124,28 @@ echo ""
 sleep 0.5
 clear
 
-
-### Instalasi Anti-DDoS (ddos-deflate)
-
+#Install DDos Protection
 echo ""
 echo -e "${BOLD_GREEN}Memulai instalasi Anti DDoS (ddos-deflate)...${NC}"
 sleep 0.5
 clear
 
-cd /tmp # Gunakan direktori sementara untuk unduhan
-wget -q "https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/ssh/ddos-deflate-master.zip" -O ddos-deflate-master.zip
-if [ $? -eq 0 ]; then
-    unzip -q ddos-deflate-master.zip
-    cd ddos-deflate-master || { echo "${BOLD_RED}ERROR:${NC} Gagal masuk ke direktori ddos-deflate-master."; exit 1; }
-    ./install.sh
-    cd /tmp || { echo "${BOLD_RED}ERROR:${NC} Gagal kembali ke direktori /tmp."; exit 1; }
-    rm -rf ddos-deflate-master.zip ddos-deflate-master
-    echo -e "${BOLD_GREEN}Instalasi Anti DDoS Selesai.${NC}"
-else
-    echo -e "${BOLD_RED}Error:${NC} Gagal mengunduh ddos-deflate-master.zip. Instalasi Anti DDoS dihentikan."
-fi
+cd
+wget "https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/ssh/ddos-deflate-master.zip"
+unzip ddos-deflate-master.zip
+cd ddos-deflate-master
+./install.sh
+cd
+rm -rf ddos-deflate-master.zip
+
 clear
-
-
-### Instalasi Anti-Torrent
-
+#Install Anti Torrent Protection
 echo ""
 echo -e "${BOLD_GREEN}Memulai instalasi Anti Torrent...${NC}"
 sleep 0.5
 clear
 
-# Buat atau edit file /etc/systemd/system/rc-local.service
+# Edit file /etc/systemd/system/rc-local.service
 cat > /etc/systemd/system/rc-local.service <<-END
 [Unit]
 Description=/etc/rc.local
@@ -359,7 +161,7 @@ SysVStartPriority=99
 WantedBy=multi-user.target
 END
 
-# Buat atau edit file /etc/rc.local
+# nano /etc/rc.local
 cat > /etc/rc.local <<-END
 #!/bin/sh -e
 # rc.local
@@ -367,26 +169,21 @@ cat > /etc/rc.local <<-END
 exit 0
 END
 
-# Beri izin eksekusi
+# Change Permission Access
 chmod +x /etc/rc.local
 
-# Aktifkan dan mulai service rc-local
-systemctl enable rc-local &>/dev/null
-systemctl start rc-local.service &>/dev/null
+# enable rc local
+systemctl enable rc-local
+systemctl start rc-local.service
 
-# Nonaktifkan IPv6 Forwarding
+# Disable ipv6 Forwarding
 echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6
-# Tambahkan ke rc.local jika belum ada
-grep -qxF 'echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local || sed -i '/exit 0/i\echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
+sed -i '$ i\echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
 
-# Aktifkan IPv4 Forwarding
+# Enable ipv4 Forwarding
 echo 1 > /proc/sys/net/ipv4/ip_forward
 
-# Aturan IPTables untuk memblokir torrent
-# Hapus aturan yang mungkin ada sebelumnya untuk menghindari duplikasi
-iptables -F FORWARD # Hapus semua aturan di chain FORWARD
-iptables -X           # Hapus semua chain yang tidak digunakan
-
+# Blocked Torrent
 iptables -A FORWARD -m string --string "get_peers" --algo bm -j DROP
 iptables -A FORWARD -m string --string "announce_peer" --algo bm -j DROP
 iptables -A FORWARD -m string --string "find_node" --algo bm -j DROP
@@ -398,25 +195,227 @@ iptables -A FORWARD -m string --algo bm --string "announce.php?passkey=" -j DROP
 iptables -A FORWARD -m string --algo bm --string "torrent" -j DROP
 iptables -A FORWARD -m string --algo bm --string "announce" -j DROP
 iptables -A FORWARD -m string --algo bm --string "info_hash" -j DROP
+iptables-save > /etc/iptables.up.rules
+iptables-restore -t < /etc/iptables.up.rules
+netfilter-persistent save
+netfilter-persistent reload
 
-# Simpan dan muat ulang aturan netfilter-persistent
-netfilter-persistent save >/dev/null 2>&1
-netfilter-persistent reload >/dev/null 2>&1
-echo -e "${BOLD_GREEN}Instalasi Anti Torrent Selesai.${NC}"
 clear
-
-
-### Instalasi BBR TCP
-
+# Install BBR TCP
 echo ""
 echo -e "${BOLD_GREEN}Memulai instalasi BBR TCP...${NC}"
 sleep 1.0
 clear
 
-# Fungsi BBR TCP (dipertahankan seperti aslinya dengan perbaikan kecil)
+cur_dir=$(pwd)
+
+[[ $EUID -ne 0 ]] && echo -e "${BOLD_RED}Error:${NC} This script must be run as root!" && exit 1
+
+[[ -d "/proc/vz" ]] && echo -e "${BOLD_RED}Error:${NC} Your VPS is based on OpenVZ, which is not supported." && exit 1
+
+if [ -f /etc/redhat-release ]; then
+    release="centos"
+elif cat /etc/issue | grep -Eqi "debian"; then
+    release="debian"
+elif cat /etc/issue | grep -Eqi "ubuntu"; then
+    release="ubuntu"
+elif cat /etc/issue | grep -Eqi "centos|red hat|redhat"; then
+    release="centos"
+elif cat /proc/version | grep -Eqi "debian"; then
+    release="debian"
+elif cat /proc/version | grep -Eqi "ubuntu"; then
+    release="ubuntu"
+elif cat /proc/version | grep -Eqi "centos|red hat|redhat"; then
+    release="centos"
+else
+    release=""
+fi
+
+is_digit(){
+    local input=${1}
+    if [[ "$input" =~ ^[0-9]+$ ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+is_64bit(){
+    if [ $(getconf WORD_BIT) = '32' ] && [ $(getconf LONG_BIT) = '64' ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+get_valid_valname(){
+    local val=${1}
+    local new_val=$(eval echo $val | sed 's/[-.]/_/g')
+    echo ${new_val}
+}
+
+get_hint(){
+    local val=${1}
+    local new_val=$(get_valid_valname $val)
+    eval echo "\$hint_${new_val}"
+}
+
+#Display Memu
+display_menu(){
+    local soft=${1}
+    local default=${2}
+    eval local arr=(\${${soft}_arr[@]})
+    local default_prompt
+    if [[ "$default" != "" ]]; then
+        if [[ "$default" == "last" ]]; then
+            default=${#arr[@]}
+        fi
+        default_prompt="(default ${arr[$default-1]})"
+    fi
+    local pick
+    local hint
+    local vname
+    local prompt="which ${soft} you'd select ${default_prompt}: "
+
+    while :
+    do
+        echo -e "\n------------ ${soft} setting ------------\n"
+        for ((i=1;i<=${#arr[@]};i++ )); do
+            vname="$(get_valid_valname ${arr[$i-1]})"
+            hint="$(get_hint $vname)"
+            [[ "$hint" == "" ]] && hint="${arr[$i-1]}"
+            echo -e "${BOLD_GREEN}${i}${NC}) $hint"
+        done
+        echo
+        read -p "${prompt}" pick
+        if [[ "$pick" == "" && "$default" != "" ]]; then
+            pick=${default}
+            break
+        fi
+
+        if ! is_digit "$pick"; then
+            prompt="Input error, please input a number"
+            continue
+        fi
+
+        if [[ "$pick" -lt 1 || "$pick" -gt ${#arr[@]} ]]; then
+            prompt="Input error, please input a number between 1 and ${#arr[@]}: "
+            continue
+        fi
+
+        break
+    done
+
+    eval ${soft}=${arr[$pick-1]}
+    vname="$(get_valid_valname ${arr[$pick-1]})"
+    hint="$(get_hint $vname)"
+    [[ "$hint" == "" ]] && hint="${arr[$pick-1]}"
+    echo -e "\nyour selection: $hint\n"
+}
+
+version_ge(){
+    test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"
+}
+
+get_latest_version() {
+    latest_version=($(wget -qO- https://kernel.ubuntu.com/~kernel-ppa/mainline/ | awk -F'\"v' '/v[4-9]./{print $2}' | cut -d/ -f1 | grep -v - | sort -V))
+
+    [ ${#latest_version[@]} -eq 0 ] && echo -e "${BOLD_RED}Error:${NC} Get latest kernel version failed." && exit 1
+
+    kernel_arr=()
+    for i in ${latest_version[@]}; do
+        if version_ge $i 4.14; then
+            kernel_arr+=($i);
+        fi
+    done
+
+    display_menu kernel last
+
+    if [[ `getconf WORD_BIT` == "32" && `getconf LONG_BIT` == "64" ]]; then
+        deb_name=$(wget -qO- https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/ | grep "linux-image" | grep "generic" | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1)
+        deb_kernel_url="https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/${deb_name}"
+        deb_kernel_name="linux-image-${kernel}-amd64.deb"
+        modules_deb_name=$(wget -qO- https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/ | grep "linux-modules" | grep "generic" | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1)
+        deb_kernel_modules_url="https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/${modules_deb_name}"
+        deb_kernel_modules_name="linux-modules-${kernel}-amd64.deb"
+    else
+        deb_name=$(wget -qO- https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/ | grep "linux-image" | grep "generic" | awk -F'\">' '/i386.deb/{print $2}' | cut -d'<' -f1 | head -1)
+        deb_kernel_url="https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/${deb_name}"
+        deb_kernel_name="linux-image-${kernel}-i386.deb"
+        modules_deb_name=$(wget -qO- https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/ | grep "linux-modules" | grep "generic" | awk -F'\">' '/i386.deb/{print $2}' | cut -d'<' -f1 | head -1)
+        deb_kernel_modules_url="https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/${modules_deb_name}"
+        deb_kernel_modules_name="linux-modules-${kernel}-i386.deb"
+    fi
+
+    [ -z ${deb_name} ] && echo -e "${BOLD_RED}Error:${NC} Getting Linux kernel binary package name failed, maybe kernel build failed. Please choose other one and try again." && exit 1
+}
+
+get_opsy() {
+    [ -f /etc/redhat-release ] && awk '{print ($1,$3~/^[0-9]/?$3:$4)}' /etc/redhat-release && return
+    [ -f /etc/os-release ] && awk -F'[= "]' '/PRETTY_NAME/{print $3,$4,$5}' /etc/os-release && return
+    [ -f /etc/lsb-release ] && awk -F'[="]+' '/DESCRIPTION/{print $2}' /etc/lsb-release && return
+}
+
+opsy=$( get_opsy )
+arch=$( uname -m )
+lbit=$( getconf LONG_BIT )
+kern=$( uname -r )
+
+get_char() {
+    SAVEDSTTY=`stty -g`
+    stty -echo
+    stty cbreak
+   # dd if=/dev/tty bs=1 count=1 2> /dev/null
+    stty -raw
+    stty echo
+    stty $SAVEDSTTY
+}
+
+getversion() {
+    if [[ -s /etc/redhat-release ]]; then
+        grep -oE  "[0-9.]+" /etc/redhat-release
+    else
+        grep -oE  "[0-9.]+" /etc/issue
+    fi
+}
+
+centosversion() {
+    if [ x"${release}" == x"centos" ]; then
+        local code=$1
+        local version="$(getversion)"
+        local main_ver=${version%%.*}
+        if [ "$main_ver" == "$code" ]; then
+            return 0
+        else
+            return 1
+        fi
+    else
+        return 1
+    fi
+}
+
+check_bbr_status() {
+    local param=$(sysctl net.ipv4.tcp_congestion_control | awk '{print $3}')
+    if [[ x"${param}" == x"bbr" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+check_kernel_version() {
+    local kernel_version=$(uname -r | cut -d- -f1)
+    if version_ge ${kernel_version} 4.9; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 install_elrepo() {
+
     if centosversion 5; then
-        echo -e "${red}Error:${plain} CentOS 5 tidak didukung untuk instalasi BBR."
+        echo -e "${BOLD_RED}Error:${NC} not supported CentOS 5."
         exit 1
     fi
 
@@ -426,12 +425,10 @@ install_elrepo() {
         rpm -Uvh https://www.elrepo.org/elrepo-release-6-8.el6.elrepo.noarch.rpm
     elif centosversion 7; then
         rpm -Uvh https://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
-    elif centosversion 8; then # Tambahkan dukungan CentOS 8 jika diperlukan ELRepo
-        yum install -y https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
     fi
 
     if [ ! -f /etc/yum.repos.d/elrepo.repo ]; then
-        echo -e "${BOLD_RED}Error:${plain} Instalasi elrepo gagal, harap periksa koneksi internet Anda atau repositori."
+        echo -e "${BOLD_RED}Error:${NC} Install elrepo failed, please check it."
         exit 1
     fi
 }
@@ -445,212 +442,143 @@ sysctl_config() {
 }
 
 install_config() {
-    if [[ x"${OS_FAMILY}" == x"centos" ]]; then # Menggunakan OS_FAMILY
+    if [[ x"${release}" == x"centos" ]]; then
         if centosversion 6; then
             if [ ! -f "/boot/grub/grub.conf" ]; then
-                echo -e "${red}Error:${plain} /boot/grub/grub.conf tidak ditemukan. Instalasi BBR mungkin memerlukan konfigurasi manual Grub."
-                # Tidak exit 1, agar tetap lanjut jika ada cara lain.
-            else
-                sed -i 's/^default=.*/default=0/g' /boot/grub/grub.conf
+                echo -e "${BOLD_RED}Error:${NC} /boot/grub/grub.conf not found, please check it."
+                exit 1
             fi
-        elif centosversion 7 || centosversion 8; then # CentOS 7/8 menggunakan grub2
+            sed -i 's/^default=.*/default=0/g' /boot/grub/grub.conf
+        elif centosversion 7; then
             if [ ! -f "/boot/grub2/grub.cfg" ]; then
-                echo -e "${red}Error:${plain} /boot/grub2/grub.cfg tidak ditemukan. Instalasi BBR mungkin memerlukan konfigurasi manual Grub2."
-                # Tidak exit 1
-            else
-                grub2-set-default 0
+                echo -e "${BOLD_RED}Error:${NC} /boot/grub2/grub.cfg not found, please check it."
+                exit 1
             fi
+            grub2-set-default 0
         fi
-    elif [[ x"${OS_FAMILY}" == x"debian" || x"${OS_FAMILY}" == x"ubuntu" ]]; then # Menggunakan OS_FAMILY
-        /usr/sbin/update-grub >/dev/null 2>&1
+    elif [[ x"${release}" == x"debian" || x"${release}" == x"ubuntu" ]]; then
+        /usr/sbin/update-grub
     fi
 }
 
-get_latest_version() {
-    # Cek ketersediaan wget
-    if ! command -v wget &> /dev/null; then
-        echo -e "${red}Error:${plain} wget tidak ditemukan. Instalasi BBR gagal."
-        exit 1
+reboot_os() {
+    echo
+    echo -e "${BOLD_GREEN}Info:${NC} The system needs to reboot."
+    read -p "Do you want to restart system? [y/n]" is_reboot
+    if [[ ${is_reboot} == "y" || ${is_reboot} == "Y" ]]; then
+        reboot
+    else
+        echo -e "${BOLD_RED}Info:${NC} Reboot has been canceled..."
+        exit 0
     fi
-    
-    # Perbaikan URL dan pemrosesan yang lebih robust
-    # Pastikan ini hanya mengambil versi stabil dan rilis terbaru
-    latest_version=($(wget -qO- https://kernel.ubuntu.com/~kernel-ppa/mainline/ | awk -F'\"v' '/v[4-9]\.[0-9]+\.[0-9]+/{print $2}' | cut -d/ -f1 | grep -v -rc | sort -V))
-
-    [ ${#latest_version[@]} -eq 0 ] && echo -e "${red}Error:${plain} Gagal mendapatkan versi kernel terbaru dari Ubuntu mainline PPA." && exit 1
-
-    kernel_arr=()
-    for i in "${latest_version[@]}"; do
-        if version_ge "$i" 4.14; then # BBR direkomendasikan pada 4.9+, tetapi 4.14+ lebih stabil untuk beberapa fitur
-            kernel_arr+=("$i");
-        fi
-    done
-
-    # Pastikan ada kernel yang memenuhi syarat
-    [ ${#kernel_arr[@]} -eq 0 ] && echo -e "${red}Error:${plain} Tidak ada versi kernel yang sesuai (>= 4.14) ditemukan." && exit 1
-
-    display_menu kernel last
-
-    local kernel_download_base_url="https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/"
-    
-    if is_64bit; then
-        deb_kernel_image_pattern="linux-image-unsigned-${kernel}.*amd64.deb" # Ubuntu 20.04+ menggunakan unsigned
-        deb_kernel_modules_pattern="linux-modules-${kernel}.*amd64.deb"
-        
-        # Cari nama file yang tepat
-        deb_kernel_name=$(wget -qO- "$kernel_download_base_url" | grep -oP "${deb_kernel_image_pattern}" | head -1)
-        deb_kernel_modules_name=$(wget -qO- "$kernel_download_base_url" | grep -oP "${deb_kernel_modules_pattern}" | head -1)
-        
-        # Fallback untuk nama file lama jika unsigned tidak ditemukan
-        if [ -z "$deb_kernel_name" ]; then
-            deb_kernel_image_pattern="linux-image-${kernel}.*amd64.deb"
-            deb_kernel_name=$(wget -qO- "$kernel_download_base_url" | grep -oP "${deb_kernel_image_pattern}" | head -1)
-        fi
-
-    else # 32-bit (i386)
-        deb_kernel_image_pattern="linux-image-unsigned-${kernel}.*i386.deb"
-        deb_kernel_modules_pattern="linux-modules-${kernel}.*i386.deb"
-        
-        deb_kernel_name=$(wget -qO- "$kernel_download_base_url" | grep -oP "${deb_kernel_image_pattern}" | head -1)
-        deb_kernel_modules_name=$(wget -qO- "$kernel_download_base_url" | grep -oP "${deb_kernel_modules_pattern}" | head -1)
-
-        if [ -z "$deb_kernel_name" ]; then
-            deb_kernel_image_pattern="linux-image-${kernel}.*i386.deb"
-            deb_kernel_name=$(wget -qO- "$kernel_download_base_url" | grep -oP "${deb_kernel_image_pattern}" | head -1)
-        fi
-    fi
-
-    # Pastikan nama file ditemukan sebelum mencoba mengunduh
-    [ -z "${deb_kernel_name}" ] && echo -e "${red}Error:${plain} Gagal mendapatkan nama paket biner kernel Linux (${kernel}). Mungkin pembuatan kernel gagal atau arsitektur tidak cocok. Silakan pilih kernel lain dan coba lagi." && exit 1
-
-    deb_kernel_url="${kernel_download_base_url}${deb_kernel_name}"
-    deb_kernel_modules_url="${kernel_download_base_url}${deb_kernel_modules_name}"
 }
 
 install_bbr() {
     check_bbr_status
     if [ $? -eq 0 ]; then
-        echo ""
-        echo -e "${BOLD_GREEN}Info:${nc} TCP BBR sudah terinstal dan aktif. Tidak ada yang perlu dilakukan."
+        echo
+        echo -e "${BOLD_GREEN}Info:${NC} TCP BBR has already been installed. nothing to do..."
         exit 0
     fi
-
     check_kernel_version
     if [ $? -eq 0 ]; then
-        echo ""
-        echo -e "${BOLD_GREEN}Info:${nc} Versi kernel Anda (${kern}) sudah mendukung BBR (>= 4.9). Langsung mengaktifkan TCP BBR..."
+        echo
+        echo -e "${BOLD_GREEN}Info:${NC} Your kernel version is greater than 4.9, directly setting TCP BBR..."
         sysctl_config
-        echo -e "${BOLD_GREEN}Info:${nc} Pengaturan TCP BBR selesai. Reboot mungkin diperlukan untuk efek penuh."
+        echo -e "${BOLD_GREEN}Info:${NC} Setting TCP BBR completed..."
         exit 0
     fi
 
-    echo -e "${BOLD_YELLOW}Peringatan:${nc} Versi kernel Anda (${kern}) lebih rendah dari 4.9. Skrip akan mencoba menginstal kernel terbaru yang kompatibel."
-    sleep 2
-
-    if [[ x"${OS_FAMILY}" == x"centos" ]]; then # Menggunakan OS_FAMILY
+    if [[ x"${release}" == x"centos" ]]; then
         install_elrepo
         [ ! "$(command -v yum-config-manager)" ] && yum install -y yum-utils > /dev/null 2>&1
         [ x"$(yum-config-manager elrepo-kernel | grep -w enabled | awk '{print $3}')" != x"True" ] && yum-config-manager --enable elrepo-kernel > /dev/null 2>&1
-        
         if centosversion 6; then
-            echo -e "${BOLD_YELLOW}Info:${nc} Menginstal kernel ML (Mainline) untuk CentOS 6. Ini mungkin mengunduh dari repositori pihak ketiga."
             if is_64bit; then
-                rpm_kernel_name="kernel-ml-4.18.20-1.el6.elrepo.x86_64.rpm" # Versi spesifik, bisa jadi usang
+                rpm_kernel_name="kernel-ml-4.18.20-1.el6.elrepo.x86_64.rpm"
                 rpm_kernel_devel_name="kernel-ml-devel-4.18.20-1.el6.elrepo.x86_64.rpm"
+                rpm_kernel_url_1="http://repos.lax.quadranet.com/elrepo/archive/kernel/el6/x86_64/RPMS/"
             else
                 rpm_kernel_name="kernel-ml-4.18.20-1.el6.elrepo.i686.rpm"
                 rpm_kernel_devel_name="kernel-ml-devel-4.18.20-1.el6.elrepo.i686.rpm"
+                rpm_kernel_url_1="http://repos.lax.quadranet.com/elrepo/archive/kernel/el6/i386/RPMS/"
             fi
-            
-            # Coba unduh dari elrepo atau mirror
-            wget -c -t3 -T60 -O "${rpm_kernel_name}" "https://www.elrepo.org/elrepo/kernel/el6/$(uname -i)/RPMS/${rpm_kernel_name}" || \
-            wget -c -t3 -T60 -O "${rpm_kernel_name}" "http://repos.lax.quadranet.com/elrepo/archive/kernel/el6/$(uname -i)/RPMS/${rpm_kernel_name}" || \
-            wget -c -t3 -T60 -O "${rpm_kernel_name}" "https://dl.lamp.sh/files/${rpm_kernel_name}"
-
-            wget -c -t3 -T60 -O "${rpm_kernel_devel_name}" "https://www.elrepo.org/elrepo/kernel/el6/$(uname -i)/RPMS/${rpm_kernel_devel_name}" || \
-            wget -c -t3 -T60 -O "${rpm_kernel_devel_name}" "http://repos.lax.quadranet.com/elrepo/archive/kernel/el6/$(uname -i)/RPMS/${rpm_kernel_devel_name}" || \
-            wget -c -t3 -T60 -O "${rpm_kernel_devel_name}" "https://dl.lamp.sh/files/${rpm_kernel_devel_name}"
-
+            rpm_kernel_url_2="https://dl.lamp.sh/files/"
+            wget -c -t3 -T60 -O ${rpm_kernel_name} ${rpm_kernel_url_1}${rpm_kernel_name}
+            if [ $? -ne 0 ]; then
+                rm -rf ${rpm_kernel_name}
+                wget -c -t3 -T60 -O ${rpm_kernel_name} ${rpm_kernel_url_2}${rpm_kernel_name}
+            fi
+            wget -c -t3 -T60 -O ${rpm_kernel_devel_name} ${rpm_kernel_url_1}${rpm_kernel_devel_name}
+            if [ $? -ne 0 ]; then
+                rm -rf ${rpm_kernel_devel_name}
+                wget -c -t3 -T60 -O ${rpm_kernel_devel_name} ${rpm_kernel_url_2}${rpm_kernel_devel_name}
+            fi
             if [ -f "${rpm_kernel_name}" ]; then
-                rpm -ivh "${rpm_kernel_name}"
+                rpm -ivh ${rpm_kernel_name}
             else
-                echo -e "${red}Error:${plain} Gagal mengunduh kernel RPM (${rpm_kernel_name}). Instalasi BBR dihentikan."
+                echo -e "${BOLD_RED}Error:${NC} Download ${rpm_kernel_name} failed, please check it."
                 exit 1
             fi
             if [ -f "${rpm_kernel_devel_name}" ]; then
-                rpm -ivh "${rpm_kernel_devel_name}"
+                rpm -ivh ${rpm_kernel_devel_name}
             else
-                echo -e "${red}Peringatan:${plain} Gagal mengunduh kernel-devel RPM (${rpm_kernel_devel_name}). Ini mungkin diperlukan untuk modul tertentu, tetapi BBR tetap akan diinstal."
+                echo -e "${BOLD_RED}Error:${NC} Download ${rpm_kernel_devel_name} failed, please check it."
+                exit 1
             fi
-            rm -f "${rpm_kernel_name}" "${rpm_kernel_devel_name}"
-
-        elif centosversion 7 || centosversion 8; then
-            echo -e "${BOLD_GREEN}Info:${nc} Menginstal kernel ML (Mainline) untuk CentOS ${OS_VERSION_ID}..."
+            rm -f ${rpm_kernel_name} ${rpm_kernel_devel_name}
+        elif centosversion 7; then
             yum -y install kernel-ml kernel-ml-devel
             if [ $? -ne 0 ]; then
-                echo -e "${red}Error:${plain} Gagal menginstal kernel terbaru dari elrepo. Harap periksa repositori atau koneksi internet Anda."
+                echo -e "${BOLD_RED}Error:${NC} Install latest kernel failed, please check it."
                 exit 1
             fi
         fi
-    elif [[ x"${OS_FAMILY}" == x"debian" || x"${OS_FAMILY}" == x"ubuntu" ]]; then # Menggunakan OS_FAMILY
-        echo -e "${BOLD_GREEN}Info:${nc} Mendapatkan versi kernel terbaru untuk Debian/Ubuntu dari Ubuntu mainline PPA..."
+    elif [[ x"${release}" == x"debian" || x"${release}" == x"ubuntu" ]]; then
+        [[ ! -e "/usr/bin/wget" ]] && apt-get -y update && apt-get -y install wget
+        echo -e "${BOLD_GREEN}Info:${NC} Getting latest kernel version..."
         get_latest_version
-        
-        # Unduh modul kernel jika ada
-        if [ -n "${deb_kernel_modules_name}" ]; then
-            echo -e "${BOLD_GREEN}Info:${nc} Mengunduh modul kernel: ${deb_kernel_modules_name}${NC}"
-            wget -c -t3 -T60 -O "${deb_kernel_modules_name}" "${deb_kernel_modules_url}"
+        if [ -n ${modules_deb_name} ]; then
+            wget -c -t3 -T60 -O ${deb_kernel_modules_name} ${deb_kernel_modules_url}
             if [ $? -ne 0 ]; then
-                echo -e "${red}Error:${plain} Gagal mengunduh modul kernel (${deb_kernel_modules_name}). Instalasi BBR dihentikan."
+                echo -e "${BOLD_RED}Error:${NC} Download ${deb_kernel_modules_name} failed, please check it."
                 exit 1
             fi
         fi
-        
-        echo -e "${BOLD_GREEN}Info:${nc} Mengunduh image kernel: ${deb_kernel_name}${NC}"
-        wget -c -t3 -T60 -O "${deb_kernel_name}" "${deb_kernel_url}"
+        wget -c -t3 -T60 -O ${deb_kernel_name} ${deb_kernel_url}
         if [ $? -ne 0 ]; then
-            echo -e "${BOLD_RED}Error:${nc} Gagal mengunduh image kernel (${deb_kernel_name}). Instalasi BBR dihentikan."
+            echo -e "${BOLD_RED}Error:${NC} Download ${deb_kernel_name} failed, please check it."
             exit 1
         fi
-        
-        echo -e "${BOLD_GREEN}Info:${nc} Menginstal paket kernel..."
-        [ -f "${deb_kernel_modules_name}" ] && dpkg -i "${deb_kernel_modules_name}"
-        dpkg -i "${deb_kernel_name}"
-        
-        # Bersihkan file .deb
-        rm -f "${deb_kernel_name}" "${deb_kernel_modules_name}"
-        
-        if [ $? -ne 0 ]; then
-            echo -e "${BOLD_RED}Error:${nc} Gagal menginstal paket kernel. Harap periksa log di ${cur_dir}/install_bbr.log."
-            exit 1
-        fi
-
+        [ -f ${deb_kernel_modules_name} ] && dpkg -i ${deb_kernel_modules_name}
+        dpkg -i ${deb_kernel_name}
+        rm -f ${deb_kernel_name} ${deb_kernel_modules_name}
     else
-        echo -e "${BOLD_RED}Error:${nc} Sistem Operasi tidak didukung untuk instalasi BBR, silakan gunakan CentOS/Debian/Ubuntu."
+        echo -e "${BOLD_RED}Error:${NC} OS is not be supported, please change to CentOS/Debian/Ubuntu and try again."
         exit 1
     fi
 
-    install_config # Konfigurasi GRUB
-    sysctl_config  # Aktifkan BBR di sysctl
-    echo -e "${BOLD_GREEN}Instalasi TCP BBR Selesai. Harap ${BOLD_YELLOW}REBOOT${NC}${BOLD_GREEN} VPS Anda untuk mengaktifkan kernel dan BBR yang baru.${NC}"
+    install_config
+    sysctl_config
+    reboot_os
 }
 
-install_bbr 2>&1 | tee "${cur_dir}/install_bbr.log"
+install_bbr 2>&1 | tee ${cur_dir}/install_bbr.log
 
 clear
-
-
-### Instalasi Limit Speed Bandwidth (Wondershaper)
-
+# Install Limit Speed Bandwith
 echo ""
-echo -e "${BOLD_GREEN}Mulai instalasi Limit Speed Bandwidth (Wondershaper) untuk melindungi bandwidth dari penggunaan berlebihan.${NC}"
+echo -e "\e[0;37m Start install Limit Speed Bandwith For Protect Bandwith From Overuse "
 sleep 1.0
 clear
-
-if [ -z "$NIC" ]; then
-    echo -e "${BOLD_YELLOW}Peringatan:${NC} NIC tidak terdeteksi. Melewati konfigurasi Wondershaper."
-else
-    echo ""
+Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_prefix="\033[42;37m" && Red_background_prefix="\033[41;37m" && Font_color_suffix="\033[0m"
+Info="${Green_font_prefix}[ON]${Font_color_suffix}"
+Error="${Red_font_prefix}[OFF]${Font_color_suffix}"
+NIC=$(ip -o $ANU -4 route show to default | awk '{print $5}');
+echo ""
+echo -e "${BOLD_YELLOW}m Limit Speed All Service"
+sleep 1.0
+echo ""
     echo -e "${BOLD_YELLOW}Konfigurasi Batas Kecepatan Semua Layanan${NC}"
     sleep 1.0
     echo ""
@@ -669,85 +597,24 @@ else
     echo -e "${BOLD_YELLOW}Jika sudah paham, mari atur Batas Kecepatan Bandwidth di bawah ini!${NC}"
     sleep 1.0
     echo ""
-
-    # Pastikan wondershaper terinstal
-    if ! command -v wondershaper &> /dev/null; then
-        echo -e "${BOLD_GREEN}Menginstal Wondershaper...${NC}"
-        if [[ ${OS_FAMILY} == 'ubuntu' || ${OS_FAMILY} == 'debian' ]]; then # Menggunakan OS_FAMILY
-            sudo apt-get install -y wondershaper
-        elif [[ ${OS_FAMILY} == 'centos' ]]; then # Menggunakan OS_FAMILY
-            # Wondershaper biasanya ada di EPEL, pastikan EPEL sudah ada atau instal
-            if ! yum list installed epel-release &> /dev/null; then
-                echo -e "${INFO} Menginstal epel-release untuk wondershaper...${NC}"
-                yum install -y epel-release
-            fi
-            yum -y install wondershaper
-        fi
-        if ! command -v wondershaper &> /dev/null; then
-            echo -e "${BOLD_RED}Error:${NC} Gagal menginstal Wondershaper. Instalasi Limit Speed Bandwidth dihentikan."
-            sleep 3
-            clear
-            # Lanjutkan ke bagian akhir skrip
-        fi
-    fi
-
-    read -rp "Atur kecepatan unduh maksimum (dalam Kbps) [Kosongkan untuk melewati]: " download_rate
-    echo ""
-    read -rp "Atur kecepatan unggah maksimum (dalam Kbps) [Kosongkan untuk melewati]: " upload_rate
-
-    # Validasi input numerik
-    if ! is_digit "$download_rate" && [ -n "$download_rate" ]; then
-        echo -e "${BOLD_RED}Peringatan:${NC} Input unduh tidak valid. Mengatur nilai ke 0."
-        download_rate=0
-    fi
-    if ! is_digit "$upload_rate" && [ -n "$upload_rate" ]; then
-        echo -e "${BOLD_RED}Peringatan:${NC} Input unggah tidak valid. Mengatur nilai ke 0."
-        upload_rate=0
-    fi
-
-    if [[ -z "$download_rate" && -z "$upload_rate" ]] || [[ "$download_rate" == "0" && "$upload_rate" == "0" ]]; then
-        echo -e "${BOLD_YELLOW}Melewati konfigurasi Wondershaper karena tidak ada nilai yang valid dimasukkan.${NC}"
-        # Hapus penanda jika sebelumnya ada dan pengguna memilih untuk tidak menyetel
-        rm -f /home/limit 2>/dev/null
-    else
-        echo -e "${BOLD_GREEN}Memulai Konfigurasi Wondershaper...${NC}"
-        sleep 0.5
-        
-        # Reset wondershaper sebelum menerapkan aturan baru
-        wondershaper clear "$NIC" > /dev/null 2>&1
-
-        # Terapkan batas
-        if [ -n "$download_rate" ] && [ -n "$upload_rate" ]; then
-            wondershaper -a "$NIC" -d "$download_rate" -u "$upload_rate" > /dev/null 2>&1
-        elif [ -n "$download_rate" ]; then
-            wondershaper -a "$NIC" -d "$download_rate" > /dev/null 2>&1
-        elif [ -n "$upload_rate" ]; then
-            wondershaper -a "$NIC" -u "$upload_rate" > /dev/null 2>&1
-        fi
-
-        systemctl enable --now wondershaper.service &>/dev/null
-        echo "start" > /home/limit # Penanda bahwa wondershaper telah dikonfigurasi
-        echo "$download_rate" > /home/limit_down # Simpan nilai
-        echo "$upload_rate" > /home/limit_up    # Simpan nilai
-        echo -e "${BOLD_GREEN}Selesai Konfigurasi Wondershaper.${NC}"
-    fi
-fi
-
-
-### Tampilkan Status Wondershaper
-
-clear
-# Baca nilai yang disimpan, jika ada
-download_rate_display=$(cat /home/limit_down 2>/dev/null)
-upload_rate_display=$(cat /home/limit_up 2>/dev/null)
-
-status_check=$(cat /home/limit 2>/dev/null) # Sembunyikan error jika file tidak ada
-if [[ "$status_check" = "start" ]]; then
-    current_status="${Status_ON}"
+read -rp "Set maximum upload rate (in Kbps): " up
+if [[ -z "$down" ]] && [[ -z "$up" ]]; then
+echo > /dev/null 2>&1
 else
-    current_status="${Status_OFF}"
+echo "Start Configuration"
+sleep 0.5
+wondershaper -a $NIC -d $down -u $up > /dev/null 2>&1
+systemctl enable --now wondershaper.service
+echo "start" > /home/limit
+echo "Done"
 fi
-
+cek=$(cat /home/limit)
+if [[ "$cek" = "start" ]]; then
+sts="${Info}"
+else
+sts="${Error}"
+fi
+clear
 echo -e " ${BOLD_GREEN}===================================${NC}"
 echo -e "${BOLD_YELLOW}      Batas Kecepatan Bandwidth        ${NC}"
 echo -e " ${BOLD_GREEN}===================================${NC}"
@@ -776,12 +643,3 @@ echo -e "${BOLD_YELLOW}# Credit: jgmdev              #${NC}"
 echo -e "${BOLD_YELLOW}# Dibuat Oleh Geo Project     #${NC}"
 echo -e "${BOLD_GREEN}=============================${NC}"
 echo ""
-echo -e "${BOLD_CYAN}Disarankan untuk me-REBOOT VPS Anda sekarang untuk mengaktifkan semua perubahan (terutama BBR).${NC}"
-read -rp "Apakah Anda ingin me-REBOOT VPS sekarang? (y/n): " REBOOT_CHOICE
-if [[ "$REBOOT_CHOICE" =~ ^[Yy]$ ]]; then
-    echo -e "${BOLD_GREEN}Melakukan reboot...${NC}"
-    sleep 2
-    reboot
-else
-    echo -e "${BOLD_YELLOW}Reboot dibatalkan. Ingat untuk me-reboot VPS Anda secara manual nanti.${NC}"
-fi
