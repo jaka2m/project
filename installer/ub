@@ -203,16 +203,65 @@ EOF
 
     elif [ "$OS_ID" == "debian" ]; then
         print_ok "Terdeteksi: Debian $OS_VERSION_ID ($OS_CODENAME)"
-        print_install "Mengatur sources.list untuk Debian Bullseye..."
-        sudo cat >/etc/apt/sources.list <<EOF
+        clear
+
+        if [ "$OS_VERSION_ID" == "10" ]; then
+            print_install "Mengatur sources.list untuk Debian 10 (Buster)..."
+            sudo cat >/etc/apt/sources.list <<EOF
 deb http://deb.debian.org/debian/ bullseye main
 deb-src http://deb.debian.org/debian/ bullseye main
 deb http://security.debian.org/debian-security bullseye-security main
 deb-src http://security.debian.org/debian-security bullseye-security main
 deb http://deb.debian.org/debian/ bullseye-updates main
 deb-src http://deb.debian.org/debian/ bullseye-updates main
+deb http://deb.debian.org/debian buster main contrib non-free
+deb http://security.debian.org/debian-security buster/updates main contrib non-free
+deb http://deb.debian.org/debian buster-updates main contrib non-free
 EOF
-        print_success "Sources.list Debian berhasil dikonfigurasi."
+            print_success "Sources.list Debian 10 berhasil dikonfigurasi."
+
+        elif [ "$OS_VERSION_ID" == "11" ]; then
+            print_install "Mengatur sources.list untuk Debian 11 (Bullseye)..."
+            sudo cat >/etc/apt/sources.list <<EOF
+deb http://deb.debian.org/debian/ bullseye main
+deb-src http://deb.debian.org/debian/ bullseye main
+deb http://security.debian.org/debian-security bullseye-security main
+deb-src http://security.debian.org/debian-security bullseye-security main
+deb http://deb.debian.org/debian/ bullseye-updates main
+deb-src http://deb.debian.org/debian/ bullseye-updates main
+deb https://deb.debian.org/debian bullseye main
+deb-src https://deb.debian.org/debian bullseye main
+deb https://deb.debian.org/debian-security/ bullseye-security main
+deb-src https://deb.debian.org/debian-security/ bullseye-security main
+deb https://deb.debian.org/debian bullseye-updates main
+deb-src https://deb.debian.org/debian bullseye-updates main
+EOF
+            print_success "Sources.list Debian 11 berhasil dikonfigurasi."
+
+        elif [ "$OS_VERSION_ID" == "12" ]; then
+            print_install "Mengatur sources.list untuk Debian 12 (Bookworm)..."
+            sudo cat >/etc/apt/sources.list <<EOF
+deb http://deb.debian.org/debian/ bullseye main
+deb-src http://deb.debian.org/debian/ bullseye main
+deb http://security.debian.org/debian-security bullseye-security main
+deb-src http://security.debian.org/debian-security bullseye-security main
+deb http://deb.debian.org/debian/ bullseye-updates main
+deb-src http://deb.debian.org/debian/ bullseye-updates main
+deb https://deb.debian.org/debian bookworm main non-free-firmware
+deb-src https://deb.debian.org/debian bookworm main non-free-firmware
+deb https://security.debian.org/debian-security bookworm-security main non-free-firmware
+deb-src https://security.debian.org/debian-security bookworm-security main non-free-firmware
+deb https://deb.debian.org/debian bookworm-updates main non-free-firmware
+deb-src https://deb.debian.org/debian bookworm-updates main non-free-firmware
+EOF
+            print_success "Sources.list Debian 12 berhasil dikonfigurasi."
+
+        else
+            print_error "Versi Debian $OS_VERSION_ID tidak didukung oleh skrip ini untuk konfigurasi sources.list."
+            print_error "Skrip akan keluar."
+            exit 1
+        fi
+
     else
         print_error "Sistem operasi tidak didukung atau tidak dapat dideteksi."
         print_error "Skrip akan keluar."
