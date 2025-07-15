@@ -7,316 +7,595 @@
 #                    IMPROVED BY : AI Assistant                     #
 #######################################
 
-# --- Konfigurasi Dasar ---
-IPTABLES="/sbin/iptables"
-IP6TABLES="/sbin/ip6tables"
-MODPROBE="/sbin/modprobe"
-RMMOD="/sbin/rmmod"
-
-# Ubah ini ke port SSH Anda yang sebenarnya
-SSHPORT="22"
-
-# Opsi Logging
-LOG="LOG --log-level info --log-prefix \"IPTABLES_DROP: \" --log-tcp-sequence --log-tcp-options --log-ip-options"
-
-# Batas Rate Default (digunakan di banyak aturan)
-# Sesuaikan nilai ini berdasarkan kapasitas server dan lalu lintas normal Anda
-RLIMIT_DEFAULT="10/second --burst 20" # 10 paket/detik, burst 20
-RLIMIT_ICMP="1/second --burst 2"    # 1 ping/detik, burst 2
-
-# Port yang Tidak Berhak Istimewa (Unprivileged Ports)
-PHIGH="1024:65535"
-PSSH="1000:1023" # Rentang ini mungkin perlu disesuaikan
-
-# --- Bersihkan Aturan yang Ada ---
-echo "Membersihkan aturan iptables yang ada..."
-"$IPTABLES" -F
-"$IPTABLES" -X
-"$IPTABLES" -Z
-"$IPTABLES" -t nat -F
-"$IPTABLES" -t nat -X
-"$IPTABLES" -t nat -Z
-"$IPTABLES" -t mangle -F
-"$IPTABLES" -t mangle -X
-"$IPTABLES" -t mangle -Z
-
-# Bersihkan aturan IPv6 jika ip6tables tersedia
-if test -x "$IP6TABLES"; then
-    echo "Membersihkan aturan ip6tables yang ada..."
-    "$IP6TABLES" -F 2>/dev/null
-    "$IP6TABLES" -X 2>/dev/null
-    "$IP6TABLES" -Z 2>/dev/null
-    "$IP6TABLES" -t mangle -F 2>/dev/null
-    "$IP6TABLES" -t mangle -X 2>/dev/null
-    "$IP6TABLES" -t mangle -Z 2>/dev/null
+ # Check if the script is executed as root
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Please execute this script as root."
+    exit 1
 fi
 
-# --- Kebijakan Default ---
-# Drop semua traffic secara default untuk keamanan maksimum
-echo "Mengatur kebijakan default ke DROP..."
-"$IPTABLES" -P INPUT DROP
-"$IPTABLES" -P FORWARD DROP
-"$IPTABLES" -P OUTPUT DROP
-
-# Izinkan tabel nat/mangle default ke ACCEPT kecuali ada kebutuhan spesifik
-"$IPTABLES" -t nat -P PREROUTING ACCEPT
-"$IPTABLES" -t nat -P OUTPUT ACCEPT
-"$IPTABLES" -t nat -P POSTROUTING ACCEPT
-"$IPTABLES" -t mangle -P PREROUTING ACCEPT
-"$IPTABLES" -t mangle -P INPUT ACCEPT
-"$IPTABLES" -t mangle -P FORWARD ACCEPT
-"$IPTABLES" -t mangle -P OUTPUT ACCEPT
-"$IPTABLES" -t mangle -P POSTROUTING ACCEPT
-
-# --- Pengerasan Kernel (sysctl) ---
-echo "Menerapkan konfigurasi kernel (sysctl)..."
-
-# Nonaktifkan IP forwarding jika bukan router
-echo 0 > /proc/sys/net/ipv4/ip_forward
-
-# Aktifkan IP spoofing protection (Reverse Path Filtering)
-for i in /proc/sys/net/ipv4/conf/*/rp_filter; do echo 1 > "$i"; done
-
-# Lindungi dari serangan SYN flood
-echo 1 > /proc/sys/net/ipv4/tcp_syncookies
-
-# Abaikan semua permintaan ICMP echo (ping) yang masuk (ini disarankan untuk sebagian besar server)
-echo 1 > /proc/sys/net/ipv4/icmp_echo_ignore_all
-
-# Abaikan permintaan ICMP echo ke broadcast
-echo 1 > /proc/sys/net/ipv4/icmp_echo_ignore_broadcasts
-
-# Catat paket dengan alamat yang tidak mungkin (martians)
-for i in /proc/sys/net/ipv4/conf/*/log_martians; do echo 1 > "$i"; done
-
-# Jangan catat respons tidak valid ke broadcast
-echo 1 > /proc/sys/net/ipv4/icmp_ignore_bogus_error_responses
-
-# Jangan terima atau kirim pengalihan ICMP
-for i in /proc/sys/net/ipv4/conf/*/accept_redirects; do echo 0 > "$i"; done
-for i in /proc/sys/net/ipv4/conf/*/send_redirects; do echo 0 > "$i"; done
-
-# Jangan terima paket ber-routing sumber (source-routed packets)
-for i in /proc/sys/net/ipv4/conf/*/accept_source_route; do echo 0 > "$i"; done
-
-# Nonaktifkan multicast routing (kecuali memang dibutuhkan)
-for i in /proc/sys/net/ipv4/conf/*/mc_forwarding; do echo 0 > "$i"; done
-
-# Nonaktifkan proxy_arp
-for i in /proc/sys/net/ipv4/conf/*/proxy_arp; do echo 0 > "$i"; done
-
-# Aktifkan pengalihan aman, hanya terima pengalihan ICMP untuk gateway
-for i in /proc/sys/net/ipv4/conf/*/secure_redirects; do echo 1 > "$i"; done
-
-# Nonaktifkan bootp_relay
-for i in /proc/sys/net/ipv4/conf/*/bootp_relay; do echo 0 > "$i"; done
-
-# Tingkatkan batas antrian backlog SYN
-echo 4096 > /proc/sys/net/ipv4/tcp_max_syn_backlog
-# Kurangi waktu SYN-ACK retransmisi
-echo 3 > /proc/sys/net/ipv4/tcp_synack_retries
-# Kurangi waktu SYN retransmisi
-echo 3 > /proc/sys/net/ipv4/tcp_syn_retries
-# Aktifkan TCP SACK (Selective ACK)
-echo 1 > /proc/sys/net/ipv4/tcp_sack
-# Aktifkan window scaling
-echo 1 > /proc/sys/net/ipv4/tcp_window_scaling
-# Aktifkan timestamp TCP
-echo 1 > /proc/sys/net/ipv4/tcp_timestamps
-
-# --- Modul Kernel ---
-# Modul ip_conntrack_ftp dan ip_conntrack_irc umumnya tidak diperlukan
-# jika Anda tidak menjalankan server FTP atau IRC aktif dengan mode port.
-# Jika Anda menggunakannya, uncomment baris di bawah ini.
-# "$MODPROBE" ip_conntrack_ftp
-# "$MODPROBE" ip_conntrack_irc
-
-# --- Rantai Kustom (Custom Chains) ---
-echo "Membuat rantai iptables kustom..."
-
-# Log lalu lintas dan terima
-"$IPTABLES" -N ACCEPT_LOG
-"$IPTABLES" -A ACCEPT_LOG -j LOG --log-prefix "ACCEPT: "
-"$IPTABLES" -A ACCEPT_LOG -j ACCEPT
-
-# Log lalu lintas dan tolak (drop)
-"$IPTABLES" -N DROP_LOG
-"$IPTABLES" -A DROP_LOG -j LOG --log-prefix "DROP: "
-"$IPTABLES" -A DROP_LOG -j DROP
-
-# Log lalu lintas dan tolak (reject)
-"$IPTABLES" -N REJECT_LOG
-"$IPTABLES" -A REJECT_LOG -j LOG --log-prefix "REJECT: "
-"$IPTABLES" -A REJECT_LOG -p tcp -j REJECT --reject-with tcp-reset
-"$IPTABLES" -A REJECT_LOG -j REJECT
-
-# Rantai untuk penanganan SYN flood
-"$IPTABLES" -N SYN_FLOOD_PROTECTION
-# Batasi koneksi baru SYN, jika melebihi batas, log dan drop
-"$IPTABLES" -A SYN_FLOOD_PROTECTION -m limit --limit "$RLIMIT_DEFAULT" -j RETURN
-"$IPTABLES" -A SYN_FLOOD_PROTECTION -j DROP_LOG
-
-# Rantai untuk ICMP yang berhubungan (hanya yang diperlukan)
-"$IPTABLES" -N RELATED_ICMP
-"$IPTABLES" -A RELATED_ICMP -p icmp --icmp-type destination-unreachable -j ACCEPT_LOG
-"$IPTABLES" -A RELATED_ICMP -p icmp --icmp-type time-exceeded -j ACCEPT_LOG
-"$IPTABLES" -A RELATED_ICMP -p icmp --icmp-type parameter-problem -j ACCEPT_LOG
-"$IPTABLES" -A RELATED_ICMP -j DROP_LOG
-
-# --- Aturan INPUT Chain ---
-echo "Mengatur aturan INPUT..."
-
-# Izinkan loopback interface sepenuhnya
-"$IPTABLES" -A INPUT -i lo -j ACCEPT
-
-# Izinkan koneksi yang sudah established dan related (sangat penting)
-"$IPTABLES" -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-
-# Lindungi dari paket INVALID state
-"$IPTABLES" -A INPUT -m state --state INVALID -j DROP_LOG
-
-# Perlindungan terhadap serangan umum (Port Scanners, Xmas, Null, FIN scans)
-"$IPTABLES" -A INPUT -p tcp --tcp-flags ALL NONE -j DROP_LOG # Null Scan
-"$IPTABLES" -A INPUT -p tcp --tcp-flags SYN,FIN SYN,FIN -j DROP_LOG # SYN-FIN Scan
-"$IPTABLES" -A INPUT -p tcp --tcp-flags SYN,RST SYN,RST -j DROP_LOG # SYN-RST Scan
-"$IPTABLES" -A INPUT -p tcp --tcp-flags FIN,PSH,URG FIN,PSH,URG -j DROP_LOG # Xmas Scan
-"$IPTABLES" -A INPUT -p tcp --tcp-flags ALL ALL -j DROP_LOG # Malformed Scan
-
-# Pencegahan SYN Flood (arahkan ke rantai kustom)
-"$IPTABLES" -A INPUT -p tcp --syn -j SYN_FLOOD_PROTECTION
-
-# Blokir paket terfragmentasi (sering digunakan dalam serangan)
-"$IPTABLES" -A INPUT -f -j DROP_LOG
-
-# Blokir IP yang dicadangkan/tidak valid (sinkhole traffic)
-# Perhatikan: Ini adalah daftar panjang, tambahkan hanya yang Anda yakini tidak akan pernah menjadi sumber traffic sah.
-# Untuk VPS umum, daftar ini mungkin terlalu agresif dan bisa memblokir ISP/traffic valid.
-# Pertimbangkan untuk mengaktifkan hanya jika Anda mengalami masalah spoofing parah.
-# "$IPTABLES" -A INPUT -s 0.0.0.0/7 -j DROP_LOG
-# "$IPTABLES" -A INPUT -s 2.0.0.0/8 -j DROP_LOG
-# ... (sertakan daftar lengkap dari skrip asli jika diinginkan) ...
-# "$IPTABLES" -A INPUT -s 224.0.0.0/3 -j DROP_LOG # Multicast
-
-# Blokir lalu lintas dari jaringan pribadi jika tidak diperlukan (misalnya, server web publik)
-# "$IPTABLES" -A INPUT -s 10.0.0.0/8 -j DROP_LOG
-# "$IPTABLES" -A INPUT -s 172.16.0.0/12 -j DROP_LOG
-# "$IPTABLES" -A INPUT -s 192.168.0.0/16 -j DROP_LOG
-
-# Aturan khusus untuk layanan yang masuk (Inbound Services)
-# Izinkan hanya port yang benar-benar Anda butuhkan!
-"$IPTABLES" -A INPUT -p tcp --dport "$SSHPORT" -j ACCEPT_LOG # SSH
-"$IPTABLES" -A INPUT -p tcp --dport 80 -j ACCEPT_LOG          # HTTP
-"$IPTABLES" -A INPUT -p tcp --dport 443 -j ACCEPT_LOG         # HTTPS
-# Contoh layanan lain yang mungkin Anda butuhkan:
-# "$IPTABLES" -A INPUT -p tcp --dport 25 -j ACCEPT_LOG          # SMTP (email masuk)
-# "$IPTABLES" -A INPUT -p tcp --dport 110 -j ACCEPT_LOG         # POP3
-# "$IPTABLES" -A INPUT -p tcp --dport 143 -j ACCEPT_LOG         # IMAP
-# "$IPTABLES" -A INPUT -p tcp --dport 3306 -j ACCEPT_LOG        # MySQL (HANYA jika diakses dari IP tertentu!)
-# "$IPTABLES" -A INPUT -s YOUR_DB_SERVER_IP -p tcp --dport 3306 -j ACCEPT_LOG
-# "$IPTABLES" -A INPUT -p udp --dport 53 -j ACCEPT_LOG          # DNS (Jika server ini adalah DNS resolver)
-# "$IPTABLES" -A INPUT -p tcp --dport 53 -j ACCEPT_LOG          # DNS (Jika server ini adalah DNS resolver)
-
-# Perlindungan terhadap koneksi ke port SMB/CIFS (Windows shares)
-"$IPTABLES" -A INPUT -p tcp -m multiport --dports 135,137,138,139,445 -j DROP_LOG
-"$IPTABLES" -A INPUT -p udp -m multiport --dports 135,137,138,139,445 -j DROP_LOG
-
-# --- Aturan OUTPUT Chain ---
-echo "Mengatur aturan OUTPUT..."
-
-# Izinkan loopback interface sepenuhnya
-"$IPTABLES" -A OUTPUT -o lo -j ACCEPT
-
-# Izinkan koneksi yang sudah established dan related
-"$IPTABLES" -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-
-# Lindungi dari paket INVALID state
-"$IPTABLES" -A OUTPUT -m state --state INVALID -j DROP_LOG
-
-# Blokir paket terfragmentasi (keluar)
-"$IPTABLES" -A OUTPUT -f -j DROP_LOG
-
-# Aturan khusus untuk layanan keluar (Outbound Services)
-# Izinkan hanya port yang benar-benar Anda butuhkan untuk server Anda
-"$IPTABLES" -A OUTPUT -p tcp --dport 80 -j ACCEPT_LOG   # HTTP
-"$IPTABLES" -A OUTPUT -p tcp --dport 443 -j ACCEPT_LOG  # HTTPS
-"$IPTABLES" -A OUTPUT -p udp --dport 53 -j ACCEPT_LOG   # DNS (resolving)
-"$IPTABLES" -A OUTPUT -p tcp --dport 53 -j ACCEPT_LOG   # DNS (resolving)
-"$IPTABLES" -A OUTPUT -p tcp --dport "$SSHPORT" -j ACCEPT_LOG # SSH keluar
-# Contoh layanan lain:
-# "$IPTABLES" -A OUTPUT -p tcp --dport 25 -j ACCEPT_LOG   # SMTP (kirim email)
-# "$IPTABLES" -A OUTPUT -p tcp --dport 465 -j ACCEPT_LOG  # SMTPS
-# "$IPTABLES" -A OUTPUT -p tcp --dport 587 -j ACCEPT_LOG  # Submission (Port untuk kirim email)
-# "$IPTABLES" -A OUTPUT -p udp --dport 123 -j ACCEPT_LOG  # NTP (sinkronisasi waktu)
-# "$IPTABLES" -A OUTPUT -p tcp --dport 21 -j ACCEPT_LOG   # FTP (jika diperlukan)
-# "$IPTABLES" -A OUTPUT -p tcp --dport 3306 -j ACCEPT_LOG # MySQL (jika server ini adalah klien DB)
-
-# --- Aturan FORWARD Chain ---
-echo "Mengatur aturan FORWARD..."
-# Lindungi dari paket INVALID state
-"$IPTABLES" -A FORWARD -m state --state INVALID -j DROP_LOG
-# Drop semua traffic FORWARD jika server bukan router
-"$IPTABLES" -A FORWARD -j DROP_LOG
-
-# --- Aturan ICMP (Ping) ---
-# Mengizinkan ping hanya untuk debugging dan dengan rate limit yang ketat.
-echo "Mengatur aturan ICMP..."
-"$IPTABLES" -A INPUT -p icmp -m state --state ESTABLISHED -j ACCEPT_LOG
-"$IPTABLES" -A OUTPUT -p icmp -m state --state ESTABLISHED -j ACCEPT_LOG
-
-"$IPTABLES" -A INPUT -p icmp -m state --state RELATED -j RELATED_ICMP "$RLIMIT_ICMP"
-"$IPTABLES" -A OUTPUT -p icmp -m state --state RELATED -j RELATED_ICMP "$RLIMIT_ICMP"
-
-# Izinkan ping masuk dan keluar dengan rate limit yang ketat
-"$IPTABLES" -A INPUT -p icmp --icmp-type echo-request -m limit --limit "$RLIMIT_ICMP" -j ACCEPT_LOG
-"$IPTABLES" -A OUTPUT -p icmp --icmp-type echo-request -m limit --limit "$RLIMIT_ICMP" -j ACCEPT_LOG
-
-# Drop semua ICMP lainnya
-"$IPTABLES" -A INPUT -p icmp -j DROP_LOG
-"$IPTABLES" -A OUTPUT -p icmp -j DROP_LOG
-"$IPTABLES" -A FORWARD -p icmp -j DROP_LOG
-
-# --- Aturan IPv6 ---
-echo "Mengatur aturan IPv6..."
-if test -x "$IP6TABLES"; then
-    # Atur kebijakan default IPv6 ke DROP
-    "$IP6TABLES" -P INPUT DROP 2>/dev/null
-    "$IP6TABLES" -P FORWARD DROP 2>/dev/null
-    "$IP6TABLES" -P OUTPUT DROP 2>/dev/null
-
-    # Izinkan loopback IPv6
-    "$IP6TABLES" -A INPUT -i lo -j ACCEPT 2>/dev/null
-    "$IP6TABLES" -A OUTPUT -o lo -j ACCEPT 2>/dev/null
-
-    # Izinkan koneksi IPv6 yang established dan related
-    "$IP6TABLES" -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT 2>/dev/null
-    "$IP6TABLES" -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT 2>/dev/null
-
-    # Izinkan SSH IPv6 (jika Anda menggunakannya)
-    "$IP6TABLES" -A INPUT -p tcp --dport "$SSHPORT" -j ACCEPT 2>/dev/null
-
-    # Izinkan HTTP/HTTPS IPv6
-    "$IP6TABLES" -A INPUT -p tcp --dport 80 -j ACCEPT 2>/dev/null
-    "$IP6TABLES" -A INPUT -p tcp --dport 443 -j ACCEPT 2>/dev/null
-
-    # Izinkan DNS IPv6 keluar
-    "$IP6TABLES" -A OUTPUT -p udp --dport 53 -j ACCEPT 2>/dev/null
-    "$IP6TABLES" -A OUTPUT -p tcp --dport 53 -j ACCEPT 2>/dev/null
-
-    # Drop semua lalu lintas IPv6 lainnya
-    "$IP6TABLES" -A INPUT -j DROP 2>/dev/null
-    "$IP6TABLES" -A OUTPUT -j DROP 2>/dev/null
-    "$IP6TABLES" -A FORWARD -j DROP 2>/dev/null
-else
-    echo "ip6tables tidak ditemukan, mengabaikan konfigurasi IPv6."
+# Check OS version
+if [[ -e /etc/debian_version ]]; then
+	source /etc/os-release
+	OS=$ID # debian or ubuntu
+elif [[ -e /etc/centos-release ]]; then
+	source /etc/os-release
+	OS=centos
 fi
 
-# --- Aturan Default Terakhir: REJECT / DROP sisa lalu lintas ---
-echo "Menerapkan aturan drop akhir..."
-# Gunakan REJECT_LOG untuk layanan yang mungkin mencoba terhubung dan Anda ingin log,
-# atau DROP_LOG untuk sisa traffic. REJECT memberi tahu pengirim bahwa port ditutup.
-"$IPTABLES" -A INPUT -j REJECT_LOG
-"$IPTABLES" -A OUTPUT -j REJECT_LOG
-"$IPTABLES" -A FORWARD -j REJECT_LOG
+# Update & Upgrade | Install 
+	if [[ $OS == 'ubuntu' ]]; then
+    sudo apt-get update -y 
+    sudo apt-get upgrade -y
+    sudo apt-get install zip -y
+    sudo apt-get install unzip -y
+    sudo apt-get install tar -y
+    sudo apt-get install gzip -y
+    sudo apt-get install p7zip-full -y
+    sudo apt install dnsutils -
+    sudo apt-get install net-tools -y
+    sudo apt-get install tcpdump -y
+    sudo apt-get install dsniff -y
+    sudo apt install grepcidr -y
+    sudo apt-get install fail2ban -y
+	sudo apt-get install netfilter-persistent -y
+elif [[ $OS == 'debian' ]]; then
+	sudo apt-get update -y
+    sudo apt-get upgrade -y
+    sudo apt-get install zip -y
+    sudo apt-get install unzip -y
+    sudo apt-get install tar -y
+    sudo apt-get install gzip -y
+    sudo apt-get install p7zip-full -y
+    sudo apt install dnsutils -y
+    sudo apt-get install net-tools -y
+    sudo apt-get install tcpdump -y
+    sudo apt-get install dsniff -y
+    sudo apt install grepcidr -y
+    sudo apt-get install fail2ban -y
+	sudo apt-get install netfilter-persistent -y
+elif [[ ${OS} == 'centos' ]]; then
+	yum -y update
+    yum -y install zip
+    yum -y install unzip
+    yum -y install tar
+    yum -y install gzip
+    yum -y install p7zip-full
+    yum -y install dnsutils
+    yum -y install net-tools
+    yum -y install tcpdump
+    yum -y install dsniff
+    yum -y install grepcidr
+	yum -y install netfilter-persistent
+	fi
 
-echo "Konfigurasi firewall selesai."
+echo ""
+echo -e "\e[0;37m ============================="
+echo -e "\e[0;37m # Protection VPS V2.0       #"
+echo -e "\e[0;37m # Made By Geo Project          #"
+echo -e "\e[0;37m ============================="
+
+echo -e ""
+echo -e "\e[0;37m Protection-VPS Installer Version 2.0 Will Begin"
+echo -e ""
+sleep 0.5
+echo -e "\e[0;37m Report Bugs https://t.me/sampiiiiu"
+echo -e ""
+sleep 0.5
+echo -e "\e[0;37m Protection-VPS installer will be begin now..."
+echo -e ""
+sleep 0.5
+clear
+#Install DDos Protection
+echo ""
+echo -e "\e[0;37m Start install Anti DDos"
+sleep 0.5
+clear
+cd
+wget "https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/ssh/ddos-deflate-master.zip"
+unzip ddos-deflate-master.zip
+cd ddos-deflate-master
+./install.sh
+cd
+rm -rf ddos-deflate-master.zip
+
+clear
+#Install Anti Torrent Protection
+echo ""
+echo -e "\e[0;37m Start install Anti Torrent"
+sleep 0.5
+clear
+# Edit file /etc/systemd/system/rc-local.service
+cat > /etc/systemd/system/rc-local.service <<-END
+[Unit]
+Description=/etc/rc.local
+ConditionPathExists=/etc/rc.local
+[Service]
+Type=forking
+ExecStart=/etc/rc.local start
+TimeoutSec=0
+StandardOutput=tty
+RemainAfterExit=yes
+SysVStartPriority=99
+[Install]
+WantedBy=multi-user.target
+END
+
+# nano /etc/rc.local
+cat > /etc/rc.local <<-END
+#!/bin/sh -e
+# rc.local
+# By default this script does nothing.
 exit 0
+END
+
+# Change Permission Access
+chmod +x /etc/rc.local
+
+# enable rc local
+systemctl enable rc-local
+systemctl start rc-local.service
+
+# Disable ipv6 Forwarding
+echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6
+sed -i '$ i\echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
+
+# Enable ipv4 Forwarding
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+# Blocked Torrent
+iptables -A FORWARD -m string --string "get_peers" --algo bm -j DROP
+iptables -A FORWARD -m string --string "announce_peer" --algo bm -j DROP
+iptables -A FORWARD -m string --string "find_node" --algo bm -j DROP
+iptables -A FORWARD -m string --algo bm --string "BitTorrent" -j DROP
+iptables -A FORWARD -m string --algo bm --string "BitTorrent protocol" -j DROP
+iptables -A FORWARD -m string --algo bm --string "peer_id=" -j DROP
+iptables -A FORWARD -m string --algo bm --string ".torrent" -j DROP
+iptables -A FORWARD -m string --algo bm --string "announce.php?passkey=" -j DROP
+iptables -A FORWARD -m string --algo bm --string "torrent" -j DROP
+iptables -A FORWARD -m string --algo bm --string "announce" -j DROP
+iptables -A FORWARD -m string --algo bm --string "info_hash" -j DROP
+iptables-save > /etc/iptables.up.rules
+iptables-restore -t < /etc/iptables.up.rules
+netfilter-persistent save
+netfilter-persistent reload
+
+clear
+# Install BBR TCP
+echo ""
+echo -e "\e[0;37m Start install BBR TCP"
+sleep 1.0
+clear
+
+red='\033[0;31m'
+green='\033[0;32m'
+yellow='\033[0;33m'
+plain='\033[0m'
+
+cur_dir=$(pwd)
+
+[[ $EUID -ne 0 ]] && echo -e "${red}Error:${plain} This script must be run as root!" && exit 1
+
+[[ -d "/proc/vz" ]] && echo -e "${red}Error:${plain} Your VPS is based on OpenVZ, which is not supported." && exit 1
+
+if [ -f /etc/redhat-release ]; then
+    release="centos"
+elif cat /etc/issue | grep -Eqi "debian"; then
+    release="debian"
+elif cat /etc/issue | grep -Eqi "ubuntu"; then
+    release="ubuntu"
+elif cat /etc/issue | grep -Eqi "centos|red hat|redhat"; then
+    release="centos"
+elif cat /proc/version | grep -Eqi "debian"; then
+    release="debian"
+elif cat /proc/version | grep -Eqi "ubuntu"; then
+    release="ubuntu"
+elif cat /proc/version | grep -Eqi "centos|red hat|redhat"; then
+    release="centos"
+else
+    release=""
+fi
+
+is_digit(){
+    local input=${1}
+    if [[ "$input" =~ ^[0-9]+$ ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+is_64bit(){
+    if [ $(getconf WORD_BIT) = '32' ] && [ $(getconf LONG_BIT) = '64' ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+get_valid_valname(){
+    local val=${1}
+    local new_val=$(eval echo $val | sed 's/[-.]/_/g')
+    echo ${new_val}
+}
+
+get_hint(){
+    local val=${1}
+    local new_val=$(get_valid_valname $val)
+    eval echo "\$hint_${new_val}"
+}
+
+#Display Memu
+display_menu(){
+    local soft=${1}
+    local default=${2}
+    eval local arr=(\${${soft}_arr[@]})
+    local default_prompt
+    if [[ "$default" != "" ]]; then
+        if [[ "$default" == "last" ]]; then
+            default=${#arr[@]}
+        fi
+        default_prompt="(default ${arr[$default-1]})"
+    fi
+    local pick
+    local hint
+    local vname
+    local prompt="which ${soft} you'd select ${default_prompt}: "
+
+    while :
+    do
+        echo -e "\n------------ ${soft} setting ------------\n"
+        for ((i=1;i<=${#arr[@]};i++ )); do
+            vname="$(get_valid_valname ${arr[$i-1]})"
+            hint="$(get_hint $vname)"
+            [[ "$hint" == "" ]] && hint="${arr[$i-1]}"
+            echo -e "${green}${i}${plain}) $hint"
+        done
+        echo
+        read -p "${prompt}" pick
+        if [[ "$pick" == "" && "$default" != "" ]]; then
+            pick=${default}
+            break
+        fi
+
+        if ! is_digit "$pick"; then
+            prompt="Input error, please input a number"
+            continue
+        fi
+
+        if [[ "$pick" -lt 1 || "$pick" -gt ${#arr[@]} ]]; then
+            prompt="Input error, please input a number between 1 and ${#arr[@]}: "
+            continue
+        fi
+
+        break
+    done
+
+    eval ${soft}=${arr[$pick-1]}
+    vname="$(get_valid_valname ${arr[$pick-1]})"
+    hint="$(get_hint $vname)"
+    [[ "$hint" == "" ]] && hint="${arr[$pick-1]}"
+    echo -e "\nyour selection: $hint\n"
+}
+
+version_ge(){
+    test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"
+}
+
+get_latest_version() {
+    latest_version=($(wget -qO- https://kernel.ubuntu.com/~kernel-ppa/mainline/ | awk -F'\"v' '/v[4-9]./{print $2}' | cut -d/ -f1 | grep -v - | sort -V))
+
+    [ ${#latest_version[@]} -eq 0 ] && echo -e "${red}Error:${plain} Get latest kernel version failed." && exit 1
+
+    kernel_arr=()
+    for i in ${latest_version[@]}; do
+        if version_ge $i 4.14; then
+            kernel_arr+=($i);
+        fi
+    done
+
+    display_menu kernel last
+
+    if [[ `getconf WORD_BIT` == "32" && `getconf LONG_BIT` == "64" ]]; then
+        deb_name=$(wget -qO- https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/ | grep "linux-image" | grep "generic" | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1)
+        deb_kernel_url="https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/${deb_name}"
+        deb_kernel_name="linux-image-${kernel}-amd64.deb"
+        modules_deb_name=$(wget -qO- https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/ | grep "linux-modules" | grep "generic" | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1)
+        deb_kernel_modules_url="https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/${modules_deb_name}"
+        deb_kernel_modules_name="linux-modules-${kernel}-amd64.deb"
+    else
+        deb_name=$(wget -qO- https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/ | grep "linux-image" | grep "generic" | awk -F'\">' '/i386.deb/{print $2}' | cut -d'<' -f1 | head -1)
+        deb_kernel_url="https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/${deb_name}"
+        deb_kernel_name="linux-image-${kernel}-i386.deb"
+        modules_deb_name=$(wget -qO- https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/ | grep "linux-modules" | grep "generic" | awk -F'\">' '/i386.deb/{print $2}' | cut -d'<' -f1 | head -1)
+        deb_kernel_modules_url="https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/${modules_deb_name}"
+        deb_kernel_modules_name="linux-modules-${kernel}-i386.deb"
+    fi
+
+    [ -z ${deb_name} ] && echo -e "${red}Error:${plain} Getting Linux kernel binary package name failed, maybe kernel build failed. Please choose other one and try again." && exit 1
+}
+
+get_opsy() {
+    [ -f /etc/redhat-release ] && awk '{print ($1,$3~/^[0-9]/?$3:$4)}' /etc/redhat-release && return
+    [ -f /etc/os-release ] && awk -F'[= "]' '/PRETTY_NAME/{print $3,$4,$5}' /etc/os-release && return
+    [ -f /etc/lsb-release ] && awk -F'[="]+' '/DESCRIPTION/{print $2}' /etc/lsb-release && return
+}
+
+opsy=$( get_opsy )
+arch=$( uname -m )
+lbit=$( getconf LONG_BIT )
+kern=$( uname -r )
+
+get_char() {
+    SAVEDSTTY=`stty -g`
+    stty -echo
+    stty cbreak
+   # dd if=/dev/tty bs=1 count=1 2> /dev/null
+    stty -raw
+    stty echo
+    stty $SAVEDSTTY
+}
+
+getversion() {
+    if [[ -s /etc/redhat-release ]]; then
+        grep -oE  "[0-9.]+" /etc/redhat-release
+    else
+        grep -oE  "[0-9.]+" /etc/issue
+    fi
+}
+
+centosversion() {
+    if [ x"${release}" == x"centos" ]; then
+        local code=$1
+        local version="$(getversion)"
+        local main_ver=${version%%.*}
+        if [ "$main_ver" == "$code" ]; then
+            return 0
+        else
+            return 1
+        fi
+    else
+        return 1
+    fi
+}
+
+check_bbr_status() {
+    local param=$(sysctl net.ipv4.tcp_congestion_control | awk '{print $3}')
+    if [[ x"${param}" == x"bbr" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+check_kernel_version() {
+    local kernel_version=$(uname -r | cut -d- -f1)
+    if version_ge ${kernel_version} 4.9; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+install_elrepo() {
+
+    if centosversion 5; then
+        echo -e "${red}Error:${plain} not supported CentOS 5."
+        exit 1
+    fi
+
+    rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+
+    if centosversion 6; then
+        rpm -Uvh https://www.elrepo.org/elrepo-release-6-8.el6.elrepo.noarch.rpm
+    elif centosversion 7; then
+        rpm -Uvh https://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
+    fi
+
+    if [ ! -f /etc/yum.repos.d/elrepo.repo ]; then
+        echo -e "${red}Error:${plain} Install elrepo failed, please check it."
+        exit 1
+    fi
+}
+
+sysctl_config() {
+    sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
+    echo "net.core.default_qdisc = fq" >> /etc/sysctl.conf
+    echo "net.ipv4.tcp_congestion_control = bbr" >> /etc/sysctl.conf
+    sysctl -p >/dev/null 2>&1
+}
+
+install_config() {
+    if [[ x"${release}" == x"centos" ]]; then
+        if centosversion 6; then
+            if [ ! -f "/boot/grub/grub.conf" ]; then
+                echo -e "${red}Error:${plain} /boot/grub/grub.conf not found, please check it."
+                exit 1
+            fi
+            sed -i 's/^default=.*/default=0/g' /boot/grub/grub.conf
+        elif centosversion 7; then
+            if [ ! -f "/boot/grub2/grub.cfg" ]; then
+                echo -e "${red}Error:${plain} /boot/grub2/grub.cfg not found, please check it."
+                exit 1
+            fi
+            grub2-set-default 0
+        fi
+    elif [[ x"${release}" == x"debian" || x"${release}" == x"ubuntu" ]]; then
+        /usr/sbin/update-grub
+    fi
+}
+
+#reboot_os() {
+    #echo
+    #echo -e "${green}Info:${plain} The system needs to reboot."
+    #read -p "Do you want to restart system? [y/n]" is_reboot
+    #if [[ ${is_reboot} == "y" || ${is_reboot} == "Y" ]]; then
+       # reboot
+    #else
+        #echo -e "${red}Info:${plain} Reboot has been canceled..."
+       # exit 0
+    #fi
+#}
+
+install_bbr() {
+    check_bbr_status
+    if [ $? -eq 0 ]; then
+        echo
+        echo -e "${green}Info:${plain} TCP BBR has already been installed. nothing to do..."
+        exit 0
+    fi
+    check_kernel_version
+    if [ $? -eq 0 ]; then
+        echo
+        echo -e "${green}Info:${plain} Your kernel version is greater than 4.9, directly setting TCP BBR..."
+        sysctl_config
+        echo -e "${green}Info:${plain} Setting TCP BBR completed..."
+        exit 0
+    fi
+
+    if [[ x"${release}" == x"centos" ]]; then
+        install_elrepo
+        [ ! "$(command -v yum-config-manager)" ] && yum install -y yum-utils > /dev/null 2>&1
+        [ x"$(yum-config-manager elrepo-kernel | grep -w enabled | awk '{print $3}')" != x"True" ] && yum-config-manager --enable elrepo-kernel > /dev/null 2>&1
+        if centosversion 6; then
+            if is_64bit; then
+                rpm_kernel_name="kernel-ml-4.18.20-1.el6.elrepo.x86_64.rpm"
+                rpm_kernel_devel_name="kernel-ml-devel-4.18.20-1.el6.elrepo.x86_64.rpm"
+                rpm_kernel_url_1="http://repos.lax.quadranet.com/elrepo/archive/kernel/el6/x86_64/RPMS/"
+            else
+                rpm_kernel_name="kernel-ml-4.18.20-1.el6.elrepo.i686.rpm"
+                rpm_kernel_devel_name="kernel-ml-devel-4.18.20-1.el6.elrepo.i686.rpm"
+                rpm_kernel_url_1="http://repos.lax.quadranet.com/elrepo/archive/kernel/el6/i386/RPMS/"
+            fi
+            rpm_kernel_url_2="https://dl.lamp.sh/files/"
+            wget -c -t3 -T60 -O ${rpm_kernel_name} ${rpm_kernel_url_1}${rpm_kernel_name}
+            if [ $? -ne 0 ]; then
+                rm -rf ${rpm_kernel_name}
+                wget -c -t3 -T60 -O ${rpm_kernel_name} ${rpm_kernel_url_2}${rpm_kernel_name}
+            fi
+            wget -c -t3 -T60 -O ${rpm_kernel_devel_name} ${rpm_kernel_url_1}${rpm_kernel_devel_name}
+            if [ $? -ne 0 ]; then
+                rm -rf ${rpm_kernel_devel_name}
+                wget -c -t3 -T60 -O ${rpm_kernel_devel_name} ${rpm_kernel_url_2}${rpm_kernel_devel_name}
+            fi
+            if [ -f "${rpm_kernel_name}" ]; then
+                rpm -ivh ${rpm_kernel_name}
+            else
+                echo -e "${red}Error:${plain} Download ${rpm_kernel_name} failed, please check it."
+                exit 1
+            fi
+            if [ -f "${rpm_kernel_devel_name}" ]; then
+                rpm -ivh ${rpm_kernel_devel_name}
+            else
+                echo -e "${red}Error:${plain} Download ${rpm_kernel_devel_name} failed, please check it."
+                exit 1
+            fi
+            rm -f ${rpm_kernel_name} ${rpm_kernel_devel_name}
+        elif centosversion 7; then
+            yum -y install kernel-ml kernel-ml-devel
+            if [ $? -ne 0 ]; then
+                echo -e "${red}Error:${plain} Install latest kernel failed, please check it."
+                exit 1
+            fi
+        fi
+    elif [[ x"${release}" == x"debian" || x"${release}" == x"ubuntu" ]]; then
+        [[ ! -e "/usr/bin/wget" ]] && apt-get -y update && apt-get -y install wget
+        echo -e "${green}Info:${plain} Getting latest kernel version..."
+        get_latest_version
+        if [ -n ${modules_deb_name} ]; then
+            wget -c -t3 -T60 -O ${deb_kernel_modules_name} ${deb_kernel_modules_url}
+            if [ $? -ne 0 ]; then
+                echo -e "${red}Error:${plain} Download ${deb_kernel_modules_name} failed, please check it."
+                exit 1
+            fi
+        fi
+        wget -c -t3 -T60 -O ${deb_kernel_name} ${deb_kernel_url}
+        if [ $? -ne 0 ]; then
+            echo -e "${red}Error:${plain} Download ${deb_kernel_name} failed, please check it."
+            exit 1
+        fi
+        [ -f ${deb_kernel_modules_name} ] && dpkg -i ${deb_kernel_modules_name}
+        dpkg -i ${deb_kernel_name}
+        rm -f ${deb_kernel_name} ${deb_kernel_modules_name}
+    else
+        echo -e "${red}Error:${plain} OS is not be supported, please change to CentOS/Debian/Ubuntu and try again."
+        exit 1
+    fi
+
+    install_config
+    sysctl_config
+    #reboot_os
+}
+
+install_bbr 2>&1 | tee ${cur_dir}/install_bbr.log
+
+clear
+# Install Limit Speed Bandwith
+echo ""
+echo -e "\e[0;37m Start install Limit Speed Bandwith For Protect Bandwith From Overuse "
+sleep 1.0
+clear
+Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_prefix="\033[42;37m" && Red_background_prefix="\033[41;37m" && Font_color_suffix="\033[0m"
+Info="${Green_font_prefix}[ON]${Font_color_suffix}"
+Error="${Red_font_prefix}[OFF]${Font_color_suffix}"
+NIC=$(ip -o $ANU -4 route show to default | awk '{print $5}');
+echo ""
+echo -e "\e[0;37m Limit Speed All Service"
+sleep 1.0
+echo ""
+echo -e "\e[0;37m 100000 Kbps represents 100 Mbps"
+sleep 1.0
+echo ""
+echo -e "\e[0;37m 50000 Kbps represents 50 Mbps"
+sleep 1.0
+echo ""
+echo -e "\e[0;37m Example : Set maximum download rate (in Kbps): 100000"
+sleep 1.0
+echo ""
+echo -e "\e[0;37m Example : Set maximum upload rate (in Kbps): 50000"
+sleep 1.0
+echo ""
+echo -e "\e[0;37m So already understand then let's set Limit Speed Bandwith Below!"
+sleep 1.0
+echo ""
+read -rp "Set maximum download rate (in Kbps): " down
+echo ""
+read -rp "Set maximum upload rate (in Kbps): " up
+if [[ -z "$down" ]] && [[ -z "$up" ]]; then
+echo > /dev/null 2>&1
+else
+echo "Start Configuration"
+sleep 0.5
+wondershaper -a $NIC -d $down -u $up > /dev/null 2>&1
+systemctl enable --now wondershaper.service
+echo "start" > /home/limit
+echo "Done"
+fi
+cek=$(cat /home/limit)
+if [[ "$cek" = "start" ]]; then
+sts="${Info}"
+else
+sts="${Error}"
+fi
+clear
+echo -e " ==================================="
+echo -e "\e[0;37m       Limit Bandwidth Speed        "
+echo -e " ==================================="
+echo -e " Status $sts"
+echo ""
+echo -e "\e[0;37m Curret Limit Download Speed $down"
+echo ""
+echo -e  "\e[0;37m Current Limit Upload Speed $up"
+sleep 5
+
+clear
+echo -e ""
+echo -e "\e[0;32m Protection-VPS Installer Version 2.0 Success Install"
+echo -e ""
+sleep 0.5
+
+echo -e "\e[0;37m ============================="
+echo -e "\e[0;37m # Protection VPS V2.0       #"
+echo -e "\e[0;37m # Made By Geo Project          #"
+echo -e "\e[0;37m ============================="
+echo ""
