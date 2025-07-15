@@ -242,24 +242,6 @@ configure_sources_list
 clear
 print_install "dependensi umum"
 echo -e "${GREEN}Starting ${NC}update...${NC}"
-function Installer() {
-install_lolcat
-display_banner
-show_whiptail_progress
-clear
-print_install "Mematikan IPv6 (sementara)..."
-sysctl -w net.ipv6.conf.all.disable_ipv6=1 >/dev/null 2>&1
-sysctl -w net.ipv6.conf.default.disable_ipv6=1 >/dev/null 2>&1
-print_ok "IPv6 dinonaktifkan."
-clear
-print_install "Memperbarui dan mengupgrade sistem..."
-sudo apt update -y || print_error "Gagal update sistem."
-sudo apt upgrade -y || print_error "Gagal upgrade sistem."
-print_success "Sistem."
-configure_sources_list
-clear
-print_install "dependensi umum"
-echo -e "${GREEN}Starting ${NC}update...${NC}"
 apt update -y
 clear
 echo -e "${GREEN}Starting ${NC}upgrade...${NC}"
@@ -415,6 +397,7 @@ clear
 echo -e "${GREEN}Starting ${NC}install socat...${NC}"
 apt install -y socat
 echo -e ""
+clear
 print_success "Packet Yang Dibutuhkan"
 clear
 local OS_ID=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
