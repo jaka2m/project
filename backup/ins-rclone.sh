@@ -18,10 +18,10 @@ yellow="\033[1;33m"
 cyan="\033[1;36m"
 clear
 # // Installing Rclone
-curl -s "https://jaka2m.github.io/project/backup/rclone.sh" | bash
+curl -s "https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/backup/rclone.sh" | bash
 mkdir -p /root/.config
 mkdir -p /root/.config/rclone
-wget -q -O /root/.config/rclone/rclone.conf "https://jaka2m.github.io/project/backup/rclone.conf"
+wget -q -O /root/.config/rclone/rclone.conf "https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/backup/rclone.conf"
 
 # // Remove Not Used Files
 rm -f /root/ins-rclone.sh
