@@ -242,31 +242,178 @@ configure_sources_list
 clear
 print_install "dependensi umum"
 echo -e "${GREEN}Starting ${NC}update...${NC}"
+function Installer() {
+install_lolcat
+display_banner
+show_whiptail_progress
+clear
+print_install "Mematikan IPv6 (sementara)..."
+sysctl -w net.ipv6.conf.all.disable_ipv6=1 >/dev/null 2>&1
+sysctl -w net.ipv6.conf.default.disable_ipv6=1 >/dev/null 2>&1
+print_ok "IPv6 dinonaktifkan."
+clear
+print_install "Memperbarui dan mengupgrade sistem..."
+sudo apt update -y || print_error "Gagal update sistem."
+sudo apt upgrade -y || print_error "Gagal upgrade sistem."
+print_success "Sistem."
+configure_sources_list
+clear
+print_install "dependensi umum"
+echo -e "${GREEN}Starting ${NC}update...${NC}"
 apt update -y
+clear
+echo -e "${GREEN}Starting ${NC}upgrade...${NC}"
 apt upgrade -y
-apt install zip pwgen openssl netcat socat cron bash-completion -y
-    apt install figlet -y
-    apt upgrade -y
-    apt dist-upgrade -y
-    systemctl enable chronyd > /dev/null 2>&1
-    systemctl restart chronyd > /dev/null 2>&1
-    systemctl enable chrony > /dev/null 2>&1
-    systemctl restart chrony > /dev/null 2>&1
-    chronyc sourcestats -v
-    chronyc tracking -v
-    apt install ntpdate -y
-    ntpdate pool.ntp.org
-    apt install sudo -y
-    apt install fail2ban -y
-    sudo apt-get clean all
-    sudo apt-get autoremove -y
-    sudo apt-get install -y debconf-utils
-    sudo apt-get remove --purge exim4 -y
-    sudo apt-get remove --purge ufw firewalld -y
-    sudo apt-get install -y --no-install-recommends software-properties-common
-    echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
-    echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
-    sudo apt-get install -y speedtest-cli vnstat libnss3-dev libnspr4-dev pkg-config libpam0g-dev libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-nss-dev flex bison make libnss3-tools libevent-dev bc rsyslog dos2unix zlib1g-dev libssl-dev libsqlite3-dev sed dirmngr libxml-parser-perl build-essential gcc g++ python htop lsof tar wget curl ruby zip unzip p7zip-full python3-pip libc6 util-linux build-essential msmtp-mta ca-certificates bsd-mailx iptables iptables-persistent netfilter-persistent net-tools openssl ca-certificates gnupg gnupg2 ca-certificates lsb-release gcc shc make cmake git screen socat xz-utils apt-transport-https gnupg1 dnsutils cron bash-completion ntpdate chrony jq openvpn easy-rsa
+apt install -y pkg-config 
+apt install -y libpam0g-dev 
+clear
+echo -e "${GREEN}Starting ${NC}install zip...${NC}"
+apt install zip
+apt install -y make
+apt install -y cmake 
+clear
+echo -e "${GREEN}Starting ${NC}install openssl...${NC}"
+apt install openssl -y
+apt install -y gnupg 
+apt install -y gnupg2 
+apt install -y bison 
+sudo apt-get remove --purge exim4 -y
+apt install cron -y
+clear
+echo -e "${GREEN}Starting ${NC}install ntpdate...${NC}"
+apt install ntpdate -y
+apt install -y chronyc sourcestats
+apt install -y chronyc tracking -v
+clear
+echo -e "${GREEN}Starting ${NC}install figlet...${NC}"
+apt install figlet -y
+apt install -y pool.ntp.org
+apt install bash-completion -y
+clear
+echo -e "${GREEN}Starting ${NC}install fail2ban...${NC}"
+apt install -y libcap-ng-dev 
+apt install -y libcap-ng-utils 
+apt install fail2ban -y
+clear
+echo -e "${GREEN}Starting ${NC}remove --purge exim4...${NC}"
+apt install -y libselinux1-dev 
+apt install -y libcurl4-nss-dev 
+apt install -y flex 
+clear
+echo -e "${GREEN}Starting ${NC}remove --purge ufw firewalld...${NC}"
+apt install -y libnss3-tools 
+apt install -y libevent-dev 
+apt install -y bc 
+apt install -y sed 
+apt install -y dirmngr 
+apt install -y libxml-parser-perl 
+apt install -y build-essential 
+clear
+echo -e "${GREEN}Starting ${NC}install git...${NC}"
+apt install -y lsof 
+clear
+echo -e "${GREEN}Starting ${NC}install jq...${NC}"
+apt install jq -y
+apt install -y libc6 
+apt install -y util-linux 
+clear
+echo -e "${GREEN}Starting ${NC}install psmisc...${NC}"
+apt install psmisc -y
+apt install -y lsb-release 
+apt install -y shc 
+clear
+echo -e "${GREEN}Starting ${NC}install nginx...${NC}"
+systemctl stop nginx
+systemctl stop apache2
+systemctl stop haproxy
+clear
+echo -e "${GREEN}Starting ${NC}no-install-recommends...${NC}"
+software-properties-common -y
+echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
+echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
+clear
+echo -e "${GREEN}Starting ${NC}install speedtest-cli ...${NC}"
+apt install -y speedtest-cli
+apt install -y chrony
+clear
+echo -e "${GREEN}Starting ${NC}install dos2unix...${NC}"
+apt install -y dos2unix
+apt install -y apt libnss3-dev 
+apt install -y libnspr4-dev 
+apt install -y easy-rsa
+apt install -y tmux
+clear
+echo -e "${GREEN}Starting ${NC}install htop...${NC}"
+apt install -y htop
+apt install -y gnupg1
+apt install -y dnsutils
+clear
+echo -e "${GREEN}Starting ${NC}install tar...${NC}"
+apt install -y tar
+apt install -y screen
+clear
+echo -e "${GREEN}Starting ${NC}install wget...${NC}"
+apt install -y wget
+apt install -y net-tools 
+apt install -y ca-certificates 
+clear
+echo -e "${GREEN}Starting ${NC}install curl...${NC}"
+apt install -y curl
+apt install -y iptables 
+apt install -y iptables-persistent  
+apt install -y netfilter-persistent  
+clear
+echo -e "${GREEN}Starting ${NC}install zip...${NC}"
+apt install -y p7zip-full 
+apt install git -y
+clear
+echo -e "${GREEN}Starting ${NC}install unzip...${NC}"
+apt install -y ruby 
+apt install -y unzip 
+clear
+echo -e "${GREEN}Starting ${NC}install p7zip-full...${NC}"
+apt install -y p7zip-full
+apt install -y gcc 
+apt install -y g++ 
+clear
+echo -e "${GREEN}Starting ${NC}install python3-pip...${NC}"
+apt install -y python3-pip
+apt install -y libssl-dev 
+apt install -y libsqlite3-dev 
+sudo apt-get remove --purge ufw firewalld -y
+clear
+echo -e "${GREEN}Starting ${NC}install bsd-mailx...${NC}"
+apt install -y iptables
+apt install -y rsyslog 
+clear
+echo -e "${GREEN}Starting ${NC}install iptables-persistent...${NC}"
+apt install -y iptables-persistent
+apt install -y zlib1g-dev 
+clear
+echo -e "${GREEN}Starting ${NC}install netfilter-persistent...${NC}"
+apt install -y netfilter-persistent
+clear
+echo -e "${GREEN}Starting ${NC}install python...${NC}"
+apt install -y python 
+apt install curl -y
+clear
+echo -e "${GREEN}Starting ${NC}install openvpn...${NC}"
+apt install -y openvpn
+apt install -y xz-utils
+apt install -y apt-transport-https 
+clear
+echo -e "${GREEN}Starting ${NC}install easy-rsa...${NC}"
+apt install -y easy-rsa
+clear
+echo -e "${GREEN}Starting ${NC}install tmux...${NC}"
+apt install -y tmux
+clear
+echo -e "${GREEN}Starting ${NC}install squid...${NC}"
+apt install -y squid
+apt install -y make
+clear
+echo -e "${GREEN}Starting ${NC}install socat...${NC}"
+apt install -y socat
 echo -e ""
 print_success "Packet Yang Dibutuhkan"
 clear
