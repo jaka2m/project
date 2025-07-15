@@ -1,10 +1,10 @@
 #!/bin/sh
 
 #######################################
-#             ANTI-DDOS BASH SCRIPT - IMPROVED         #
+#  ANTI-DDOS BASH SCRIPT - IMPROVED   #
 #######################################
-#                    DEVELOPER : GEO PROJECT                     #
-#                    IMPROVED BY : AI Assistant                     #
+#      DEVELOPER : GEO PROJECT        #
+#     IMPROVED BY : AI Assistant      #
 #######################################
 
  # Check if the script is executed as root
