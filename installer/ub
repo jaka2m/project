@@ -280,7 +280,7 @@ clear
 echo -e "${GREEN}Starting ${NC}remove --purge exim4...${NC}"
 apt install -y libselinux1-dev 
 apt install -y libcurl4-nss-dev 
-apt install -y flex 
+apt install -y flex cron fail2ban
 clear
 echo -e "${GREEN}Starting ${NC}remove --purge ufw firewalld...${NC}"
 apt install -y libnss3-tools 
