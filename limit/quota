@@ -1,180 +1,229 @@
 #!/bin/bash
 
-# Muat variabel konfigurasi dari file var.txt
-# Asumsi: /etc/geovpn/var.txt berisi INFO_AKUN, ADMIN, TIME (untuk curl timeout)
+function send-log(){
 source '/etc/geovpn/var.txt'
-
-# --- Fungsi: send-log ---
-# Mengirim notifikasi Telegram saat kuota pengguna habis
-# Membutuhkan variabel global 'user' dan 'total' yang diset sebelum dipanggil
-function send-log() {
-  URL="https://api.telegram.org/bot${INFO_AKUN}/sendMessage"
-  TEXT="
+URL="https://api.telegram.org/bot$INFO_AKUN/sendMessage"
+TEXT="
 <code>────────────────────</code>
 <b>⚠️NOTIF QUOTA HABIS⚠️</b>
 <code>────────────────────</code>
-<code>Username  : </code><code>${user}</code>
-<code>Usage     : </code><code>${total}</code>
+<code>Username  : </code><code>$user</code>
+<code>Usage     : </code><code>$total</code>
 <code>────────────────────</code>
 "
-  curl -s --max-time "${TIME}" -d "chat_id=${ADMIN}&disable_web_page_preview=1&text=${TEXT}&parse_mode=html" "${URL}" >/dev/null
+curl -s --max-time $TIME -d "chat_id=$ADMIN&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
 }
 
-# --- Fungsi: con (Convert Bytes) ---
-# Mengkonversi nilai byte menjadi format KB, MB, atau GB yang lebih mudah dibaca
 function con() {
-  local -i bytes=$1
-  if [[ bytes -lt 1024 ]]; then
-    echo "${bytes}B"
-  elif [[ bytes -lt 1048576 ]]; then
-    echo "$(( (bytes + 1023)/1024 ))KB"
-  elif [[ bytes -lt 1073741824 ]]; then
-    echo "$(( (bytes + 1048575)/1048576 ))MB"
-  else
-    echo "$(( (bytes + 1073741823)/1073741824 ))GB"
-  fi
-}
-
-# --- Fungsi: update_and_reset_traffic ---
-# Mengambil trafik dari Xray API, mengakumulasikannya, dan meresetnya.
-# Parameter: $1 = protokol (e.g., vmess, vless, trojan)
-# Parameter: $2 = penanda di config.json (e.g., ###, #&, #!)
-function update_and_reset_traffic() {
-  local protocol=$1
-  local marker=$2
-
-  # Ambil daftar user berdasarkan penanda protokol
-  data_users=($(cat /etc/xray/config.json | grep "^${marker}" | awk '{print $2}' | sort | uniq))
-
-  # Pastikan direktori limit untuk protokol ini ada
-  mkdir -p "/etc/limit/${protocol}"
-
-  for user_current in "${data_users[@]}"; do
-    # Ambil statistik total trafik (inbound + outbound) dari Xray API
-    # Menggunakan statsquery untuk mengambil kedua arah lalu menjumlahkannya
-    stats_output=$(xray api statsquery --server=127.0.0.1:10000 | grep -E "user>>>${user_current}>>>traffic>>>(downlink|uplink)")
-
-    inb=$(echo "${stats_output}" | grep 'downlink' | awk '{print $2}' | sed 's/,//g; s/"//g')
-    outb=$(echo "${stats_output}" | grep 'uplink' | awk '{print $2}' | sed 's/,//g; s/"//g')
-
-    # Jika salah satu nilai kosong, asumsikan 0 untuk menghindari error aritmatika
-    inb=${inb:-0}
-    outb=${outb:-0}
-
-    current_total_traffic=$(( inb + outb ))
-
-    # Periksa apakah file akumulasi trafik untuk user ini sudah ada
-    if [ -e "/etc/limit/${protocol}/${user_current}" ]; then
-      accumulated_traffic=$(cat "/etc/limit/${protocol}/${user_current}")
-      # Pastikan nilai yang dibaca tidak kosong
-      accumulated_traffic=${accumulated_traffic:-0}
-      
-      total_accumulated=$(( current_total_traffic + accumulated_traffic ))
-      echo "${total_accumulated}" > "/etc/limit/${protocol}/${user_current}"
+    local -i bytes=$1;
+    if [[ $bytes -lt 1024 ]]; then
+        echo "${bytes}B"
+    elif [[ $bytes -lt 1048576 ]]; then
+        echo "$(( (bytes + 1023)/1024 ))KB"
+    elif [[ $bytes -lt 1073741824 ]]; then
+        echo "$(( (bytes + 1048575)/1048576 ))MB"
     else
-      echo "${current_total_traffic}" > "/etc/limit/${protocol}/${user_current}"
+        echo "$(( (bytes + 1073741823)/1073741824 ))GB"
     fi
-
-    # Reset statistik trafik (uplink dan downlink) untuk user ini di Xray API
-    # Penting: Reset kedua arah untuk akurasi pengukuran selanjutnya
-    xray api stats --server=127.0.0.1:10000 -name "user>>>${user_current}>>>traffic>>>uplink" -reset > /dev/null 2>&1
-    xray api stats --server=127.0.0.1:10000 -name "user>>>${user_current}>>>traffic>>>downlink" -reset > /dev/null 2>&1
-  done
 }
 
-# --- Fungsi: check_and_remove_user ---
-# Memeriksa penggunaan trafik dan menghapus user jika melebihi limit.
-# Parameter: $1 = protokol (e.g., vmess, vless, trojan)
-# Parameter: $2 = penanda di config.json (e.g., ###, #&, #!)
-# Parameter: $3 = lokasi DB user (e.g., .vmess.db, .vless.db, .trojan.db)
-function check_and_remove_user() {
-  local protocol=$1
-  local marker=$2
-  local user_db_file=$3
-
-  data_users=($(cat /etc/xray/config.json | grep "^${marker}" | awk '{print $2}' | sort | uniq))
-
-  for user in "${data_users[@]}"; do
-    # Periksa apakah file limit yang disetel manual untuk user ada
-    if [ -e "/etc/${protocol}/${user}" ]; then
-      limit_set_manual=$(cat "/etc/${protocol}/${user}")
-      # Pastikan nilai limit tidak kosong atau terlalu pendek
-      if [[ -n "${limit_set_manual}" && "${#limit_set_manual}" -gt 1 ]]; then
-        # Periksa apakah data penggunaan terakumulasi sudah ada
-        if [ -e "/etc/limit/${protocol}/${user}" ]; then
-          current_usage=$(cat "/etc/limit/${protocol}/${user}")
-          
-          # Bandingkan penggunaan dengan limit
-          if (( current_usage > limit_set_manual )); then
-            # Ambil tanggal kadaluarsa untuk penghapusan yang lebih spesifik
-            exp=$(grep -w "^${marker} ${user}" "/etc/xray/config.json" | awk '{print $3}' | sort | uniq)
-            
-            # Hapus konfigurasi user dari config.json
-            sed -i "/^${marker} ${user} ${exp}/,/^},{/d" /etc/xray/config.json
-            
-            # Hapus entri user dari file database
-            sed -i "/^${marker} ${user} ${exp}/d" "/etc/${protocol}/${user_db_file}"
-            
-            # Restart Xray untuk menerapkan perubahan
-            systemctl restart xray > /dev/null 2>&1
-
-            # Kirim notifikasi Telegram
-            total=$(con "${current_usage}") # Gunakan variabel global 'user' dari loop
-            send-log
-            
-            # Hapus file akumulasi trafik setelah user dihapus
-            rm -f "/etc/limit/${protocol}/${user}"
+function cekvmess(){
+  data=($(cat /etc/xray/config.json | grep '^###' | cut -d ' ' -f 2 | sort | uniq))
+  if [[ ! -e /etc/limit/vmess ]]; then
+  mkdir -p /etc/limit/vmess
+  fi
+  for user in ${data[@]}
+  do
+  mkdir -p /tmp/quota
+  data=$(xray api statsquery --server=127.0.0.1:10000 | grep -C 2 $user | sed /"}"/d | sed /"{"/d | grep value | awk '{print $2}' | sed 's/,//g; s/"//g' | sort)
+  inb=$(echo "$data" | sed -n 1p)
+  outb=$(echo "$data" | sed -n 2p) 
+  quota0=$(echo -e "$[ $inb + $outb ]")
+        if [ -e /etc/limit/vmess/${user} ]; then
+        quota1=$(cat /etc/limit/vmess/${user});
+             if [[ ${#quota1} -gt 0 ]]; then
+                quota2=$(( ${quota0} + ${quota1} ));
+                echo "${quota2}" > /etc/limit/vmess/"${user}"
+                xray api stats --server=127.0.0.1:10000 -name "user>>>${user}>>>traffic>>>downlink" -reset > /dev/null 2>&1
+              else
+                  echo "${quota0}" > /etc/limit/vmess/"${user}"
+                  xray api stats --server=127.0.0.1:10000 -name "user>>>${user}>>>traffic>>>downlink" -reset > /dev/null 2>&1
+                fi
+           else
+               echo "${quota0}" > /etc/limit/vmess/"${user}"
+               xray api stats --server=127.0.0.1:10000 -name "user>>>${user}>>>traffic>>>downlink" -reset > /dev/null 2>&1
+            fi
+     done
+}
+function cekvless(){
+  data=($(cat /etc/xray/config.json | grep '^###' | cut -d ' ' -f 2 | sort | uniq))
+  if [[ ! -e /etc/limit/vless ]]; then
+  mkdir -p /etc/limit/vless
+  fi
+  for user in ${data[@]}
+  do
+  mkdir -p /tmp/quota
+  data=$(xray api statsquery --server=127.0.0.1:10000 | grep -C 2 $user | sed /"}"/d | sed /"{"/d | grep value | awk '{print $2}' | sed 's/,//g; s/"//g' | sort)
+  inb=$(echo "$data" | sed -n 1p)
+  outb=$(echo "$data" | sed -n 2p) 
+  quota0=$(echo -e "$[ $inb + $outb ]")
+        if [ -e /etc/limit/vless/${user} ]; then
+        quota1=$(cat /etc/limit/vless/${user});
+             if [[ ${#quota1} -gt 0 ]]; then
+                quota2=$(( ${quota0} + ${quota1} ));
+                echo "${quota2}" > /etc/limit/vless/"${user}"
+                xray api stats --server=127.0.0.1:10000 -name "user>>>${user}>>>traffic>>>downlink" -reset > /dev/null 2>&1
+              else
+                  echo "${quota0}" > /etc/limit/vless/"${user}"
+                  xray api stats --server=127.0.0.1:10000 -name "user>>>${user}>>>traffic>>>downlink" -reset > /dev/null 2>&1
+                fi
+           else
+               echo "${quota0}" > /etc/limit/vless/"${user}"
+               xray api stats --server=127.0.0.1:10000 -name "user>>>${user}>>>traffic>>>downlink" -reset > /dev/null 2>&1
+            fi
+     done
+}
+function cektrojan(){
+  data=($(cat /etc/xray/config.json | grep '^###' | cut -d ' ' -f 2 | sort | uniq))
+  if [[ ! -e /etc/limit/trojan ]]; then
+  mkdir -p /etc/limit/trojan
+  fi
+  for user in ${data[@]}
+  do
+  mkdir -p /tmp/quota
+  data=$(xray api statsquery --server=127.0.0.1:10000 | grep -C 2 $user | sed /"}"/d | sed /"{"/d | grep value | awk '{print $2}' | sed 's/,//g; s/"//g' | sort)
+  inb=$(echo "$data" | sed -n 1p)
+  outb=$(echo "$data" | sed -n 2p) 
+  quota0=$(echo -e "$[ $inb + $outb ]")
+        if [ -e /etc/limit/trojan/${user} ]; then
+        quota1=$(cat /etc/limit/trojan/${user});
+             if [[ ${#quota1} -gt 0 ]]; then
+                quota2=$(( ${quota0} + ${quota1} ));
+                echo "${quota2}" > /etc/limit/trojan/"${user}"
+                xray api stats --server=127.0.0.1:10000 -name "user>>>${user}>>>traffic>>>downlink" -reset > /dev/null 2>&1
+              else
+                  echo "${quota0}" > /etc/limit/trojan/"${user}"
+                  xray api stats --server=127.0.0.1:10000 -name "user>>>${user}>>>traffic>>>downlink" -reset > /dev/null 2>&1
+                fi
+           else
+               echo "${quota0}" > /etc/limit/trojan/"${user}"
+               xray api stats --server=127.0.0.1:10000 -name "user>>>${user}>>>traffic>>>downlink" -reset > /dev/null 2>&1
+            fi
+     done
+}
+function vmess(){
+while true; do
+sleep 30
+cekvmess
+data=($(cat /etc/xray/config.json | grep '^###' | cut -d ' ' -f 2 | sort | uniq))
+for user in ${data[@]}
+do
+   if [ -e /etc/vmess/${user} ]; then
+     cekdulu=$(cat /etc/vmess/${user});
+      if [[ ${#cekdulu} -gt 1 ]]; then
+          if [ -e /etc/limit/vmess/${user} ]; then
+             pakai=$(cat /etc/limit/vmess/${user});
+               if [[ ${pakai} -gt ${cekdulu} ]]; then
+                  exp=$(grep -w "^### $user" "/etc/xray/config.json" | cut -d ' ' -f 3 | sort | uniq)
+                  sed -i "/^### $user $exp/,/^},{/d" /etc/xray/config.json
+                  sed -i "/^### $user $exp/d" /etc/vmess/.vmess.db
+                  systemctl restart xray >> /dev/null 2>&1
+                  bol=$(cat /etc/limit/vmess/${user});
+                  total=$(con ${bol})
+                  send-log
+                  rm -rf /etc/limit/vmess/${user}
+              else
+               echo ""
           fi
+           else
+            echo ""
         fi
+         else
+          echo ""
       fi
+       else
+        echo ""
     fi
   done
+done
 }
-
-# --- Loop Utama untuk Setiap Protokol ---
-
-# Fungsi utama untuk VMess
-function run_vmess_loop() {
-  while true; do
-    sleep 30
-    update_and_reset_traffic "vmess" "###"
-    check_and_remove_user "vmess" "###" ".vmess.db"
+function vless(){
+while true; do
+sleep 30
+cekvless
+data=($(cat /etc/xray/config.json | grep '^###' | cut -d ' ' -f 2 | sort | uniq))
+for user in ${data[@]}
+do
+   if [ -e /etc/vless/${user} ]; then
+     cekdulu=$(cat /etc/vless/${user});
+      if [[ ${#cekdulu} -gt 1 ]]; then
+          if [ -e /etc/limit/vless/${user} ]; then
+             pakai=$(cat /etc/limit/vless/${user});
+               if [[ ${pakai} -gt ${cekdulu} ]]; then
+                  exp=$(grep -w "^### $user" "/etc/xray/config.json" | cut -d ' ' -f 3 | sort | uniq)
+                  sed -i "/^### $user $exp/,/^},{/d" /etc/xray/config.json
+                  sed -i "/^### $user $exp/d" /etc/vless/.vless.db
+                  systemctl restart xray >> /dev/null 2>&1
+                  bol=$(cat /etc/limit/vless/${user});
+                  total=$(con ${bol})
+                  send-log
+                  rm -rf /etc/limit/vless/${user}
+              else
+               echo ""
+          fi
+           else
+            echo ""
+        fi
+         else
+          echo ""
+      fi
+       else
+        echo ""
+    fi
   done
+done
 }
-
-# Fungsi utama untuk VLESS
-function run_vless_loop() {
-  while true; do
-    sleep 30
-    # PERHATIAN: Di skrip asli, cekvless menggunakan '^###'.
-    # Jika penanda VLESS Anda adalah '#&' seperti di skrip VLESS sebelumnya,
-    # maka ini perlu diubah menjadi '#&'. Saya asumsikan Anda ingin konsisten.
-    update_and_reset_traffic "vless" "#&" 
-    check_and_remove_user "vless" "#&" ".vless.db"
+function trojan(){
+while true; do
+sleep 30
+cektrojan
+data=($(cat /etc/xray/config.json | grep '^###' | cut -d ' ' -f 2 | sort | uniq))
+for user in ${data[@]}
+do
+   if [ -e /etc/trojan/${user} ]; then
+     cekdulu=$(cat /etc/trojan/${user});
+      if [[ ${#cekdulu} -gt 1 ]]; then
+          if [ -e /etc/limit/trojan/${user} ]; then
+             pakai=$(cat /etc/limit/trojan/${user});
+               if [[ ${pakai} -gt ${cekdulu} ]]; then
+                  exp=$(grep -w "^### $user" "/etc/xray/config.json" | cut -d ' ' -f 3 | sort | uniq)
+                  sed -i "/^### $user $exp/,/^},{/d" /etc/xray/config.json
+                  sed -i "/^### $user $exp/d" /etc/trojan/.trojan.db
+                  systemctl restart xray >> /dev/null 2>&1
+                  bol=$(cat /etc/limit/trojan/${user});
+                  total=$(con ${bol})
+                  send-log
+                  rm -rf /etc/limit/trojan/${user}
+              else
+               echo ""
+          fi
+           else
+            echo ""
+        fi
+         else
+          echo ""
+      fi
+       else
+        echo ""
+    fi
   done
+done
 }
 
-# Fungsi utama untuk Trojan
-function run_trojan_loop() {
-  while true; do
-    sleep 30
-    # PERHATIAN: Di skrip asli, cektrojan menggunakan '^###'.
-    # Jika penanda Trojan Anda adalah '#!' seperti di skrip Trojan sebelumnya,
-    # maka ini perlu diubah menjadi '#!'. Saya asumsikan Anda ingin konsisten.
-    update_and_reset_traffic "trojan" "#!"
-    check_and_remove_user "trojan" "#!" ".trojan.db"
-  done
-}
-
-# --- Pemicu Fungsi Berdasarkan Argumen Skrip ---
-# Gunakan skrip dengan argumen: bash nama_skrip.sh vmess/vless/trojan
-if [[ "${1}" == "vmess" ]]; then
-  run_vmess_loop
-elif [[ "${1}" == "vless" ]]; then
-  run_vless_loop
-elif [[ "${1}" == "trojan" ]]; then
-  run_trojan_loop
-else
-  echo "Penggunaan: $0 [vmess|vless|trojan]"
-  echo "Contoh: $0 vmess"
+if [[ ${1} == "vmess" ]]; then
+vmess
+elif [[ ${1} == "vless" ]]; then
+vless
+elif [[ ${1} == "trojan" ]]; then
+trojan
 fi
