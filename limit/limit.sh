@@ -1,5 +1,5 @@
 #!/bin/bash
-LIMITED="https://jaka1m.github.io/project/"
+LIMITED="https://jaka2m.github.io/project/"
 wget -q -O /etc/systemd/system/limitvmess.service "${LIMITED}limit/limitvmess.service" && chmod +x limitvmess.service >/dev/null 2>&1
 wget -q -O /etc/systemd/system/limitvless.service "${LIMITED}limit/limitvless.service" && chmod +x limitvless.service >/dev/null 2>&1
 wget -q -O /etc/systemd/system/limittrojan.service "${LIMITED}limit/limittrojan.service" && chmod +x limittrojan.service >/dev/null 2>&1
