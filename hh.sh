@@ -358,7 +358,8 @@ print_install "Menyiapkan Dependensi untuk Ubuntu $(cat /etc/os-release | grep -
 sudo apt update -y > /dev/null 2>&1
 apt-get -y install --no-install-recommends software-properties-common > /dev/null 2>&1
 if [ "$DISTRO_CODENAME" == "noble" ]; then
-echo -e "${GREENBG}Deteksi: Ubuntu Noble (24.04 LTS). Menginstal HAProxy dari repositori resmi.${NC}"
+echo -e ""
+echo -e "${GREEN}Deteksi: Ubuntu Noble (24.04 LTS). Menginstal HAProxy dari repositori resmi.${NC}"
 apt-get update -y > /dev/null 2>&1
 apt-get -y install haproxy > /dev/null 2>&1
 apt-get -y install socat > /dev/null 2>&1
