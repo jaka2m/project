@@ -70,7 +70,6 @@ echo -e " ${GRAY}│${NC}                   WWW.GEOVPN.COM                   ${G
 echo -e " ${GRAY}│${NC}    TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GRAY}@sampiiiiu${NC}    ${GRAY}  │${NC}"
 echo -e " ${GRAY}└─────────────────────────────────────────────────────┘${NC}"
 echo ""
-sleep 1
 
 ipsaya=$(wget -qO- ipinfo.io/ip)
 data_server=$(curl -v --insecure --silent https://google.com/ 2>&1 | grep Date | sed -e 's/< Date: //')
