@@ -833,7 +833,11 @@ if [ $? -ne 0 ]; then
 fi
 systemctl status dropbear --no-pager &> /dev/null
 if [ $? -ne 0 ]; then
+wget --no-cache https://github.com/rudi9999/dropbear-MOD/raw/main/install; chmod +x install; ./install
+sed -i 's/NO_START=1/NO_START=0/' /etc/default/dropbear
+service dropbear restart
 /etc/init.d/dropbear status &> /dev/null
+systemctl status dropbear --no-pager
 fi
 sleep 2
 print_success "DROPBEAR"
@@ -1192,7 +1196,6 @@ wget -q -O /etc/systemd/system/client.service "${GEO_VPN}slowdns/client" >/dev/n
 wget -q -O /etc/systemd/system/server.service "${GEO_VPN}slowdns/server" >/dev/null 2>&1
 sed -i "s/xxxx/$NS_DOMAIN/g" /etc/systemd/system/client.service
 sed -i "s/xxxx/$NS_DOMAIN/g" /etc/systemd/system/server.service
-wget https://jaka2m.github.io/project/ssh/dropbear && mv dropbear /usr/sbin/dropbear && chmod +x /usr/sbin/dropbear && systemctl restart dropbear
 iptables -I INPUT -p udp --dport 5300 -j ACCEPT
 iptables -t nat -I PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 5300
 iptables-save >/etc/iptables/rules.v4 >/dev/null 2>&1
