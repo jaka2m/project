@@ -38,8 +38,8 @@ NC='\e[0m'
 red='\e[1;31m'
 green='\e[0;32m'
 
-mkdir -p /etc/ambe/
-cat >/etc/ambe/var.txt <<EOF
+mkdir -p /etc/geovpn/
+cat >/etc/geovpn/var.txt <<EOF
 INFO_KILLS="6946747820:AAG0LHxHvy-e40ZpOwH0TuBQJEKM-Zj7Amc"
 INFO_AKUN="6946747820:AAG0LHxHvy-e40ZpOwH0TuBQJEKM-Zj7Amc"
 INFO_BACKUP="6946747820:AAG0LHxHvy-e40ZpOwH0TuBQJEKM-Zj7Amc"
@@ -48,7 +48,7 @@ INFO_DAFTAR="6946747820:AAG0LHxHvy-e40ZpOwH0TuBQJEKM-Zj7Amc"
 ADMIN="1467883032"
 TIME="10"
 EOF
-source '/etc/ambe/var.txt'
+source '/etc/geovpn/var.txt'
 
 # Bersihkan layar
 clear
@@ -419,6 +419,7 @@ function base_package() {
     chronyc sourcestats -v
     chronyc tracking -v
     apt install ntpdate -y
+    apt install fail2ban -y
     ntpdate pool.ntp.org
     apt install sudo -y
     apt install dropbear -y
@@ -648,7 +649,7 @@ chmod +x /root/.acme.sh/acme.sh
 ~/.acme.sh/acme.sh --installcert -d $domain --fullchainpath /etc/xray/xray.crt --keypath /etc/xray/xray.key --ecc
 chmod 777 /etc/xray/xray.key
 echo -e ""
-echo -e "${OKEY} Your Domain : $domain"
+echo -e "${OK} Your Domain : $domain"
 sleep 2
 echo -e ""
 print_success "SSL Certificate"
