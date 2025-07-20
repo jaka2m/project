@@ -58,7 +58,17 @@ clear && clear && clear
 export IP=$(curl -sS ipinfo.io/ip)
 
 # Tampilkan Banner
-samawa
+echo -e " ${GRAY}┌─────────────────────────────────────────────────────┐${NC}"
+echo -e " ${GRAY}│${NC}${GRAY}         ____ _____ _____     ______  _   _${NC}${GRAY}          │${NC}"
+echo -e " ${GRAY}│${NC}${GRAY}        / ___| ____/ _ \ \   / /  _ \| \ | |${NC}${GRAY}         │${NC}"
+echo -e " ${GRAY}│${NC}${GRAY}       | |  _|  _|| | | \ \ / /| |_) |  \| |${NC}${GRAY}         │${NC}"
+echo -e " ${GRAY}│${NC}${GRAY}       | |_| | |__| |_| |\ V / |  __/| |\  |${NC}${GRAY}         │${NC}"
+echo -e " ${GRAY}│${NC}${GRAY}        \____|_____\___/  \_/  |_|   |_| \_|${NC}${GREEN}         │${NC}"
+echo -e " ${GRAY}│${NC}                                                    ${GRAY} │${NC}"
+echo -e " ${GRAY}│${NC}             MULTIPORT VPN SCRIPT V3.1              ${GRAY} │${NC}"
+echo -e " ${GRAY}│${NC}                   WWW.GEOVPN.COM                   ${GRAY} │${NC}"
+echo -e " ${GRAY}│${NC}    TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GRAY}@sampiiiiu${NC}    ${GRAY}  │${NC}"
+echo -e " ${GRAY}└─────────────────────────────────────────────────────┘${NC}"
 echo ""
 sleep 1
 
@@ -238,7 +248,7 @@ secs_to_human() {
     echo "Waktu instalasi : $((${1} / 3600)) jam $((((${1} / 60) % 60))) menit $((${1} % 60)) detik"
 }
 
-function samawa(){
+function SAMAWA(){
 clear
 echo -e " ${GRAY}┌─────────────────────────────────────────────────────┐${NC}"
 echo -e " ${GRAY}│${NC}${GRAY}         ____ _____ _____     ______  _   _${NC}${GRAY}          │${NC}"
@@ -297,20 +307,6 @@ chmod +x /usr/sbin/ddos-deflate-master/*
 cd /usr/sbin/ddos-deflate-master
 ./uninstall.sh && ./install.sh
 print_success "DDoS-Deflate"
-}
-function SAMAWA(){
-clear
-echo -e " ${BLUE}┌─────────────────────────────────────────────────────┐${NC}"
-echo -e " ${BLUE}│${NC}${GREEN}         ____ _____ _____     ______  _   _${NC}${BLUE}          │${NC}"
-echo -e " ${BLUE}│${NC}${GREEN}        / ___| ____/ _ \ \   / /  _ \| \ | |${NC}${BLUE}         │${NC}"
-echo -e " ${BLUE}│${NC}${GREEN}       | |  _|  _|| | | \ \ / /| |_) |  \| |${NC}${BLUE}         │${NC}"
-echo -e " ${BLUE}│${NC}${GREEN}       | |_| | |__| |_| |\ V / |  __/| |\  |${NC}${BLUE}         │${NC}"
-echo -e " ${BLUE}│${NC}${GREEN}        \____|_____\___/  \_/  |_|   |_| \_|${NC}${BLUE}         │${NC}"
-echo -e " ${BLUE}│${NC}                                                    ${BLUE} │${NC}"
-echo -e " ${BLUE}│${NC}             MULTIPORT VPN SCRIPT V3.1              ${BLUE} │${NC}"
-echo -e " ${BLUE}│${NC}                   WWW.GEOVPN.COM                   ${BLUE} │${NC}"
-echo -e " ${BLUE}│${NC}    TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GREEN}@tau_samawa${NC}    ${BLUE} │${NC}"
-echo -e " ${BLUE}└─────────────────────────────────────────────────────┘${NC}"
 }
 
 print_install "MEMBUAT DIRECTORY XRAY"
@@ -693,7 +689,7 @@ TEXT="Installasi VPN Script Stable V3.1
 ============================
 <i>Automatic Notification from</i>
 <i>Github GEOVPN</i>
-"'&reply_markup={"inline_keyboard":[[{"text":"ᴏʀᴅᴇʀ🐳","url":"https://t.me/tau_samawa"},{"text":"ɪɴꜱᴛᴀʟʟ🐬","url":"https://t.me/testikuy_mang/163"}]]}'
+"'&reply_markup={"inline_keyboard":[[{"text":"ᴏʀᴅᴇʀ🐳","url":"https://t.me/tau_SAMAWA"},{"text":"ɪɴꜱᴛᴀʟʟ🐬","url":"https://t.me/testikuy_mang/163"}]]}'
 curl -s --max-time $TIME -d "chat_id=$ADMIN&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
 }
 function folder_xray() {
