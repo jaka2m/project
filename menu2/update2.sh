@@ -1,76 +1,19 @@
 #!/bin/bash
-# //====================================================
-# //	System Request:Debian 9+/Ubuntu 18.04+/20+
-# //	Author:	Geo Project
-# //	Dscription: Xray Menu Management
-# //	email: admin@geolstore.net
-# //  telegram: https://t.me/tau_samawa
-# //====================================================
-# // Root Checking
-if [ "${EUID}" -ne 0 ]; then
-		echo -e "${EROR} Please Run This Script As Root User !"
-		exit 1
-fi
-# // Export Color & Information
-export RED='\033[0;31m'
-export GREEN='\033[0;32m'
-export YELLOW='\033[0;33m'
-export BLUE='\033[0;34m'
-export PURPLE='\033[0;35m'
-export CYAN='\033[0;36m'
-export LIGHT='\033[0;37m'
-export NC='\033[0m'
+MYIP=$(wget -qO- ipinfo.io/ip);
+Green="\e[92;1m"
+RED="\033[31m"
+NC='\033[0m'
 OR='\033[1;93m'
-Lred='\e[91m'
-LLgreen='\e[92m'
-Lyellow='\e[93m'
-yellow="\033[1;33m"
-green="\e[92;1m"
-yellow="\033[1;33m"
-cyan="\033[1;36m"
-# // Export Banner Status Information
-export EROR="[${RED} ERROR ${NC}]"
-export INFO="[${YELLOW} INFO ${NC}]"
-export OKEY="[${GREEN} OKEY ${NC}]"
-export PENDING="[${YELLOW} PENDING ${NC}]"
-export SEND="[${YELLOW} SEND ${NC}]"
-export RECEIVE="[${YELLOW} RECEIVE ${NC}]"
-# // Export Align
-export BOLD="\e[1m"
-export WARNING="${RED}\e[5m"
-export UNDERLINE="\e[4m"
-# // Exporting URL Host
+grenbo="\e[92;1m"
+clear
 source '/etc/geovpn/var.txt'
-URL="https://api.telegram.org/bot$INFO_AKUN/sendMessage"
-export Server_URLL="raw.githubusercontent.com/jaka1m/perizinan/main"
-export Server_Port="443"
-export Server_IP="underfined"
-export Script_Mode="Stable"
-export Auther="geovpn"
-MYIP=$(curl -sS ipv4.icanhazip.com)
-domain=$(cat /etc/xray/domain)
+#install
 rm -f /root/update2.sh
-# // Exporting IP Address
-export IP=$( curl -s ifconfig.me )
-function SAMAWA(){
-clear
-echo -e " ${BLUE}┌─────────────────────────────────────────────────────┐${NC}"
-echo -e " ${BLUE}│${NC}${GREEN}         ____ _____ _____     ______  _   _${NC}${BLUE}          │${NC}"
-echo -e " ${BLUE}│${NC}${GREEN}        / ___| ____/ _ \ \   / /  _ \| \ | |${NC}${BLUE}         │${NC}"
-echo -e " ${BLUE}│${NC}${GREEN}       | |  _|  _|| | | \ \ / /| |_) |  \| |${NC}${BLUE}         │${NC}"
-echo -e " ${BLUE}│${NC}${GREEN}       | |_| | |__| |_| |\ V / |  __/| |\  |${NC}${BLUE}         │${NC}"
-echo -e " ${BLUE}│${NC}${GREEN}        \____|_____\___/  \_/  |_|   |_| \_|${NC}${BLUE}         │${NC}"
-echo -e " ${BLUE}│${NC}                                                    ${BLUE} │${NC}"
-echo -e " ${BLUE}│${NC}             MULTIPORT VPN SCRIPT V3.0              ${BLUE} │${NC}"
-echo -e " ${BLUE}│${NC}                   WWW.GEOVPN.COM                   ${BLUE} │${NC}"
-echo -e " ${BLUE}│${NC}    TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GREEN}@tau_samawa${NC}    ${BLUE} │${NC}"
-echo -e " ${BLUE}└─────────────────────────────────────────────────────┘${NC}"
-}
-function ins_menu(){
-clear
-echo -e " ${INFO} Downloading File"
-sleep 2
-    wget https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/menu2/menu.zip >/dev/null 2>&1
+rm -rf /home/geo
+apt update && apt upgrade -y
+apt install python3 python3-pip -y
+apt install sqlite3 -y
+wget https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/menu2/menu.zip >/dev/null 2>&1
 7z e -psumbawa menu.zip
     unzip geo.zip
     mv geo /home
@@ -82,39 +25,107 @@ sleep 2
     rm -rf /home/geo/var.txt
     rm -f /usr/local/sbin/on.sh
     rm -rf /usr/local/sbin/snap >/dev/null 2>&1
-echo -e " ${INFO} Dwonload File Successfully"
-sec=2
+cd /home/geo
+pip3 install -r requirements.txt
+pip install pillow
+pip install speedtest-cli
+clear
+# System commands status
+city=$(cat /etc/xray/city)
+dat=$(date +"%d-%B-%Y")
+isp=$(cat /etc/xray/isp)
+PUB=$(cat /etc/slowdns/server.pub)
+KEY=$(cat /etc/slowdns/server.key)
+DNS=$(cat /etc/xray/ns.txt)
+domain=$(cat /etc/xray/domain)
+uuid=$(tr </dev/urandom -dc a-z | head -c15)
+    clear
+    BOTTTT=$(systemctl status geo | grep active | awk '{print $3}' | sed 's/(//g' | sed 's/)//g')
+    if [[ $BOTTTT == "running" ]]; then
+        STATBOT="${grenbo}🟢 Online${NC}"
+    else
+        STATBOT="${RED}🔴 Offline${NC}"
+    fi
+    echo -e "  ${OR}===========================${NC}"
+    echo -e "  \e[1;92m ☀️ BOT SIMPLE GEO TELEGRAM ☀️"
+    echo -e "  ${OR}===========================${NC}"
+    echo ""
+    echo -e "  YOUR BOT STATUS $STATBOT    "
+    echo -e "  Telegram Bot Setup menu"
+    echo -e "  make vpn in the telegram bot"
+    echo -e "  short tutorials :"
+    echo -e "  get this value from @BotFather, required"
+    echo -e "  take your id at @MissRose_bot,cmd (/id)"
+    echo -e "  ${OR}===========================${NC}"
+    read -e -p "  Input your Bot Token : " bottoken
+    read -e -p "  Input your Id Telegram : " idtelegram
+    rm -rf /home/geo/database.db >/dev/null 2>&1
+cat >/home/geo/var.txt <<EOF
+BOT_TOKEN="$bottoken"
+ADMIN="$idtelegram"
+DOMAIN="$domain"
+PUB="$PUB"
+DNS="$DNS"
+SESSIONS="$uuid"
+USER1="empty1"
+USER2="empty2"
+USER3="empty3"
+USER4="empty4"
+USER5="empty5"
+USER6="empty6"
+USER7="empty7"
+USER8="empty8"
+USER9="empty9"
+USER10="empty0"
+EOF
+cat > /etc/systemd/system/geo.service << END
+[Unit]
+Description=GEO BOT
+Documentation=GeoProject
+After=network.target
+[Service]
+WorkingDirectory=/home
+ExecStart=/usr/bin/python3 -m geo
+Restart=always
+[Install]
+WantedBy=multi-user.target
+END
+    systemctl daemon-reload
+    systemctl stop geo
+    systemctl enable geo
+    systemctl start geo
+    systemctl restart geo
+    
+clear
 echo ""
-spinner=(⣻ ⢿ ⡿ ⣟ ⣯ ⣷)
-while [ $sec -gt 0 ]; do
-  echo -ne "\e[32m ${spinner[sec]} Back to Menu $sec seconds...\r"
-  sleep 1
-  sec=$(($sec - 1))
-done
+URL="https://api.telegram.org/bot$INFO_INSTALLER/sendMessage"
+    TEXT="Installasi VPN BOT Telegram V3.1
+    ============================
+    <code>DOMAIN     :</code> <code>$domain</code>
+    <code>API TOKEN  :</code> <code>$bottoken</code>
+    <code>ID         :</code> <code>$idtelegram</code>
+    <code>IP VPS     :</code> <code>$MYIP</code>
+    ============================
+    (C) Copyright 2024 By Geo Project
+    ============================
+<i>Automatic Notification from</i>
+<i>Github GEO</i> 
+"'&reply_markup={"inline_keyboard":[[{"text":"ᴏʀᴅᴇʀ🐳","url":"https://t.me/tau_samawa"},{"text":"ɪɴꜱᴛᴀʟʟ🐬","url":"https://t.me/testikuy_mang/163"}]]}'
+   curl -s --max-time $TIME -d "chat_id=$ADMIN&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
 echo ""
+    systemctl daemon-reload
+    systemctl stop geo
+    systemctl enable geo
+    systemctl start geo
+    systemctl restart geo
+clear
+echo -e " \e[1;92m ☀️ YOUR DATA BOT ☀️$NC"
+echo -e " ${OR}=========================${NC}"
+echo "Api Token     : $bottoken"
+echo "ID            : $idtelegram"
+echo "DOMAIN        : $domain"
+echo -e " ${OR}=========================${NC}"
+echo ""
+sleep 1
+read -n 1 -s -r -p "Press [ Enter ] to back on menu"
 menu
-}
-# // Exporting Network Interface
-SAMAWA
-echo -e ""
-read -p "Apakah Anda Yakin Melakukan Update ? ( Y / N ) " update
-echo ""
-echo ""
-if [[ $update == "Y" ]]; then
-clear
-echo -e "${INFO} Update !"
-ins_menu
-elif [[ $update == "y" ]]; then
-clear
-echo -e "${INFO} Update !"
-ins_menu
-elif [[ $update == "N" ]]; then
-echo -e "${INFO} Update Canceled !"
-exit 1
-elif [[ $update == "n" ]]; then
-echo -e "${INFO} Update Canceled !"
-exit 1
-else
-echo -e "${EROR} Update Otomatis !"
-ins_menu
-fi
