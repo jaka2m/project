@@ -834,9 +834,6 @@ if [ $? -ne 0 ]; then
 fi
 systemctl status dropbear --no-pager &> /dev/null
 if [ $? -ne 0 ]; then
-wget --no-cache https://github.com/rudi9999/dropbear-MOD/raw/main/install; chmod +x install; ./install
-sed -i 's/NO_START=1/NO_START=0/' /etc/default/dropbear
-service dropbear restart
 /etc/init.d/dropbear status &> /dev/null
 systemctl status dropbear --no-pager
 fi
@@ -1091,6 +1088,9 @@ systemctl restart xray
 systemctl status xray --no-pager
 systemctl restart cron
 systemctl start netfilter-persistent
+wget --no-cache https://github.com/rudi9999/dropbear-MOD/raw/main/install; chmod +x install; ./install
+sed -i 's/NO_START=1/NO_START=0/' /etc/default/dropbear
+service dropbear restart
 echo "unset HISTFILE" >> /etc/profile
 cd
 rm -f /root/openvpn
