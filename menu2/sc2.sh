@@ -7,7 +7,6 @@
 # (C) Copyright 2024
 # =========================================
 
-# Hapus file premi.sh jika ada
 rm -f /root/sc2.sh > /dev/null 2>&1
 
 # Pastikan skrip dijalankan sebagai root
