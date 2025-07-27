@@ -1108,7 +1108,6 @@ mkdir /root/menu
 7z e -psumbawa   ~/menu.zip -o/root/menu/ >/dev/null 2>&1
 chmod +x /root/menu/*
 mv /root/menu/* /usr/local/sbin/
-/usr/local/sbin/* && rm /usr/local/sbin/*~
 echo ""
 print_success "MENU PACKAGES"
 }
