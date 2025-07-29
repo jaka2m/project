@@ -760,7 +760,7 @@ echo "& plughin Account SSH" >>/etc/ssh/.ssh.db
 }
 function ins_xray() {
 clear
-print_install "CORE XRAY LATES VERSION"
+#print_install "CORE XRAY LATES VERSION"
     lane_atas
     echo -e "${c}│      ${g}PROCESS INSTAKKED CORE XRAY LATES VERSION${NC}     ${c}│${NC}"
     lane_bawah
@@ -931,7 +931,7 @@ systemctl status udp --no-pager
 clear
 function ins_sshd(){
 clear
-print_install "MEMASANG SSHD"
+#print_install "MEMASANG SSHD"
     lane_atas
     echo -e "${c}│      ${g}PROCESS INSTALLED SSHD${NC}     ${c}│${NC}"
     lane_bawah
@@ -1016,7 +1016,7 @@ wget -O /var/www/html/index.html "https://raw.githubusercontent.com/jaka2m/proje
 }
 function ins_swab(){
 clear
-$print_install "MEMASANG SWAP 1 G"
+#print_install "MEMASANG SWAP 1 G"
     lane_atas
     echo -e "${c}│      ${g}PROCESS INSTALLED SWAP${NC}     ${c}│${NC}"
     lane_bawah
@@ -1038,7 +1038,7 @@ print_success "SWAP 1 G"
 }
 function ins_bbr(){
 clear
-print_install "MEMASANG BBR"
+#print_install "MEMASANG BBR"
     lane_atas
     echo -e "${c}│      ${g}PROCESS INSTALLED BBR${NC}     ${c}│${NC}"
     lane_bawah
@@ -1175,7 +1175,7 @@ clear
 }
 function menu(){
 clear
-print_install "MEMASANG MENU PACKAGES"
+#print_install "MEMASANG MENU PACKAGES"
     lane_atas
     echo -e "${c}│      ${g}PROCESS INSTALLED MENU PACKAGES${NC}     ${c}│${NC}"
     lane_bawah
@@ -1189,7 +1189,7 @@ print_success "MENU PACKAGES"
 }
 function ins_rclone(){
 clear
-print_install "MEMASANG RCLONE"
+#print_install "MEMASANG RCLONE"
     lane_atas
     echo -e "${c}│      ${g}PROCESS INSTALLED RCLONE${NC}     ${c}│${NC}"
     lane_bawah
