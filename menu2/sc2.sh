@@ -405,10 +405,8 @@ print_success "Pemasangan HAProxy pada $(cat /etc/os-release | grep -w PRETTY_NA
 
 # Update and remove packages
 function base_package() {
-    echo -e ""
     clear
     print_install "Menginstall Packet Yang Dibutuhkan"
-    apt install 
 apt install zip -y
 apt install pwgen -y
 apt install openssl -y
