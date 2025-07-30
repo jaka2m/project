@@ -143,22 +143,6 @@ function configure_sources_list() {
         clear
 
         if [ "$OS_VERSION_ID" == "22.04" ]; then
-            print_install "Mengatur sources.list untuk Ubuntu 22.04 (Jammy Jellyfish)..."
-            sudo cat >/etc/apt/sources.list <<EOF
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal-updates main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal-security main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal-backports main restricted universe multiverse
-deb http://mirror.poliwangi.ac.id/ubuntu/ focal-proposed main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu/ jammy-security main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse
-deb http://archive.canonical.com/ubuntu/ jammy partner
-EOF
-            print_success "Sources.list Ubuntu 22.04 berhasil dikonfigurasi."
-
-        elif [ "$OS_VERSION_ID" == "20.04" ]; then
         # ================================================
 # FIXED LXD INSTALLATION SCRIPT FOR DEBIAN 12
 # ================================================
@@ -250,7 +234,22 @@ Gunakan perintah berikut:
 - Cek status: lxc list
 - Stop container: lxc stop ubuntu20
 EOF
+            print_install "Mengatur sources.list untuk Ubuntu 22.04 (Jammy Jellyfish)..."
+            sudo cat >/etc/apt/sources.list <<EOF
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal-updates main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal-security main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal-backports main restricted universe multiverse
+deb http://mirror.poliwangi.ac.id/ubuntu/ focal-proposed main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ jammy-security main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse
+deb http://archive.canonical.com/ubuntu/ jammy partner
+EOF
+            print_success "Sources.list Ubuntu 22.04 berhasil dikonfigurasi."
 
+        elif [ "$OS_VERSION_ID" == "20.04" ]; then
             print_install "Mengatur sources.list untuk Ubuntu 20.04 (Focal Fossa)..."
             sudo cat >/etc/apt/sources.list <<EOF
 deb http://archive.ubuntu.com/ubuntu/ focal main restricted
