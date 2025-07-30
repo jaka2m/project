@@ -408,7 +408,14 @@ function base_package() {
     echo -e ""
     clear
     print_install "Menginstall Packet Yang Dibutuhkan"
-    apt install zip pwgen openssl netcat socat cron bash-completion -y
+    apt install 
+apt install zip -y
+apt install pwgen -y
+apt install openssl -y
+apt install netcat -y
+apt install socat -y
+apt install cron -y
+apt install bash-completion -y
     apt install figlet -y
     apt update -y
     apt upgrade -y
@@ -423,7 +430,10 @@ function base_package() {
     apt install fail2ban -y
     ntpdate pool.ntp.org
     apt install sudo -y
+    apt install openvpn -y
+    apt install jq -y
     apt install dropbear -y
+    apt install p7zip-full -y
     sudo apt-get clean all
     sudo apt-get autoremove -y
     sudo apt-get install -y debconf-utils
@@ -432,7 +442,74 @@ function base_package() {
     sudo apt-get install -y --no-install-recommends software-properties-common
     echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
     echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
-    sudo apt-get install -y speedtest-cli vnstat libnss3-dev libnspr4-dev pkg-config libpam0g-dev libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-nss-dev flex bison make libnss3-tools libevent-dev bc rsyslog dos2unix zlib1g-dev libssl-dev libsqlite3-dev sed dirmngr libxml-parser-perl build-essential gcc g++ python htop lsof tar wget curl ruby zip unzip p7zip-full python3-pip libc6 util-linux build-essential msmtp-mta ca-certificates bsd-mailx iptables iptables-persistent netfilter-persistent net-tools openssl ca-certificates gnupg gnupg2 ca-certificates lsb-release gcc shc make cmake git screen socat xz-utils apt-transport-https gnupg1 dnsutils cron bash-completion ntpdate chrony jq openvpn easy-rsa
+    apt install speedtest-cli -y
+    apt install vnstat -y
+    apt install libnss3-dev -y
+apt install libnspr4-dev -y
+apt install pkg-config -y
+apt install libpam0g-dev -y
+apt install libcap-ng-dev -y
+apt install libcap-ng-utils -y
+apt install libselinux1-dev -y
+apt install libcurl4-nss-dev -y
+apt install flex -y
+apt install bison-y
+apt install make -y
+apt install libnss3-tools -y
+apt install libevent-dev -y
+apt install bc rsyslog -y
+apt install dos2unix -y
+apt install zlib1g-dev -y
+apt install libssl-dev -y
+apt install libsqlite3-dev -y
+apt install sed -y
+apt install dirmngr -y
+apt install libxml-parser-perl -y
+apt install build-essential -y
+apt install gcc -y
+apt install g++ -y
+apt install python -y
+apt install htop -y
+apt install lsof -y
+apt install tar -y
+apt install wget -y
+apt install curl -y
+apt install ruby -y
+apt install zip -y
+apt install unzip -y
+apt install python3-pip -y
+apt install libc6 -y
+apt install util-linux -y
+apt install build-essential -y
+apt install msmtp-mta -y
+apt install ca-certificates -y
+apt install bsd-mailx -y
+apt install iptables -y
+apt install iptables-persistent -y
+apt install netfilter-persistent -y
+apt install net-tools -y
+apt install openssl -y
+apt install ca-certificates -y
+apt install gnupg -y
+apt install gnupg2 -y
+apt install ca-certificates -y
+apt install lsb-release -y
+apt install gcc -y
+apt install shc -y
+apt install make -y
+apt install cmake -y
+apt install git -y
+apt install screen -y
+apt install socat -y
+apt install xz-utils -y
+apt install apt-transport-https -y
+apt install gnupg1 -y
+apt install dnsutils -y
+apt install cron -y
+apt install bash-completion -y
+apt install ntpdate -y
+apt install chrony -y
+apt install easy-rsa -y
     print_success "Packet Yang Dibutuhkan"
     
 }
@@ -581,7 +658,7 @@ echo "ns.$SUB_DOMAIN.$Domain_Hasil_Random" > /etc/xray/ns.txt
 echo "$SUB_DOMAIN.$Domain_Hasil_Random" > /root/domain
 domain="${SUB_DOMAIN}.${Domain_Hasil_Random}"
 clear
-echo -e "${OKEY} Starting Generating Certificate"
+echo -e "${OK} Starting Generating Certificate"
 rm -rf /etc/xray/xray.key
 rm -rf /etc/xray/xray.crt
 domain=$(cat /root/domain)
@@ -598,7 +675,7 @@ chmod +x /root/.acme.sh/acme.sh
 ~/.acme.sh/acme.sh --installcert -d $domain --fullchainpath /etc/xray/xray.crt --keypath /etc/xray/xray.key --ecc
 chmod 777 /etc/xray/xray.key
 echo -e " "
-echo -e "${OKEY} Your Domain : $SUB_DOMAIN.$Domain_Hasil_Random"
+echo -e "${OK} Your Domain : $SUB_DOMAIN.$Domain_Hasil_Random"
 sleep 4
 echo -e ""
 print_success "SSL Certificate"
@@ -805,41 +882,41 @@ sed -i 's/AcceptEnv/#AcceptEnv/g' /etc/ssh/sshd_config
 echo -e ""
 print_success "PASSWORD SSH"
 }
+
 function ins_dropbear(){
-clear
-print_install "MENGINSTALL DROPBEAR"
-if ! command -v wget &> /dev/null
-then
-print_error "Wget tidak ditemukan. Memasang wget..."
-apt-get update && apt-get install -y wget
-fi
-wget -q -O /etc/default/dropbear "${GEO_VPN}ssh/dropbear.conf"
-chmod +x /etc/default/dropbear
-if ! grep -q "Banner /etc/geovpn.txt" /etc/ssh/sshd_config; then
-echo "Banner /etc/geovpn.txt" >> /etc/ssh/sshd_config
-fi
-sed -i.bak 's@DROPBEAR_BANNER=""@DROPBEAR_BANNER="/etc/geovpn.txt"@g' /etc/default/dropbear
-wget -O /etc/geovpn.txt "${GEO_VPN}ssh/issue.net"
-local OS_ID=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
-local OS_VERSION_ID=$(grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"')
-if [ "$OS_ID" == "ubuntu" ] && [ "$OS_VERSION_ID" == "24.04" ]; then
-print_install "Membersihkan tag HTML dari banner Dropbear untuk Ubuntu 24.04..."
-sed -i 's/<[^>]*>//g' /etc/geovpn.txt
-sed -i '/^\s*$/d' /etc/geovpn.txt
-print_success "Tag HTML berhasil dibersihkan."
-fi
-systemctl restart dropbear &> /dev/null
-if [ $? -ne 0 ]; then
-/etc/init.d/dropbear restart &> /dev/null
-fi
-systemctl status dropbear --no-pager &> /dev/null
-if [ $? -ne 0 ]; then
-/etc/init.d/dropbear status &> /dev/null
-systemctl status dropbear --no-pager
-fi
-sleep 2
-print_success "DROPBEAR"
+    clear
+    print_install "MENGINSTALL DROPBEAR"
+
+    if ! command -v wget &> /dev/null; then
+        print_error "Wget tidak ditemukan. Memasang wget..."
+        apt-get update && apt-get install -y wget
+    fi
+
+    wget -q -O /etc/default/dropbear "${GEO_VPN}ssh/dropbear.conf"
+    chmod +x /etc/default/dropbear
+
+    if ! grep -q "Banner /etc/geovpn.txt" /etc/ssh/sshd_config; then
+        echo "Banner /etc/geovpn.txt" >> /etc/ssh/sshd_config
+    fi
+
+    sed -i.bak 's@DROPBEAR_BANNER=""@DROPBEAR_BANNER="/etc/geovpn.txt"@g' /etc/default/dropbear
+    wget -O /etc/geovpn.txt "${GEO_VPN}ssh/issue.net"
+
+    systemctl restart dropbear &> /dev/null
+    if [ $? -ne 0 ]; then
+        /etc/init.d/dropbear restart &> /dev/null
+    fi
+
+    systemctl status dropbear --no-pager &> /dev/null
+    if [ $? -ne 0 ]; then
+        /etc/init.d/dropbear status &> /dev/null
+        systemctl status dropbear --no-pager
+    fi
+
+    sleep 2
+    print_success "DROPBEAR"
 }
+
 function udp_mini(){
 clear
 print_install "MEMASANG UDP MINI"
