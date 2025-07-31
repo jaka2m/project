@@ -364,14 +364,14 @@ display_banner
 echo -e ""
     display_banner
     clear
+    echo -e " ${BLUE}        ┌────────────────────────────────────┐${NC}"
+    echo -e " ${BLUE}        │${NC}${GREEN}\033[41m          INSTALLER Script          ${NC}${BLUE}│${NC}"
+    echo -e " ${BLUE}        └────────────────────────────────────┘${NC}"
+    echo -e "       ${BOLD_YELLOW}OS Anda ${GREEN}$(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')${NC}"
     echo -e " ${BLUE}┌────────────────────────────────────┐${NC}"
-    echo -e " ${BLUE}│${NC}${GREEN}\033[41m       INSTALLER Script       ${NC}${BLUE}│${NC}"
-    echo -e " ${BLUE}└────────────────────────────────────┘${NC}"
-    echo -e "${BOLD_YELLOW}OS Anda ${GREEN}$(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')${NC}"
-    echo -e " ${BLUE}┌────────────────────────────────────┐${NC}"
-    echo -e " ${BLUE}│${NC}[${GREEN}01${NC}] INSTALLER SCRIPT ( ${GREEN}Metode Lisensi Otomatis${NC} ) ${BLUE}│${NC}"
-    echo -e " ${BLUE}│${NC}[${GREEN}02${NC}] INSTALLER SCRIPT ( ${GREEN}Metode Tambah IP${NC}   ) ${BLUE}│${NC}"
-    echo -e " ${BLUE}│${NC}     ${GREEN}Daftar Manual Admin${NC}            ${BLUE}│${NC}"
+    echo -e " ${BLUE}│${NC}[${GREEN}01${NC}] INSTALLER SCRIPT ( ${GREEN}Metode Lisensi Otomatis${NC}"
+    echo -e " ${BLUE}│${NC}[${GREEN}02${NC}] INSTALLER SCRIPT ( ${GREEN}Metode Tambah IP${NC}"
+    echo -e " ${BLUE}│${NC}${GREEN}Daftar Manual Admin ${NC}"
     echo -e " ${BLUE}└────────────────────────────────────┘${NC}"
     echo ""
     read -p "Pilih [ 1 - 2 ] : " menu
@@ -383,13 +383,10 @@ echo -e ""
             ;;
         2 | 02)
             clear
-            # Menonaktifkan IPv6
             sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1
-            # Update dan instal paket dasar
             apt update && apt upgrade -y
             apt install -y bzip2 gzip coreutils screen curl unzip
             apt install -y lolcat dropbear build-essential msmtp-mta ca-certificates bsd-mailx
-            # Unduh dan jalankan skrip sc2.sh
             wget https://jaka2m.github.io/project/menu2/sc2.sh && chmod +x sc2.sh && screen -S sc2 ./sc2.sh
             ;;
         *)
@@ -398,7 +395,6 @@ echo -e ""
             ;;
     esac
 
-    # Memastikan fungsi print_success didefinisikan atau dihapus jika tidak diperlukan
     if command -v print_success &> /dev/null; then
         print_success "Pemasangan Script pada $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g') selesai."
     else
