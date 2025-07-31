@@ -354,6 +354,10 @@ read -p "Select [ 1 - 2 ] : " menu
 case $menu in
 1 | 01)
 clear
+wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+sudo apt --fix-broken install
+sudo apt install -y liblua5.3-0 -y
 DISTRO_CODENAME=$(grep VERSION_CODENAME /etc/os-release | cut -d= -f2)
 print_install "Menyiapkan Dependensi untuk Ubuntu $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')"
 sudo apt update -y > /dev/null 2>&1
@@ -361,93 +365,6 @@ apt-get -y install --no-install-recommends software-properties-common > /dev/nul
 if [ "$DISTRO_CODENAME" == "noble" ]; then
 echo -e ""
 echo -e "${GREEN}Deteksi: Ubuntu Noble (24.04 LTS). Menginstal HAProxy dari repositori resmi.${NC}"
-# --- [1] HAPUS SNAP LAMA ---
-echo "🧹 Membersihkan snap yang bermasalah..."
-sudo systemctl stop snapd
-sudo apt purge -y snapd
-sudo rm -rf /var/snap /snap /var/lib/snapd
-
-# --- [2] INSTALL SNAP YANG FRESH ---
-echo "🔄 Menginstall ulang snapd..."
-sudo apt update
-sudo apt install -y snapd
-sudo systemctl start snapd
-sudo systemctl enable snapd
-
-# Tunggu sampai snapd benar-benar ready
-sleep 10
-
-# --- [3] UPDATE SNAPD ---
-echo "🆙 Memperbarui snapd core..."
-sudo snap install core
-sudo snap refresh core
-
-# --- [4] INSTALL LXD ---
-echo "🐳 Menginstall LXD..."
-sudo snap install lxd --channel=latest/stable
-sudo snap refresh lxd --channel=latest/stable
-
-# --- [5] INISIALISASI LXD ---
-echo "🔧 Inisialisasi LXD..."
-
-# Pastikan service LXD aktif
-sudo snap start lxd
-
-# Tunggu sampai LXD benar-benar ready
-timeout=30
-while [ $timeout -gt 0 ]; do
-    if sudo lxd waitready; then
-        break
-    fi
-    echo "⏳ Menunggu LXD ready... (sisa waktu: $timeout detik)"
-    sleep 1
-    ((timeout--))
-done
-
-if [ $timeout -eq 0 ]; then
-    echo "⚠️ LXD tidak ready dalam waktu yang ditentukan, restarting service..."
-    sudo snap restart lxd
-    sleep 10
-fi
-
-# Jalankan inisialisasi
-sudo lxd init --auto --storage-backend=dir
-
-# Verifikasi socket
-echo "🔍 Memverifikasi socket LXD..."
-if [ ! -S /var/snap/lxd/common/lxd/unix.socket ]; then
-    echo "⚠️ Socket LXD tidak ditemukan, restarting service..."
-    sudo snap restart lxd
-    sleep 10
-fi
-
-# --- [6] KONFIGURASI USER ---
-echo "👤 Konfigurasi user..."
-sudo usermod -aG lxd $USER
-newgrp lxd <<EONG
-echo "✅ LXD siap digunakan"
-lxc list
-EONG
-
-# --- [7] VERIFIKASI ---
-echo "🔍 Verifikasi instalasi..."
-sudo lxc info
-lxc list
-
-# --- [8] BUAT CONTAINER ---
-echo "🚀 Membuat container Ubuntu 20.04..."
-lxc launch ubuntu:20.04 ubuntu20
-lxc exec ubuntu20 -- apt update && lxc exec ubuntu20 -- apt upgrade -y
-
-cat <<EOF
-
-✅ INSTALASI BERHASIL!
-
-Gunakan perintah berikut:
-- Akses container: lxc exec ubuntu20 -- bash
-- Cek status: lxc list
-- Stop container: lxc stop ubuntu20
-EOF
 apt-get update -y > /dev/null 2>&1
 apt-get -y install haproxy > /dev/null 2>&1
 apt-get -y install socat > /dev/null 2>&1
@@ -1165,10 +1082,6 @@ print_success "LIMIT XRAY"
 }
 function ins_epro(){
 clear
-wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
-sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb
-sudo apt --fix-broken install
-sudo apt install -y liblua5.3-0 -y
 print_install "MENGINSTALL EPRO WEBSOCKET PROXY"
 wget -O /usr/bin/ws "${GEO_VPN}ws/ws" >/dev/null 2>&1
 wget -O /usr/bin/tun.conf "${GEO_VPN}ws/tun.conf" >/dev/null 2>&1
