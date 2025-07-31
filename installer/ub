@@ -2,96 +2,91 @@
 # =========================================
 # Quick Setup | Script Setup Manager
 # Edition : Stable Edition V3.1
-# Auther  : Geo Project
+# Author  : Geo Project
 # (C) Copyright 2024
 # =========================================
 
+# --- Initial Setup and Checks ---
+# Remove any previous 'ub' file if it exists
 rm -rf /root/ub
+
+# Check if script is run as root
 if [ "${EUID}" -ne 0 ]; then
-echo "You need to run this script as root"
-exit 1
+    echo "You need to run this script as root."
+    exit 1
 fi
+
+# Check for OpenVZ virtualization (not supported)
 if [ "$(systemd-detect-virt)" == "openvz" ]; then
-echo "OpenVZ is not supported"
-exit 1
+    echo "OpenVZ is not supported."
+    exit 1
 fi
-localip=$(hostname -I | cut -d\  -f1)
+
+# Add hostname to /etc/hosts if not already present
+localip=$(hostname -I | cut -d' ' -f1)
 hst=( `hostname` )
 dart=$(cat /etc/hosts | grep -w `hostname` | awk '{print $2}')
 if [[ "$hst" != "$dart" ]]; then
-echo "$localip $(hostname)" >> /etc/hosts
+    echo "$localip $(hostname)" >> /etc/hosts
 fi
 
+# Setup .profile for automatic screen resume
 cat > /root/.profile <<EOF
 clear
 sleep 2
 screen -r
 EOF
+
+# Clear terminal initially
 clear
 
-clear
+# --- Define Colors and Utility Functions ---
 export BLUE='\033[0;34m'
 export GREEN='\033[0;32m'
 export CYAN='\033[0;36m'
 export YELLOW='\033[0;33m'
 export RED='\033[0;31m'
-export NC='\033[0m'
+export NC='\033[0m' # No Color
 export OK="[ ${GREEN}OK${NC} ]"
 export ERROR="[ ${RED}ERROR${NC} ]"
 export INFO="[ ${CYAN}INFO${NC} ]"
-export FONT="${NC}"
-rm -f /root/ub
+export FONT="${NC}" # Using NC for general font color
+export REDBG='\033[41m' # Red background for error messages
 
+# Function to print OK status
 function print_ok() {
-echo -e "${OK} ${BLUE}$1${FONT}"
+    echo -e "${OK} ${BLUE} $1 ${FONT}"
 }
+
+# Function to print installation section header
 function print_install() {
-if command -v lolcat &>/dev/null; then
-echo -e "${YELLOW} ╔════════════════════════════════════════════╗ ${FONT}"
-echo -e " ║ ( $1 ) " | lolcat
-echo -e "${YELLOW} ╚════════════════════════════════════════════╝ ${FONT}"
-else
-echo -e "${YELLOW} ╔════════════════════════════════════════════╗ ${FONT}"
-echo -e "${YELLOW} ║${NC} ( $1 ) ${YELLOW}║${FONT}"
-echo -e "${YELLOW} ╚════════════════════════════════════════════╝ ${FONT}"
-fi
-sleep 1
+    echo -e "${GREEN} =============================== ${FONT}"
+    echo -e "${GREEN} # $1 ${FONT}"
+    echo -e "${GREEN} =============================== ${FONT}"
+    sleep 1
 }
+
+# Function to print error messages
 function print_error() {
-echo -e "${ERROR} ${RED}$1${FONT}"
+    echo -e "${ERROR} ${REDBG} $1 ${FONT}"
 }
+
+# Function to print success messages with conditional check
 function print_success() {
-if [[ 0 -eq $? ]]; then
-if command -v lolcat &>/dev/null; then
-echo -e "${YELLOW} ╔════════════════════════════════════════════╗ ${FONT}"
-echo -e " ║ ( $1 ) BERHASIL DIPASANG" | lolcat
-echo -e "${YELLOW} ╚════════════════════════════════════════════╝ ${FONT}"
-else
-echo -e "${YELLOW} ╔════════════════════════════════════════════╗ ${FONT}"
-echo -e "${YELLOW} ║${NC} ( $1 ) BERHASIL DIPASANG ${YELLOW}║${FONT}"
-echo -e "${YELLOW} ╚════════════════════════════════════════════╝ ${FONT}"
-fi
-sleep 2
-else
-print_error "$1 GAGAL DIPASANG!"
-sleep 2
-fi
+    if [[ 0 -eq $? ]]; then # Checks the exit status of the last executed command
+        echo -e "${GREEN} =============================== ${FONT}"
+        echo -e "${GREEN} # $1 berhasil dipasang ${NC}"
+        echo -e "${GREEN} =============================== ${FONT}"
+        sleep 2
+    else
+        echo -e "${RED} # $1 gagal dipasang ${NC}" # Added for failure case
+    fi
 }
-function install_lolcat() {
-if ! command -v lolcat &>/dev/null; then
-print_install "Menginstal Lolcat..."
-sudo apt update -y >/dev/null 2>&1
-sudo apt upgrade -y
-sudo apt install -y lolcat
-gem install lolcat
-if [[ $? -ne 0 ]]; then
-print_error "Gagal menginstal lolcat."
-fi
-fi
-}
+
+# --- Display Banner Function ---
 function display_banner() {
-clear
-echo -e "${BLUE}╔═════════════════════════════════════════════════════╗${NC}"
+    clear
+    echo -e "${BLUE}╔═════════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║${GREEN}       ____ _____ _____      ______  _   _          ${BLUE} ║${NC}"
 echo -e "${BLUE}║${GREEN}      / ___| ____/ _ \ \    / /  _ \| \ | |         ${BLUE} ║${NC}"
 echo -e "${BLUE}║${GREEN}     | |  _|  _|| | | \ \  / /| |_) |  \| |         ${BLUE} ║${NC}"
@@ -102,44 +97,57 @@ echo -e "${BLUE}║${NC}             ${YELLOW}MULTIPORT VPN SCRIPT V3.1${NC}    
 echo -e "${BLUE}║${NC}                   ${CYAN}WWW.GEOVPN.COM${NC}                   ${BLUE} ║${NC}"
 echo -e "${BLUE}║${NC}   TELEGRAM CH ${GREEN}@testikuy_mang${NC} ADMIN ${GREEN}@sampiiiiu${NC}      ${BLUE} ║${NC}"
 echo -e "${BLUE}╚═════════════════════════════════════════════════════╝${NC}"
-echo -e ""
-}
-function show_whiptail_progress() {
-local phases=(
-'    TELEGRAM : @sampiiiiu'
-'    CHANNEL : @testikuy_mang'
-'    WhatsApp : 082339191527'
-)
-if ! command -v whiptail &>/dev/null; then
-print_error "Paket 'whiptail' tidak ditemukan. Progress bar tidak akan ditampilkan."
-sleep 2
-return
-fi
-for i in $(seq 1 100); do
-sleep 0.05
-if [ "$i" -eq 100 ]; then
-echo -e "XXX\n100\n${GREEN}Selesai!${NC}\nXXX"
-elif [ $((i % 25)) -eq 0 ]; then
-local phase=$((i / 25 - 1))
-echo -e "XXX\n$i\n${phases[$phase]}\nXXX"
-else
-echo "$i"
-fi
-done | whiptail --title "SCRIPT By GEO PROJECT" --gauge "Memuat modul instalasi..." 8 50 0
-clear
+    echo -e ""
 }
 
-function installer() {
-display_banner
+# --- Whiptail Progress Bar Function ---
+function show_whiptail_progress() {
+    local phases=(
+        '    TELEGRAM : @sampiiiiu'
+        '    CHANNEL : @testikuy_mang'
+        '    WhatsApp : 082339191527'
+    )
+    if ! command -v whiptail &>/dev/null; then
+        print_error "Paket 'whiptail' tidak ditemukan. Progress bar tidak akan ditampilkan."
+        sleep 2
+        return
+    fi
+
+    # Use a loop for the progress bar
+    for i in $(seq 1 100); do
+        sleep 0.05 # Control speed of progress bar
+
+        # Update message at certain intervals
+        if [ "$i" -eq 100 ]; then
+            echo -e "XXX\n100\n${GREEN}Selesai!${NC}\nXXX"
+        elif [ $((i % 25)) -eq 0 ]; then
+            local phase_index=$((i / 25 - 1))
+            # Ensure index is within bounds of the phases array
+            if [ "$phase_index" -ge 0 ] && [ "$phase_index" -lt ${#phases[@]} ]; then
+                echo -e "XXX\n$i\n${phases[$phase_index]}\nXXX"
+            else
+                echo "$i" # Fallback if index out of range
+            fi
+        else
+            echo "$i" # Just print progress percentage
+        fi
+    done | whiptail --title "SCRIPT By GEO PROJECT" --gauge "Memuat modul instalasi..." 8 50 0
     clear
+}
+
+# --- Main Installer Function ---
+function installer_main() {
+    display_banner # Display the main banner
+
+    clear # Clear after banner for menu display
     echo -e " ${BLUE}        ┌────────────────────────────────────┐${NC}"
     echo -e " ${BLUE}        │${NC}${GREEN}\033[41m          INSTALLER Script          ${NC}${BLUE}│${NC}"
     echo -e " ${BLUE}        └────────────────────────────────────┘${NC}"
-    echo -e "       ${BOLD_YELLOW}OS Anda ${GREEN}$(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')${NC}"
+    echo -e "    ${BOLD_YELLOW}OS Anda ${GREEN}$(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')${NC}"
     echo -e " ${BLUE}┌────────────────────────────────────┐${NC}"
-    echo -e " ${BLUE}│${NC}[${GREEN}01${NC}] INSTALLER SCRIPT ( ${GREEN}Metode Lisensi Otomatis${NC}"
-    echo -e " ${BLUE}│${NC}[${GREEN}02${NC}] INSTALLER SCRIPT ( ${GREEN}Metode Tambah IP${NC}"
-    echo -e " ${BLUE}│${NC}${GREEN}Daftar Manual Admin ${NC}"
+    echo -e " ${BLUE}│${NC}[${GREEN}01${NC}] INSTALLER SCRIPT (${GREEN} Metode Lisensi Otomatis ${NC})${BLUE}│${NC}"
+    echo -e " ${BLUE}│${NC}[${GREEN}02${NC}] INSTALLER SCRIPT (${GREEN} Metode Tambah IP ${NC}   )${BLUE}│${NC}"
+    echo -e " ${BLUE}│${NC}     ${GREEN}Daftar Manual Admin ${NC}            ${BLUE}│${NC}"
     echo -e " ${BLUE}└────────────────────────────────────┘${NC}"
     echo ""
     read -p "Pilih [ 1 - 2 ] : " menu
@@ -147,15 +155,21 @@ display_banner
     case $menu in
         1 | 01)
             clear
-            wget https://geoproject.biz.id/installer/sc && bash sc
+            # Assuming 'sc' is meant to be a script, it should be executable.
+            # Adding -O sc to ensure file is saved as 'sc'
+            wget https://geoproject.biz.id/installer/sc -O sc && chmod +x sc && bash sc
             ;;
         2 | 02)
             clear
+            # Disable IPv6
             sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1
+            # Update and install base packages
             apt update && apt upgrade -y
             apt install -y bzip2 gzip coreutils screen curl unzip
+            # Install additional specific packages
             apt install -y lolcat dropbear build-essential msmtp-mta ca-certificates bsd-mailx
-            wget https://jaka2m.github.io/project/menu2/sc2.sh && chmod +x sc2.sh && screen -S sc2 ./sc2.sh
+            # Download, make executable, and run sc2.sh in a screen session
+            wget https://jaka2m.github.io/project/menu2/sc2.sh -O sc2.sh && chmod +x sc2.sh && screen -S sc2 ./sc2.sh
             ;;
         *)
             echo -e "${RED}[ERROR]${NC} Pilihan tidak valid. Silakan pilih 1 atau 2."
@@ -163,10 +177,9 @@ display_banner
             ;;
     esac
 
-    if command -v print_success &> /dev/null; then
-        print_success "Pemasangan Script pada $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g') selesai."
-    else
-        echo -e "${GREEN}Pemasangan Script pada $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g') selesai.${NC}"
-    fi
+    # Display final success message
+    print_success "Pemasangan Script pada $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g') selesai."
 }
-Installer
+
+# --- Execute Main Installer Function ---
+installer_main
