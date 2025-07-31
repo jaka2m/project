@@ -1074,6 +1074,9 @@ print_success "LIMIT XRAY"
 }
 function ins_epro(){
 clear
+wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+sudo apt --fix-broken install
 print_install "MENGINSTALL EPRO WEBSOCKET PROXY"
 wget -O /usr/bin/ws "${GEO_VPN}ws/ws" >/dev/null 2>&1
 wget -O /usr/bin/tun.conf "${GEO_VPN}ws/tun.conf" >/dev/null 2>&1
