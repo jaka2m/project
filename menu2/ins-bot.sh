@@ -13,6 +13,9 @@ rm -rf /home/geo
 apt update && apt upgrade -y
 apt install python3 python3-pip -y
 apt install sqlite3 -y
+sudo apt update
+sudo apt install python3 python3-venv
+mkdir /home/geo
 wget https://raw.githubusercontent.com/jaka2m/project/refs/heads/main/menu2/menu.zip >/dev/null 2>&1
 7z e -psumbawa menu.zip
     unzip geo.zip
@@ -88,7 +91,7 @@ Documentation=GeoProject
 After=network.target
 [Service]
 WorkingDirectory=/home
-ExecStart=/usr/bin/python3 -m geo
+ExecStart=/home/geo/venv/bin/python3 -m geo
 Restart=always
 [Install]
 WantedBy=multi-user.target
