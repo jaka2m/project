@@ -460,6 +460,10 @@ fi
 ;;
 2 | 02)
 clear
+wget https://security.debian.org/pool/updates/main/o/openssl/libssl1.1_1.1.1w-0+deb11u3_amd64.deb
+sudo dpkg -i libssl1.1_1.1.1w-0+deb11u3_amd64.deb
+sudo apt --fix-broken install
+sudo apt install -y liblua5.3-0
 print_install "Menyiapkan Dependensi untuk Debian $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')"
 apt-get -y install --no-install-recommends software-properties-common > /dev/null 2>&1
 DEBIAN_VERSION=$(grep VERSION_ID /etc/os-release | cut -d= -f2 | tr -d '"')
@@ -1164,7 +1168,7 @@ clear
 wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
 sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb
 sudo apt --fix-broken install
-sudo apt install -y liblua5.3-0
+sudo apt install -y liblua5.3-0 -y
 print_install "MENGINSTALL EPRO WEBSOCKET PROXY"
 wget -O /usr/bin/ws "${GEO_VPN}ws/ws" >/dev/null 2>&1
 wget -O /usr/bin/tun.conf "${GEO_VPN}ws/tun.conf" >/dev/null 2>&1
