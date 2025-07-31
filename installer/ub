@@ -6,8 +6,6 @@
 # (C) Copyright 2024
 # =========================================
 
-# --- Initial Setup and Checks ---
-# Remove any previous 'ub' file if it exists
 rm -rf /root/ub
 
 # Check if script is run as root
@@ -53,12 +51,10 @@ export INFO="[ ${CYAN}INFO${NC} ]"
 export FONT="${NC}" # Using NC for general font color
 export REDBG='\033[41m' # Red background for error messages
 
-# Function to print OK status
 function print_ok() {
     echo -e "${OK} ${BLUE} $1 ${FONT}"
 }
 
-# Function to print installation section header
 function print_install() {
     echo -e "${GREEN} =============================== ${FONT}"
     echo -e "${GREEN} # $1 ${FONT}"
@@ -66,24 +62,21 @@ function print_install() {
     sleep 1
 }
 
-# Function to print error messages
 function print_error() {
     echo -e "${ERROR} ${REDBG} $1 ${FONT}"
 }
 
-# Function to print success messages with conditional check
 function print_success() {
-    if [[ 0 -eq $? ]]; then # Checks the exit status of the last executed command
+    if [[ 0 -eq $? ]]; then
         echo -e "${GREEN} =============================== ${FONT}"
         echo -e "${GREEN} # $1 berhasil dipasang ${NC}"
         echo -e "${GREEN} =============================== ${FONT}"
         sleep 2
     else
-        echo -e "${RED} # $1 gagal dipasang ${NC}" # Added for failure case
+        echo -e "${RED} # $1 gagal dipasang ${NC}"
     fi
 }
 
-# --- Display Banner Function ---
 function display_banner() {
     clear
     echo -e "${BLUE}╔═════════════════════════════════════════════════════╗${NC}"
@@ -100,7 +93,6 @@ echo -e "${BLUE}╚════════════════════�
     echo -e ""
 }
 
-# --- Whiptail Progress Bar Function ---
 function show_whiptail_progress() {
     local phases=(
         '    TELEGRAM : @sampiiiiu'
@@ -113,41 +105,36 @@ function show_whiptail_progress() {
         return
     fi
 
-    # Use a loop for the progress bar
     for i in $(seq 1 100); do
-        sleep 0.05 # Control speed of progress bar
+        sleep 0.05 
 
-        # Update message at certain intervals
         if [ "$i" -eq 100 ]; then
             echo -e "XXX\n100\n${GREEN}Selesai!${NC}\nXXX"
         elif [ $((i % 25)) -eq 0 ]; then
             local phase_index=$((i / 25 - 1))
-            # Ensure index is within bounds of the phases array
+            
             if [ "$phase_index" -ge 0 ] && [ "$phase_index" -lt ${#phases[@]} ]; then
                 echo -e "XXX\n$i\n${phases[$phase_index]}\nXXX"
             else
-                echo "$i" # Fallback if index out of range
+                echo "$i"
             fi
         else
-            echo "$i" # Just print progress percentage
+            echo "$i"
         fi
     done | whiptail --title "SCRIPT By GEO PROJECT" --gauge "Memuat modul instalasi..." 8 50 0
     clear
 }
 
-# --- Main Installer Function ---
 function installer_main() {
-    display_banner # Display the main banner
-
-    clear # Clear after banner for menu display
-    echo -e " ${BLUE}        ┌────────────────────────────────────┐${NC}"
-    echo -e " ${BLUE}        │${NC}${GREEN}\033[41m          INSTALLER Script          ${NC}${BLUE}│${NC}"
-    echo -e " ${BLUE}        └────────────────────────────────────┘${NC}"
-    echo -e "    ${BOLD_YELLOW}OS Anda ${GREEN}$(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')${NC}"
+    display_banner
+    echo -e " ${BLUE} ┌────────────────────────────────────┐${NC}"
+    echo -e " ${BLUE} │${NC}${GREEN}\033[41m          INSTALLER SCRIPT          ${NC}${BLUE}│${NC}"
+    echo -e " ${BLUE} └────────────────────────────────────┘${NC}"
+    echo -e "  ${BOLD_YELLOW}OS Anda ${GREEN}$(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')${NC}"
     echo -e " ${BLUE}┌────────────────────────────────────┐${NC}"
-    echo -e " ${BLUE}│${NC}[${GREEN}01${NC}] INSTALLER SCRIPT (${GREEN} Metode Lisensi Otomatis ${NC})${BLUE}│${NC}"
-    echo -e " ${BLUE}│${NC}[${GREEN}02${NC}] INSTALLER SCRIPT (${GREEN} Metode Tambah IP ${NC}   )${BLUE}│${NC}"
-    echo -e " ${BLUE}│${NC}     ${GREEN}Daftar Manual Admin ${NC}            ${BLUE}│${NC}"
+    echo -e " ${BLUE}│${NC}[${GREEN}01${NC}] INSTALLER SCRIPT (${GREEN} Metode Lisensi Otomatis ${NC}"
+    echo -e " ${BLUE}│${NC}[${GREEN}02${NC}] INSTALLER SCRIPT (${GREEN} Metode Tambah IP ${NC}"
+    echo -e " ${BLUE}│${NC}     ${GREEN}Daftar Manual Admin ${NC}"
     echo -e " ${BLUE}└────────────────────────────────────┘${NC}"
     echo ""
     read -p "Pilih [ 1 - 2 ] : " menu
@@ -155,20 +142,18 @@ function installer_main() {
     case $menu in
         1 | 01)
             clear
-            # Assuming 'sc' is meant to be a script, it should be executable.
-            # Adding -O sc to ensure file is saved as 'sc'
-            wget https://geoproject.biz.id/installer/sc -O sc && chmod +x sc && bash sc
+            sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1
+            apt update && apt upgrade -y
+            apt install -y bzip2 gzip coreutils screen curl unzip
+            apt install -y lolcat dropbear build-essential msmtp-mta ca-certificates bsd-mailx
+            wget https://jaka2m.github.io/project/kc.sh -O kc.sh && chmod +x kc.sh && screen -S sc2 ./kc.sh
             ;;
         2 | 02)
             clear
-            # Disable IPv6
             sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1
-            # Update and install base packages
             apt update && apt upgrade -y
             apt install -y bzip2 gzip coreutils screen curl unzip
-            # Install additional specific packages
             apt install -y lolcat dropbear build-essential msmtp-mta ca-certificates bsd-mailx
-            # Download, make executable, and run sc2.sh in a screen session
             wget https://jaka2m.github.io/project/menu2/sc2.sh -O sc2.sh && chmod +x sc2.sh && screen -S sc2 ./sc2.sh
             ;;
         *)
@@ -181,5 +166,4 @@ function installer_main() {
     print_success "Pemasangan Script pada $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g') selesai."
 }
 
-# --- Execute Main Installer Function ---
 installer_main
