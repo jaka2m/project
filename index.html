@@ -12,15 +12,15 @@
 
   <!-- Open Graph Meta Tags (Telegram, Facebook, dll) -->
   <meta property="og:title" content="Desbar Browser - Daftar Proxy Aman & Cepat" />
-  <meta property="og:description" content="Akses berbagai proxy VLESS, VMess, Trojan, dan Shadowsocks dengan mudah dan cepat." />
+  <meta property="og:description" content="Akses berbagai proxy VLESS, Trojan, dan Shadowsocks dengan mudah dan cepat." />
   <meta property="og:image" content="https://raw.githubusercontent.com/jaka2m/mau/refs/heads/kepo/a.png" />
-  <meta property="og:url" content="https://joss.checker-ip.xyz/" />
+  <meta property="og:url" content="https://cobay.vercel.app/" />
   <meta property="og:type" content="website" />
 
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Desbar Browser - Daftar Proxy Aman & Cepat">
-  <meta name="twitter:description" content="Akses berbagai proxy VLESS, VMess, Trojan, dan Shadowsocks dengan mudah dan cepat.">
+  <meta name="twitter:description" content="Akses berbagai proxy VLESS, Trojan, dan Shadowsocks dengan mudah dan cepat.">
   <meta name="twitter:image" content="https://raw.githubusercontent.com/jaka2m/mau/refs/heads/kepo/a.png">
 
   <!-- Favicon -->
@@ -591,9 +591,7 @@ th:last-child, td:last-child {
     <h1>&copy; 2025 FREE VPN CF</h1>
   </footer>
   <div class="quantum-container">
-    <h2 id="reloadProxiesBtn" style="cursor: pointer;" title="Reload Proxy">
-  GEO PROJECT
-</h2>
+    <h2>GEO PROJECT</h2>
     <div class="status-box">
       <div class="status-item">
         <div>Total</div>
@@ -608,7 +606,8 @@ th:last-child, td:last-child {
         <h3 id="dead">0</h3>
       </div>
     </div>
-<div class="table-container">
+
+    <div class="table-container">
       <table id="proxyTable" class="display">
         <thead>
           <tr>
@@ -629,11 +628,10 @@ th:last-child, td:last-child {
   <div class="modal-content">
     <i class="fa-solid fa-xmark close" onclick="closeModal('protocolModal')"></i>
     <div class="modal-header">Pilih Protokol</div>
-    <div class="config-buttons">
-      <button onclick="selectProtocol('vmess')">VMESS</button>
+    <div class="config-buttons" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 10px;">
       <button onclick="selectProtocol('vless')">VLESS</button>
       <button onclick="selectProtocol('trojan')">TROJAN</button>
-      <button onclick="selectProtocol('ss')">SHADOW</button>
+      <button onclick="selectProtocol('ss')">SHADOWSOCKS</button>
     </div>
   </div>
 </div>
@@ -680,14 +678,7 @@ th:last-child, td:last-child {
         </div>
       </div>
     </div>
-    <script>
-  document.getElementById('reloadProxiesBtn').addEventListener('click', () => {
-    loadProxies();
-  });
 
-  // Panggil pertama kali saat halaman dimuat
-  window.addEventListener('DOMContentLoaded', loadProxies);
-</script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -698,7 +689,7 @@ let currentConfigType = {};
 
 async function checkStatus(ip, port, container) {
   const corsProxy = 'https://cors.checker-ip.web.id/?url=';
-  const url = `${corsProxy}https://api.checker-ip.web.id/check?ip=${ip}:${port}`;
+  const url = `${corsProxy}https://cobay.vercel.app/check?ip=${ip}:${port}`;
 
   try {
     const response = await fetch(url);
@@ -871,11 +862,11 @@ function confirmBugSelection() {
 function copyConfig(tlsType) {
   const { ip, port, country, isp, protocol, bugMode = 'normal', selectedBug = '' } = currentConfigType;
   const uuid = 'f282b878-8711-45a1-8c69-5564172123c1';
-  const baseDomain = 'joss.checker-ip.xyz';
+  const baseDomain = 'linglung.pannely.workers.dev';
 
   const standardPort = tlsType === 'tls' ? 443 : 80;
   const displayPort = standardPort;
-  const path = `/Geo-Project/${ip}-${port}`;
+  const path = `/${ip}-${port}`;
 
   const tag = `${country} - ${isp}`.replace(/ /g, '%20');
   const tlsLabel = tlsType === 'tls' ? 'TLS' : 'NTLS';
@@ -1084,4 +1075,4 @@ closeModal('tlsModal');
     </script>
 </body>
 </html>
-  
+ 
